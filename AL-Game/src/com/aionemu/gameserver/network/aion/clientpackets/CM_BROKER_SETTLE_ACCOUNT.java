@@ -17,18 +17,20 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.services.BrokerService;
+import com.aionemu.gameserver.utils.MathUtil;
 
 /**
  * @author kosyachok
  */
 public class CM_BROKER_SETTLE_ACCOUNT extends AionClientPacket {
 
-	@SuppressWarnings("unused")
-	private int npcId;
+	private int npcObjId;
 
 	public CM_BROKER_SETTLE_ACCOUNT(int opcode, State state, State... restStates) {
 		super(opcode, state, restStates);
@@ -36,13 +38,16 @@ public class CM_BROKER_SETTLE_ACCOUNT extends AionClientPacket {
 
 	@Override
 	protected void readImpl() {
-		this.npcId = readD();
+		this.npcObjId = readD();
 	}
 
 	@Override
 	protected void runImpl() {
 		Player player = getConnection().getActivePlayer();
+		VisibleObject obj = player.getKnownList().getObject(npcObjId);
 
-		BrokerService.getInstance().settleAccount(player);
+		if (obj != null && obj instanceof Npc && MathUtil.isInRange(player, obj, 6)) {
+			BrokerService.getInstance().settleAccount(player);
+		}
 	}
 }

@@ -50,10 +50,13 @@ public class NpcLifeStats extends CreatureLifeStats<Npc> {
 	}
 
 	@Override
+	protected void onReduceMp(TYPE type, int value, int skillId, LOG log) {
+		sendAttackStatusPacketUpdate(type, value, skillId, log);
+	}
+	@Override
 	protected void onReduceMp() {
 		// nothing todo
 	}
-
 	@Override
 	public void triggerRestoreTask() {
 		restoreLock.lock();

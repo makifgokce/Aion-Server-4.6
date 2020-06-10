@@ -23,18 +23,27 @@ import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aionemu.gameserver.GameServer;
+import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.configs.main.GSConfig;
+import com.aionemu.gameserver.dao.BlockListDAO;
+import com.aionemu.gameserver.dao.FriendListDAO;
+import com.aionemu.gameserver.dao.FriendRequestListDAO;
+import com.aionemu.gameserver.dao.PlayerSettingsDAO;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.dataholders.StaticData;
 import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.Gender;
 import com.aionemu.gameserver.model.PlayerClass;
 import com.aionemu.gameserver.model.Race;
+import com.aionemu.gameserver.model.gameobjects.player.FriendList.Status;
 import com.aionemu.gameserver.model.templates.BoundRadius;
 import com.aionemu.gameserver.model.templates.VisibleObjectTemplate;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_DP_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_STATS_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_STATUPDATE_DP;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_STATUPDATE_EXP;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.stats.XPLossEnum;
 import com.aionemu.gameserver.world.World;
@@ -57,6 +66,11 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	private Race race;
 	private String name;
 	private PlayerClass playerClass;
+
+	private FriendList friendList = DAOManager.getDAO(FriendListDAO.class).load(this);
+	private FriendRequestList friendRequestList = DAOManager.getDAO(FriendRequestListDAO.class).load(this);
+	private BlockList blockList = DAOManager.getDAO(BlockListDAO.class).load(this);
+	private PlayerSettings playerSettings = DAOManager.getDAO(PlayerSettingsDAO.class).load(this);
 	/**
 	 * Should be changed right after character creation *
 	 */
@@ -71,7 +85,10 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	private WorldPosition position;
 	private int questExpands = 0;
 	private int npcExpands = 0;
-	private int warehouseSize = 0;
+	private int itemExpands = 0;
+	private int warehouseNpcExpands = 0;
+	private int warehouseQuestExpands = 0;
+	private int warehouseItemExpands = 0;
 	private int AdvancedStigmaSlotSize = 0;
 	private int titleId = -1;
 	private int bonusTitleId = -1;
@@ -90,6 +107,8 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	private long lastTransferTime;
 	public int battleGroundPoints = 0;
 	private int initialGameStatsDatabase = 0;
+	public int serverId;
+	public int responseRate;
 
 	// TODO: Move all function to playerService or Player class.
 	public PlayerCommonData(int objId) {
@@ -120,6 +139,13 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 		return npcExpands;
 	}
 
+	public void setItemExpands(int itemExpands) {
+		this.itemExpands = itemExpands;
+	}
+
+	public int getItemExpands() {
+		return itemExpands;
+	}
 	/**
 	 * @return the AdvancedStigmaSlotSize
 	 */
@@ -141,7 +167,7 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 
 	public long getExpNeed() {
 		if (this.level == DataManager.PLAYER_EXPERIENCE_TABLE.getMaxLevel()) {
-			return 0;
+			return 584561235;
 		}
 		return DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(this.level + 1) - DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(this.level);
 	}
@@ -227,7 +253,7 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 
 		long repose = 0;
 		if (this.isReadyForReposteEnergy() && this.getCurrentReposteEnergy() > 0) {
-			repose = (long) ((reward / 100f) * 40); // 40% bonus
+			repose = (long) ((reward / 100f) * getResponseRate()); // 40% bonus
 			this.addReposteEnergy(-repose);
 		}
 
@@ -361,7 +387,7 @@ public class PlayerCommonData extends VisibleObjectTemplate {
             reposteCurrent = 0;
             reposteMax = 0;
         } else {
-            reposteMax = (long) (getExpNeed() * 0.25f); // Retail 99%
+            reposteMax = (long) (getExpNeed() * 0.02f); // Retail 99%
         }
     }
 
@@ -403,50 +429,42 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	 *
 	 * @param exp
 	 */
-	public void setExp(long exp) {
-		// maxLevel is 66 but in game 65 should be shown with full XP bar
-		int maxLevel = DataManager.PLAYER_EXPERIENCE_TABLE.getMaxLevel();
+    public void setExp(long exp) {
+        // maxLevel is 66 but in game 65 should be shown with full XP bar
+        int maxLevel = DataManager.PLAYER_EXPERIENCE_TABLE.getMaxLevel();
 
-		if (getPlayerClass() != null && getPlayerClass().isStartingClass())
-			maxLevel = GSConfig.STARTING_LEVEL > GSConfig.STARTCLASS_MAXLEVEL ? GSConfig.STARTING_LEVEL : GSConfig.STARTCLASS_MAXLEVEL;
+        if (getPlayerClass() != null && getPlayerClass().isStartingClass())
+            maxLevel = GSConfig.STARTING_LEVEL > GSConfig.STARTCLASS_MAXLEVEL ? GSConfig.STARTING_LEVEL : GSConfig.STARTCLASS_MAXLEVEL;
 
-		long maxExp = DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(maxLevel);
+        long maxExp = DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(maxLevel);
 
-		if (exp > maxExp)
-			exp = maxExp;
+        if (exp > maxExp)
+            exp = maxExp;
 
-		int oldLvl = this.level;
-		this.exp = exp;
-		// make sure level is never larger than maxLevel-1
-		boolean up = false;
-		while ((this.level + 1) < maxLevel && (up = exp >= DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(this.level + 1)) || (this.level - 1) >= 0
-				&& exp < DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(this.level)) {
-			if (up) {
-				this.level++;
-			} else {
-				this.level--;
-			}
+        int oldLvl = this.level;
+        this.exp = exp;
+        // make sure level is never larger than maxLevel-1
+        boolean up = false;
+        while ((this.level + 1) < maxLevel
+                && (up = exp >= DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(this.level + 1)) || (this.level - 1) >= 0
+                && exp < DataManager.PLAYER_EXPERIENCE_TABLE.getStartExpForLevel(this.level)) {
+            if (up) {
+                this.level++;
+            } else {
+                this.level--;
+            }
 
-			upgradePlayerData();
-		}
+            upgradePlayerData();
+        }
 
-		if (this.getPlayer() != null) {
-			if (up && GSConfig.ENABLE_RATIO_LIMITATION) {
-				if (this.level >= GSConfig.RATIO_MIN_REQUIRED_LEVEL && getPlayer().getPlayerAccount().getNumberOf(getRace()) == 1) {
-					GameServer.updateRatio(getRace(), 1);
-				}
+        if (this.getPlayer() != null) {
+            if (oldLvl != level) {
+                updateMaxReposte();
+            }
 
-				if (this.level >= GSConfig.RATIO_MIN_REQUIRED_LEVEL && getPlayer().getPlayerAccount().getNumberOf(getRace()) == 1) {
-					GameServer.updateRatio(getRace(), -1);
-				}
-			}
-			if (oldLvl != level) {
-				updateMaxReposte();
-			}
-
-		PacketSendUtility.sendPacket(this.getPlayer(), new SM_STATUPDATE_EXP(getExpShown(), getExpRecoverable(), getExpNeed(), this.getCurrentReposteEnergy(), this.getMaxReposteEnergy(), this.getCurrentEventExp()));
-		}
-	}
+            PacketSendUtility.sendPacket(this.getPlayer(), new SM_STATUPDATE_EXP(getExpShown(), getExpRecoverable(), getExpNeed(), this.getCurrentReposteEnergy(), this.getMaxReposteEnergy(), this.getCurrentEventExp()));
+        }
+    }
 
 	private void upgradePlayerData() {
 		Player player = getPlayer();
@@ -469,6 +487,10 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	 */
 	public final Race getRace() {
 		return race;
+	}
+
+	public int getRaceId() {
+		return race.getRaceId();
 	}
 
 	public Race getOppositeRace() {
@@ -641,20 +663,44 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 	}
 
 	/**
-	 * @param warehouseSize
-	 *            the warehouseSize to set
+	 * @param warehouseNpcExpands
 	 */
-	public void setWarehouseSize(int warehouseSize) {
-		this.warehouseSize = warehouseSize;
+	public void setWarehouseNpcExpands(int warehouseNpcExpands) {
+		this.warehouseNpcExpands = warehouseNpcExpands;
 	}
 
 	/**
-	 * @return the warehouseSize
+	 * @return warehouseNpcExpands
 	 */
-	public int getWarehouseSize() {
-		return warehouseSize;
+	public int getWarehouseNpcExpands() {
+		return warehouseNpcExpands;
+	}
+	/**
+	 * @param warehouseQuestExpands
+	 */
+	public void setWarehouseQuestExpands(int warehouseQuestExpands) {
+		this.warehouseQuestExpands = warehouseQuestExpands;
 	}
 
+	/**
+	 * @return warehouseQuestExpands
+	 */
+	public int getWarehouseQuestExpands() {
+		return warehouseQuestExpands;
+	}
+	/**
+	 * @param warehouseItemExpands
+	 */
+	public void setWarehouseItemExpands(int warehouseItemExpands) {
+		this.warehouseItemExpands = warehouseItemExpands;
+	}
+
+	/**
+	 * @return the warehouseItemExpands
+	 */
+	public int getWarehouseItemExpands() {
+		return warehouseItemExpands;
+	}
 	public void setMailboxLetters(int count) {
 		this.mailboxLetters = count;
 	}
@@ -754,5 +800,84 @@ public class PlayerCommonData extends VisibleObjectTemplate {
 
 	public void setInitialGameStats(int initialGameStats) {
 		this.initialGameStatsDatabase = initialGameStats;
+	}
+	/**
+	 * Gets this players Friend List
+	 *
+	 * @return FriendList
+	 */
+	public FriendList getFriendList() {
+		return friendList;
+	}
+
+	public FriendRequestList getFriendRequestList() {
+		return friendRequestList;
+	}
+	/**
+	 * Sets this players friend list. <br />
+	 * Remember to send the player the <tt>SM_FRIEND_LIST</tt> packet.
+	 *
+	 * @param list
+	 */
+	public void setFriendList(FriendList list) {
+		this.friendList = list;
+	}
+
+	public BlockList getBlockList() {
+		return blockList;
+	}
+
+	public void setBlockList(BlockList list) {
+		this.blockList = list;
+	}
+
+	public void onLoggedIn() {
+		friendList.setStatus(Status.ONLINE, this);
+	}
+
+	public void onLoggedOut() {
+		this.getPlayer().onLoggedOut();;
+		friendList.setStatus(FriendList.Status.OFFLINE, this);
+	}
+
+	public void setFriendRequestList(FriendRequestList list) {
+		this.friendRequestList = list;
+	}
+
+	/**
+	 * @return the playerSettings
+	 */
+	public PlayerSettings getPlayerSettings() {
+		return playerSettings;
+	}
+
+	/**
+	 * @param playerSettings
+	 *            the playerSettings to set
+	 */
+	public void setPlayerSettings(PlayerSettings playerSettings) {
+		this.playerSettings = playerSettings;
+	}
+
+	/**
+	 * @return serverId
+	 */
+	public int getServerId() {
+		return this.serverId;
+	}
+
+	/**
+	 * @param serverId
+	 */
+	public void setServerId(int serverId) {
+		this.serverId = serverId;
+	}
+
+	public int getResponseRate() {
+		return this.responseRate;
+	}
+
+	public void setResponseRate(int responseRate) {
+		this.responseRate = responseRate;
 	}
 }

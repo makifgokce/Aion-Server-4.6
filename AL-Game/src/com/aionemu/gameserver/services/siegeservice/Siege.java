@@ -10,12 +10,31 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.services.siegeservice;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.callbacks.EnhancedObject;
 import com.aionemu.gameserver.ai2.AbstractAI;
@@ -32,221 +51,216 @@ import com.aionemu.gameserver.model.templates.npc.AbyssNpcType;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SIEGE_LOCATION_STATE;
 import com.aionemu.gameserver.services.SiegeService;
 import com.aionemu.gameserver.world.World;
-import java.util.Collection;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author SoulKeeper, Source
  */
 public abstract class Siege<SL extends SiegeLocation> {
 
-	private static final Logger log = LoggerFactory.getLogger(Siege.class);
-	private final SiegeBossDeathListener siegeBossDeathListener = new SiegeBossDeathListener(this);
-	private final SiegeBossDoAddDamageListener siegeBossDoAddDamageListener = new SiegeBossDoAddDamageListener(this);
-	private final AtomicBoolean finished = new AtomicBoolean();
-	private final SiegeCounter siegeCounter = new SiegeCounter();
-	private final SL siegeLocation;
-	private boolean bossKilled;
-	private SiegeNpc boss;
-	private Date startTime;
-	private boolean started;
+    private static final Logger log = LoggerFactory.getLogger(Siege.class);
+    private final SiegeBossDeathListener siegeBossDeathListener = new SiegeBossDeathListener(this);
+    private final SiegeBossDoAddDamageListener siegeBossDoAddDamageListener = new SiegeBossDoAddDamageListener(this);
+    private final AtomicBoolean finished = new AtomicBoolean();
+    private final SiegeCounter siegeCounter = new SiegeCounter();
+    private final SL siegeLocation;
+    private boolean bossKilled;
+    private SiegeNpc boss;
+    private Date startTime;
+    private boolean started;
 
-	public Siege(SL siegeLocation) {
-		this.siegeLocation = siegeLocation;
-	}
+    public Siege(SL siegeLocation) {
+        this.siegeLocation = siegeLocation;
+    }
 
-	public final void startSiege() {
+    public final void startSiege() {
 
-		boolean doubleStart = false;
+        boolean doubleStart = false;
 
-		// keeping synchronization as minimal as possible
-		synchronized (this) {
-			if (started) {
-				doubleStart = true;
-			} else {
-				startTime = new Date();
-				started = true;
-			}
-		}
+        // keeping synchronization as minimal as possible
+        synchronized (this) {
+            if (started) {
+                doubleStart = true;
+            } else {
+                startTime = new Date();
+                started = true;
+            }
+        }
 
-		if (doubleStart) {
-			log.error("Attempt to start siege of SiegeLocation#" + siegeLocation.getLocationId() + " for 2 times");
-			return;
-		}
+        if (doubleStart) {
+            log.error("Attempt to start siege of SiegeLocation#" + siegeLocation.getLocationId() + " for 2 times");
+            return;
+        }
 
-		onSiegeStart();
-		// Check for Balaur Assault
-		if (SiegeConfig.BALAUR_AUTO_ASSAULT) {
-			BalaurAssaultService.getInstance().onSiegeStart(this);
-		}
-	}
+        onSiegeStart();
+        //Check for Balaur Assault
+        if (SiegeConfig.BALAUR_AUTO_ASSAULT) {
+            BalaurAssaultService.getInstance().onSiegeStart(this);
+        }
+    }
 
-	public final void startSiege(int locationId) {
-		SiegeService.getInstance().startSiege(locationId);
-	}
+    public final void startSiege(int locationId) {
+        SiegeService.getInstance().startSiege(locationId);
+    }
 
-	public final void stopSiege() {
-		if (finished.compareAndSet(false, true)) {
-			onSiegeFinish();
+    public final void stopSiege() {
+        if (finished.compareAndSet(false, true)) {
+            onSiegeFinish();
 
-			if (SiegeConfig.BALAUR_AUTO_ASSAULT) {
-				BalaurAssaultService.getInstance().onSiegeFinish(this);
-			}
-		} else {
-			log.error("Attempt to stop siege of SiegeLocation#" + siegeLocation.getLocationId() + " for 2 times");
-		}
-	}
+            if (SiegeConfig.BALAUR_AUTO_ASSAULT) {
+                BalaurAssaultService.getInstance().onSiegeFinish(this);
+            }
+        } else {
+            log.error("Attempt to stop siege of SiegeLocation#" + siegeLocation.getLocationId() + " for 2 times");
+        }
+    }
 
-	public SL getSiegeLocation() {
-		return siegeLocation;
-	}
+    public SL getSiegeLocation() {
+        return siegeLocation;
+    }
 
-	public int getSiegeLocationId() {
-		return siegeLocation.getLocationId();
-	}
+    public int getSiegeLocationId() {
+        return siegeLocation.getLocationId();
+    }
 
-	public boolean isBossKilled() {
-		return bossKilled;
-	}
+    public boolean isBossKilled() {
+        return bossKilled;
+    }
 
-	public void setBossKilled(boolean bossKilled) {
-		this.bossKilled = bossKilled;
-	}
+    public void setBossKilled(boolean bossKilled) {
+        this.bossKilled = bossKilled;
+    }
 
-	public SiegeNpc getBoss() {
-		return boss;
-	}
+    public SiegeNpc getBoss() {
+        return boss;
+    }
 
-	public void setBoss(SiegeNpc boss) {
-		this.boss = boss;
-	}
+    public void setBoss(SiegeNpc boss) {
+        this.boss = boss;
+    }
 
-	public SiegeBossDoAddDamageListener getSiegeBossDoAddDamageListener() {
-		return siegeBossDoAddDamageListener;
-	}
+    public SiegeBossDoAddDamageListener getSiegeBossDoAddDamageListener() {
+        return siegeBossDoAddDamageListener;
+    }
 
-	public SiegeBossDeathListener getSiegeBossDeathListener() {
-		return siegeBossDeathListener;
-	}
+    public SiegeBossDeathListener getSiegeBossDeathListener() {
+        return siegeBossDeathListener;
+    }
 
-	public SiegeCounter getSiegeCounter() {
-		return siegeCounter;
-	}
+    public SiegeCounter getSiegeCounter() {
+        return siegeCounter;
+    }
 
-	protected abstract void onSiegeStart();
+    protected abstract void onSiegeStart();
 
-	protected abstract void onSiegeFinish();
+    protected abstract void onSiegeFinish();
 
-	public void addBossDamage(Creature attacker, int damage) {
-		// We don't have to add damage anymore if siege is finished
-		if (isFinished()) {
-			return;
-		}
+    public void addBossDamage(Creature attacker, int damage) {
+        // We don't have to add damage anymore if siege is finished
+        if (isFinished()) {
+            return;
+        }
 
-		// Just to be sure that attacker exists.
-		// if don't - dunno what to do
-		if (attacker == null) {
-			return;
-		}
+        // Just to be sure that attacker exists.
+        // if don't - dunno what to do
+        if (attacker == null) {
+            return;
+        }
 
-		// Actually we don't care if damage was done from summon.
-		// We should threat all the damage like it was done from the owner
-		attacker = attacker.getMaster();
-		getSiegeCounter().addDamage(attacker, damage);
-	}
+        // Actually we don't care if damage was done from summon.
+        // We should threat all the damage like it was done from the owner
+        attacker = attacker.getMaster();
+        getSiegeCounter().addDamage(attacker, damage);
+    }
 
-	public abstract boolean isEndless();
+    public abstract boolean isEndless();
 
-	public abstract void addAbyssPoints(Player player, int abysPoints);
+    public abstract void addAbyssPoints(Player player, int abysPoints);
 
-	public abstract void addGloryPoints(Player player, int gloryPoints);
+    public abstract void addGloryPoints(Player player, int gloryPoints);
 
-	public boolean isStarted() {
-		return started;
-	}
+    public boolean isStarted() {
+        return started;
+    }
 
-	public boolean isFinished() {
-		return finished.get();
-	}
+    public boolean isFinished() {
+        return finished.get();
+    }
 
-	public Date getStartTime() {
-		return startTime;
-	}
+    public Date getStartTime() {
+        return startTime;
+    }
 
-	protected void registerSiegeBossListeners() {
-		// Add hate listener - we should know when someone attacked general
-		EnhancedObject eo = (EnhancedObject) getBoss().getAggroList();
-		eo.addCallback(getSiegeBossDoAddDamageListener());
+    protected void registerSiegeBossListeners() {
+        // Add hate listener - we should know when someone attacked general
+        EnhancedObject eo = (EnhancedObject) getBoss().getAggroList();
+        eo.addCallback(getSiegeBossDoAddDamageListener());
 
-		// Add die listener - we should stop the siege when general dies
-		AbstractAI ai = (AbstractAI) getBoss().getAi2();
-		eo = (EnhancedObject) ai;
-		eo.addCallback(getSiegeBossDeathListener());
-	}
+        // Add die listener - we should stop the siege when general dies
+        AbstractAI ai = (AbstractAI) getBoss().getAi2();
+        eo = (EnhancedObject) ai;
+        eo.addCallback(getSiegeBossDeathListener());
+    }
 
-	protected void unregisterSiegeBossListeners() {
-		// Add hate listener - we should know when someone attacked general
-		EnhancedObject eo = (EnhancedObject) getBoss().getAggroList();
-		eo.removeCallback(getSiegeBossDoAddDamageListener());
+    protected void unregisterSiegeBossListeners() {
+        // Add hate listener - we should know when someone attacked general
+        EnhancedObject eo = (EnhancedObject) getBoss().getAggroList();
+        eo.removeCallback(getSiegeBossDoAddDamageListener());
 
-		// Add die listener - we should stop the siege when general dies
-		AbstractAI ai = (AbstractAI) getBoss().getAi2();
-		eo = (EnhancedObject) ai;
-		eo.removeCallback(getSiegeBossDeathListener());
-	}
+        // Add die listener - we should stop the siege when general dies
+        AbstractAI ai = (AbstractAI) getBoss().getAi2();
+        eo = (EnhancedObject) ai;
+        eo.removeCallback(getSiegeBossDeathListener());
+    }
 
-	protected void initSiegeBoss() {
+    protected void initSiegeBoss() {
 
-		SiegeNpc boss = null;
+        SiegeNpc boss = null;
 
-		Collection<SiegeNpc> npcs = World.getInstance().getLocalSiegeNpcs(getSiegeLocationId());
-		for (SiegeNpc npc : npcs) {
-			if (npc.getObjectTemplate().getAbyssNpcType().equals(AbyssNpcType.BOSS)) {
+        Collection<SiegeNpc> npcs = World.getInstance().getLocalSiegeNpcs(getSiegeLocationId());
+        for (SiegeNpc npc : npcs) {
+            if (npc.getObjectTemplate().getAbyssNpcType().equals(AbyssNpcType.BOSS)) {
 
-				if (boss != null) {
-					throw new SiegeException("Found 2 siege bosses for outpost " + getSiegeLocationId());
-				}
+                if (boss != null) {
+                    throw new SiegeException("Found 2 siege bosses for outpost " + getSiegeLocationId() + " NPC " + npc.getNpcId());
+                }
 
-				boss = npc;
-			}
-		}
+                boss = npc;
+            }
+        }
 
-		if (boss == null) {
-			throw new SiegeException("Siege Boss not found for siege " + getSiegeLocationId());
-		}
+        if (boss == null) {
+            throw new SiegeException("Siege Boss not found for siege " + getSiegeLocationId());
+        }
 
-		setBoss(boss);
-		registerSiegeBossListeners();
-	}
+        setBoss(boss);
+        registerSiegeBossListeners();
+    }
 
-	protected void spawnNpcs(int locationId, SiegeRace race, SiegeModType type) {
-		SiegeService.getInstance().spawnNpcs(locationId, race, type);
-	}
+    protected void spawnNpcs(int locationId, SiegeRace race, SiegeModType type) {
+        SiegeService.getInstance().spawnNpcs(locationId, race, type);
+    }
 
-	protected void deSpawnNpcs(int locationId) {
-		SiegeService.getInstance().deSpawnNpcs(locationId);
-	}
+    protected void deSpawnNpcs(int locationId) {
+        SiegeService.getInstance().deSpawnNpcs(locationId);
+    }
 
-	protected void broadcastState(SiegeLocation location) {
-		SiegeService.getInstance().broadcast(new SM_SIEGE_LOCATION_STATE(location), null);
-	}
+    protected void broadcastState(SiegeLocation location) {
+        SiegeService.getInstance().broadcast(new SM_SIEGE_LOCATION_STATE(location), null);
+    }
 
-	protected void broadcastUpdate(SiegeLocation location) {
-		SiegeService.getInstance().broadcastUpdate(location);
-	}
+    protected void broadcastUpdate(SiegeLocation location) {
+        SiegeService.getInstance().broadcastUpdate(location);
+    }
 
-	protected void broadcastUpdate(SiegeLocation location, int nameId) {
-		SiegeService.getInstance().broadcastUpdate(location, new DescriptionId(nameId));
-	}
+    protected void broadcastUpdate(SiegeLocation location, int nameId) {
+        SiegeService.getInstance().broadcastUpdate(location, new DescriptionId(nameId));
+    }
 
-	protected void updateOutpostStatusByFortress(FortressLocation location) {
-		SiegeService.getInstance().updateOutpostStatusByFortress(location);
-	}
+    protected void updateOutpostStatusByFortress(FortressLocation location) {
+        SiegeService.getInstance().updateOutpostStatusByFortress(location);
+    }
 
-	protected void updateTiamarantaRiftsStatus(boolean isPreparation, boolean isSync) {
-		SiegeService.getInstance().updateTiamarantaRiftsStatus(isPreparation, isSync);
-	}
+    protected void updateTiamarantaRiftsStatus(boolean isPreparation, boolean isSync) {
+        SiegeService.getInstance().updateTiamarantaRiftsStatus(isPreparation, isSync);
+    }
 }

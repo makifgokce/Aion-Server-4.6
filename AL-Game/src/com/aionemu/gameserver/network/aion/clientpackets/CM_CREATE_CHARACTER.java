@@ -23,6 +23,7 @@ import java.util.List;
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.main.GSConfig;
 import com.aionemu.gameserver.configs.main.MembershipConfig;
+import com.aionemu.gameserver.configs.network.NetworkConfig;
 import com.aionemu.gameserver.dao.InventoryDAO;
 import com.aionemu.gameserver.model.Gender;
 import com.aionemu.gameserver.model.PlayerClass;
@@ -61,6 +62,7 @@ public class CM_CREATE_CHARACTER extends AionClientPacket {
 	private PlayerCommonData playerCommonData;
 
 	private int step;
+	private int raceValue = 0;
 
 	/**
 	 * Constructs new instance of <tt>CM_CREATE_CHARACTER </tt> packet
@@ -86,9 +88,21 @@ public class CM_CREATE_CHARACTER extends AionClientPacket {
 
 		readB(50 - (name.length() * 2)); // some shit? 2.5.x
 
-		playerCommonData.setLevel(1);
+		playerCommonData.setLevel(GSConfig.STARTING_LEVEL);
 		playerCommonData.setGender(readD() == 0 ? Gender.MALE : Gender.FEMALE);
-		playerCommonData.setRace(readD() == 0 ? Race.ELYOS : Race.ASMODIANS);
+
+		raceValue = readD();
+		switch (raceValue) {
+			case 0:
+				playerCommonData.setRace(Race.ELYOS);
+				break;
+			case 1:
+				playerCommonData.setRace(Race.ASMODIANS);
+				break;
+			case 8:
+				playerCommonData.setRace(Race.NAGA);
+				break;
+		}
 		playerCommonData.setPlayerClass(PlayerClass.getPlayerClassById((byte) readD()));
 
 		if (getConnection().getAccount().getMembership() >= MembershipConfig.STIGMA_SLOT_QUEST) {
@@ -167,6 +181,7 @@ public class CM_CREATE_CHARACTER extends AionClientPacket {
 		readC();
 		playerAppearance.setHeight(readF());
 		step = readC(); // 0x01
+		playerCommonData.setServerId(NetworkConfig.GAMESERVER_ID);
 	}
 
 	/**
@@ -177,11 +192,11 @@ public class CM_CREATE_CHARACTER extends AionClientPacket {
 		AionConnection client = getConnection();
 
 		Account account = client.getAccount();
-
 		/* Some reasons why player can' be created */
 		if (client.getActivePlayer() != null) {
 			return;
 		}
+
 		if (step == 1) {
 			client.sendPacket(new SM_CREATE_CHARACTER(null, SM_CREATE_CHARACTER.RESPONE_CREATE_READY));
 			return;
@@ -226,10 +241,19 @@ public class CM_CREATE_CHARACTER extends AionClientPacket {
 			IDFactory.getInstance().releaseId(playerCommonData.getPlayerObjId());
 			return;
 		}
+		if (account.size() > 0){
+			for (PlayerAccountData data : account.getSortedAccountsList()) {
+				if (playerCommonData.getRace().getRaceId() != data.getPlayerCommonData().getRaceId()) {
+					client.sendPacket(new SM_CREATE_CHARACTER(null, SM_CREATE_CHARACTER.RESPONSE_OTHER_RACE));
+					IDFactory.getInstance().releaseId(playerCommonData.getPlayerObjId());
+					return;
+				}
+			}
+		}
 		if (GSConfig.CHARACTER_CREATION_MODE == 0) {
 			for (PlayerAccountData data : account.getSortedAccountsList()) {
 				if (data.getPlayerCommonData().getRace() != playerCommonData.getRace()) {
-					client.sendPacket(new SM_CREATE_CHARACTER(null, SM_CREATE_CHARACTER.FAILED_TO_CREATE_THE_CHARACTER));
+					client.sendPacket(new SM_CREATE_CHARACTER(null, SM_CREATE_CHARACTER.RESPONSE_OTHER_RACE));
 					IDFactory.getInstance().releaseId(playerCommonData.getPlayerObjId());
 					return;
 				}

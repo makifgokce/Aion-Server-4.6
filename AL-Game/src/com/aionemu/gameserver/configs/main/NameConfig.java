@@ -17,19 +17,15 @@
 
 package com.aionemu.gameserver.configs.main;
 
-import com.aionemu.commons.configuration.Property;
 import java.util.regex.Pattern;
+
+import com.aionemu.commons.configuration.Property;
 
 /**
  * @author nrg
  */
 public class NameConfig {
 
-	/**
-	 * Enables custom names usage.
-	 */
-	@Property(key = "gameserver.name.allow.custom", defaultValue = "false")
-	public static boolean ALLOW_CUSTOM_NAMES;
 	/**
 	 * Character name pattern (checked when character is being created)
 	 */

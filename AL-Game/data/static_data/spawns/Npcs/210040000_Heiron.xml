@@ -536,7 +536,7 @@
 		</spawn>
 		<!-- Engraved Stone Tablet -->
 		<spawn npc_id="700217" respawn_time="295">
-			<spot x="2114.68" y="400.379" z="235.743" h="86"/>
+			<spot x="2114.68" y="400.379" z="235.743" h="86" static_id="1142"/>
 		</spawn>
 		<!-- Fallen Lapontos -->
 		<spawn npc_id="700218" respawn_time="295">

@@ -257,18 +257,18 @@ public abstract class Storage implements IStorage {
 	 * Delete item from storage and mark for DB update
 	 */
 	Item delete(Item item, ItemDeleteType deleteType, Player actor) {
-		if (remove(item) != null) {
-			item.setPersistentState(PersistentState.DELETED);
-			deletedItems.add(item);
-			setPersistentState(PersistentState.UPDATE_REQUIRED);
-			ItemPacketService.sendItemDeletePacket(actor, StorageType.getStorageTypeById(item.getItemLocation()), item, deleteType);
-			if (item.getItemTemplate().isQuestUpdateItem()) {
-				actor.getController().updateNearbyQuests();
-			}
-			return item;
-		}
-		return null;
-	}
+        if (remove(item) != null) {
+            item.setPersistentState(PersistentState.DELETED);
+            deletedItems.add(item);
+            setPersistentState(PersistentState.UPDATE_REQUIRED);
+            ItemPacketService.sendItemDeletePacket(actor, StorageType.getStorageTypeById(item.getItemLocation()), item, deleteType);
+            if (item.getItemTemplate().isQuestUpdateItem()) {
+                actor.getController().updateNearbyQuests();
+            }
+            return item;
+        }
+        return null;
+    }
 
 	boolean decreaseByItemId(int itemId, long count, Player actor) {
 		return decreaseByItemId(itemId, count, QuestStatus.NONE, actor);

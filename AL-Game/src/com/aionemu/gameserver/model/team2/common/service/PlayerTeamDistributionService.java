@@ -73,7 +73,6 @@ public class PlayerTeamDistributionService {
 		}
 
 		for (Player member : filteredStats.players) {
-			Player partner = member.findPartner();
 			// mentor and dead players shouldn't receive AP/EP/DP
 			if (member.isMentor() || member.getLifeStats().isAlreadyDead()) {
 				continue;
@@ -100,13 +99,8 @@ public class PlayerTeamDistributionService {
 			rewardDp *= damagePercent;
 			rewardAp *= damagePercent;
 
-			if (member.isMarried() && member.getPlayerGroup2().getMembers() == partner && member.getPlayerGroup2().getMembers().size() == 2) {
-				member.getCommonData().addExp(rewardXp + (rewardXp * 20 / 100), RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
-                member.getCommonData().addEventExp(rewardXp + (rewardXp * 20 / 100));
-            } else {
-                member.getCommonData().addExp(rewardXp, RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
-                member.getCommonData().addEventExp(rewardXp);
-			}
+            member.getCommonData().addExp(rewardXp, RewardType.GROUP_HUNTING, owner.getObjectTemplate().getNameId());
+            member.getCommonData().addEventExp(rewardXp);
 
 			// DP reward
 			member.getCommonData().addDp(rewardDp);

@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +70,7 @@ public class CM_CAPTCHA extends AionClientPacket {
 				word = readS();
 				break;
 			default:
-				log.warn("Unknown CAPTCHA packet type? 0x" + Integer.toHexString(type).toUpperCase());
+				log.warn("Unknown CAPTCHA packet type? 0x" + Integer.toHexString(type).toUpperCase(Locale.forLanguageTag("en")));
 				break;
 		}
 	}

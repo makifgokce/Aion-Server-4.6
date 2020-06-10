@@ -10,11 +10,23 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.services.siegeservice;
 
 import com.aionemu.gameserver.ai2.AbstractAI;
@@ -24,19 +36,19 @@ import com.aionemu.gameserver.services.SiegeService;
 @SuppressWarnings("rawtypes")
 public class SiegeBossDeathListener extends OnDieEventCallback {
 
-	private final Siege<?> siege;
+    private final Siege<?> siege;
 
-	public SiegeBossDeathListener(Siege siege) {
-		this.siege = siege;
-	}
+    public SiegeBossDeathListener(Siege siege) {
+        this.siege = siege;
+    }
 
-	@Override
-	public void onBeforeDie(AbstractAI obj) {
-	}
+    @Override
+    public void onBeforeDie(AbstractAI obj) {
+    }
 
-	@Override
-	public void onAfterDie(AbstractAI obj) {
-		siege.setBossKilled(true);
-		SiegeService.getInstance().stopSiege(siege.getSiegeLocationId());
-	}
+    @Override
+    public void onAfterDie(AbstractAI obj) {
+        siege.setBossKilled(true);
+        SiegeService.getInstance().stopSiege(siege.getSiegeLocationId());
+    }
 }

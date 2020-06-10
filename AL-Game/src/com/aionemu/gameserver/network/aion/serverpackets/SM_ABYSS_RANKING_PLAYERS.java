@@ -67,14 +67,13 @@ public class SM_ABYSS_RANKING_PLAYERS extends AionServerPacket {
 			writeD(rs.getPlayerId()); // PlayerID
 			writeD(race);
 			writeD(rs.getPlayerClass().getClassId());// Class Id
-			writeD(0); // Sex ? 0=male / 1=female
+			writeD(rs.getGender().getGenderId()); // Sex ? 0=male / 1=female
 			writeQ(rs.getPlayerAP());// Abyss Points
 			writeD(rs.getPlayerGP());// Glory Points
 			writeH(rs.getPlayerLevel());
 
 			writeS(rs.getPlayerName(), 52);// Player Name
-			writeS(rs.getLegionName(), 82);// Legion Name
-			writeD(0);
+			writeS(rs.getLegionName(), 86); // Legion Name
 		}
 	}
 }

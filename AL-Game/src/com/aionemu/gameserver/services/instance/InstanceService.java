@@ -19,8 +19,6 @@ package com.aionemu.gameserver.services.instance;
 
 import java.util.Iterator;
 
-import javolution.util.FastList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +40,18 @@ import com.aionemu.gameserver.services.AutoGroupService;
 import com.aionemu.gameserver.services.HousingService;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
 import com.aionemu.gameserver.spawnengine.SpawnEngine;
-import com.aionemu.gameserver.spawnengine.StaticDoorSpawnManager;
 import com.aionemu.gameserver.spawnengine.WalkerFormator;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
-import com.aionemu.gameserver.world.*;
+import com.aionemu.gameserver.world.World;
+import com.aionemu.gameserver.world.WorldMap;
+import com.aionemu.gameserver.world.WorldMap2DInstance;
+import com.aionemu.gameserver.world.WorldMapInstance;
+import com.aionemu.gameserver.world.WorldMapInstanceFactory;
+import com.aionemu.gameserver.world.WorldMapType;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
+
+import javolution.util.FastList;
 
 /**
  * @author ATracer
@@ -55,8 +59,8 @@ import com.aionemu.gameserver.world.zone.ZoneInstance;
 public class InstanceService {
 
 	private static final Logger log = LoggerFactory.getLogger("INSTANCE_LOG");
-	private static final FastList<Integer> instanceAggro = new FastList<Integer>();
-	private static final FastList<Integer> instanceCoolDownFilter = new FastList<Integer>();
+	private static final FastList<Integer> instanceAggro = new FastList<>();
+	private static final FastList<Integer> instanceCoolDownFilter = new FastList<>();
     private static final int SOLO_INSTANCES_DESTROY_DELAY = 10 * 60 * 1000; // 10 minutes
 
 	public static void load() {

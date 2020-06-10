@@ -22,9 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.slf4j.LoggerFactory;
-
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.DB;
 import com.aionemu.commons.database.DatabaseFactory;
@@ -32,7 +31,7 @@ import com.aionemu.commons.database.IUStH;
 import com.aionemu.gameserver.dao.MySQL5DAOUtils;
 import com.aionemu.gameserver.dao.PlayerSettingsDAO;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
-import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
 import com.aionemu.gameserver.model.gameobjects.player.PlayerSettings;
 
 /**
@@ -42,13 +41,9 @@ public class MySQL5PlayerSettingsDAO extends PlayerSettingsDAO {
 
 	private static final Logger log = LoggerFactory.getLogger(MySQL5PlayerSettingsDAO.class);
 
-	/**
-	 * TODO 1) analyze possibility to zip settings 2) insert/update instead of
-	 * replace 0 - uisettings 1 - shortcuts 2 - display 3 - deny
-	 */
 	@Override
-	public void loadSettings(final Player player) {
-		final int playerId = player.getObjectId();
+	public PlayerSettings load(final PlayerCommonData pcd) {
+		final int playerId = pcd.getPlayerObjId();
 		final PlayerSettings playerSettings = new PlayerSettings();
 		Connection con = null;
 		try {
@@ -84,14 +79,58 @@ public class MySQL5PlayerSettingsDAO extends PlayerSettingsDAO {
 			DatabaseFactory.close(con);
 		}
 		playerSettings.setPersistentState(PersistentState.UPDATED);
-		player.setPlayerSettings(playerSettings);
+		return playerSettings;
+	}
+	/**
+	 * TODO 1) analyze possibility to zip settings 2) insert/update instead of
+	 * replace 0 - uisettings 1 - shortcuts 2 - display 3 - deny
+	 */
+	@Override
+	public void loadSettings(final PlayerCommonData pcd) {
+		final int playerId = pcd.getPlayerObjId();
+		final PlayerSettings playerSettings = new PlayerSettings();
+		Connection con = null;
+		try {
+			con = DatabaseFactory.getConnection();
+			PreparedStatement statement = con.prepareStatement("SELECT * FROM player_settings WHERE player_id = ?");
+			statement.setInt(1, playerId);
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				int type = resultSet.getInt("settings_type");
+				switch (type) {
+					case 0:
+						playerSettings.setUiSettings(resultSet.getBytes("settings"));
+						break;
+					case 1:
+						playerSettings.setShortcuts(resultSet.getBytes("settings"));
+						break;
+					case 2:
+						playerSettings.setHouseBuddies(resultSet.getBytes("settings"));
+						break;
+					case -1:
+						playerSettings.setDisplay(resultSet.getInt("settings"));
+						break;
+					case -2:
+						playerSettings.setDeny(resultSet.getInt("settings"));
+						break;
+				}
+			}
+			resultSet.close();
+			statement.close();
+		} catch (Exception e) {
+			log.error("Could not restore PlayerSettings data for player " + playerId + " from DB: " + e.getMessage(), e);
+		} finally {
+			DatabaseFactory.close(con);
+		}
+		playerSettings.setPersistentState(PersistentState.UPDATED);
+		pcd.setPlayerSettings(playerSettings);
 	}
 
 	@Override
-	public void saveSettings(final Player player) {
-		final int playerId = player.getObjectId();
+	public void saveSettings(final PlayerCommonData pcd) {
+		final int playerId = pcd.getPlayerObjId();
 
-		PlayerSettings playerSettings = player.getPlayerSettings();
+		PlayerSettings playerSettings = pcd.getPlayerSettings();
 		if (playerSettings.getPersistentState() == PersistentState.UPDATED) {
 			return;
 		}

@@ -18,6 +18,7 @@
 package admincommands;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -40,7 +41,7 @@ public class Who extends AdminCommand {
 
 		for (Player player : players) {
 			if (params != null && params.length > 0) {
-				String cmd = params[0].toLowerCase();
+				String cmd = params[0].toLowerCase(Locale.forLanguageTag("en"));
 
 				if (("ely").startsWith(cmd)) {
 					if (player.getCommonData().getRace() == Race.ASMODIANS) {

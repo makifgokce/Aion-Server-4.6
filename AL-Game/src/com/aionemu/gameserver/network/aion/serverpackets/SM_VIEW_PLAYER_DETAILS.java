@@ -56,7 +56,7 @@ public class SM_VIEW_PLAYER_DETAILS extends AionServerPacket {
 	private void writeItemInfo(Item item) {
 		ItemTemplate template = item.getItemTemplate();
 
-		writeD(0);
+		writeD(item.getObjectId());
 		writeD(template.getTemplateId());
 		writeNameId(template.getNameId());
 

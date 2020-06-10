@@ -17,10 +17,6 @@
 
 package com.aionemu.gameserver.questEngine;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntProcedure;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-
-import javolution.util.FastMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +52,7 @@ import com.aionemu.gameserver.model.templates.quest.QuestDrop;
 import com.aionemu.gameserver.model.templates.quest.QuestItems;
 import com.aionemu.gameserver.model.templates.quest.QuestNpc;
 import com.aionemu.gameserver.model.templates.rewards.BonusType;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_QUEST_REPEAT;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.questEngine.handlers.ConstantSpawnHandler;
 import com.aionemu.gameserver.questEngine.handlers.HandlerResult;
@@ -76,6 +71,12 @@ import com.aionemu.gameserver.utils.stats.AbyssRankEnum;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.zone.ZoneName;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import javolution.util.FastList;
+import javolution.util.FastMap;
+
 /**
  * @author MrPoke, Hilgert
  * @modified vlog
@@ -83,40 +84,41 @@ import com.aionemu.gameserver.world.zone.ZoneName;
 public class QuestEngine implements GameEngine {
 
 	private static final Logger log = LoggerFactory.getLogger(QuestEngine.class);
-	private static final FastMap<Integer, QuestHandler> questHandlers = new FastMap<Integer, QuestHandler>();
+	private static final FastMap<Integer, QuestHandler> questHandlers = new FastMap<>();
 	private static ScriptManager scriptManager = new ScriptManager();
-	private TIntObjectHashMap<QuestNpc> questNpcs = new TIntObjectHashMap<QuestNpc>();
-	private TIntObjectHashMap<TIntArrayList> questItemRelated = new TIntObjectHashMap<TIntArrayList>();
+	private TIntObjectHashMap<QuestNpc> questNpcs = new TIntObjectHashMap<>();
+	private TIntObjectHashMap<TIntArrayList> questItemRelated = new TIntObjectHashMap<>();
 	private TIntArrayList questHouseItems = new TIntArrayList();
-	private TIntObjectHashMap<TIntArrayList> questItems = new TIntObjectHashMap<TIntArrayList>();
+	private TIntObjectHashMap<TIntArrayList> questItems = new TIntObjectHashMap<>();
 	private TIntArrayList questOnEnterZoneMissionEnd = new TIntArrayList();
 	private TIntArrayList questOnLevelUp = new TIntArrayList();
 	private TIntArrayList questOnDie = new TIntArrayList();
 	private TIntArrayList questOnLogOut = new TIntArrayList();
 	private TIntArrayList questOnEnterWorld = new TIntArrayList();
-	private FastMap<ZoneName, TIntArrayList> questOnEnterZone = new FastMap<ZoneName, TIntArrayList>();
-	private FastMap<ZoneName, TIntArrayList> questOnLeaveZone = new FastMap<ZoneName, TIntArrayList>();
-	private FastMap<String, TIntArrayList> questOnPassFlyingRings = new FastMap<String, TIntArrayList>();
-	private TIntObjectHashMap<TIntArrayList> questOnMovieEnd = new TIntObjectHashMap<TIntArrayList>();
-	private List<Integer> questOnTimerEnd = new ArrayList<Integer>();
-	private List<Integer> onInvisibleTimerEnd = new ArrayList<Integer>();
-	private FastMap<AbyssRankEnum, TIntArrayList> questOnKillRanked = new FastMap<AbyssRankEnum, TIntArrayList>();
-	private FastMap<Integer, TIntArrayList> questOnKillInWorld = new FastMap<Integer, TIntArrayList>();
-	private TIntObjectHashMap<TIntArrayList> questOnUseSkill = new TIntObjectHashMap<TIntArrayList>();
+	private FastMap<ZoneName, TIntArrayList> questOnEnterZone = new FastMap<>();
+	private FastMap<ZoneName, TIntArrayList> questOnLeaveZone = new FastMap<>();
+	private FastMap<String, TIntArrayList> questOnPassFlyingRings = new FastMap<>();
+	private TIntObjectHashMap<TIntArrayList> questOnMovieEnd = new TIntObjectHashMap<>();
+	private List<Integer> questOnTimerEnd = new ArrayList<>();
+	private List<Integer> onInvisibleTimerEnd = new ArrayList<>();
+	private FastMap<AbyssRankEnum, TIntArrayList> questOnKillRanked = new FastMap<>();
+	private FastMap<Integer, TIntArrayList> questOnKillInWorld = new FastMap<>();
+	private TIntObjectHashMap<TIntArrayList> questOnUseSkill = new TIntObjectHashMap<>();
 	private FastMap<Integer, DialogAction> dialogMap = FastMap.newInstance();
-	private Map<Integer, Integer> questOnFailCraft = new HashMap<Integer, Integer>();
-	private Map<Integer, Set<Integer>> questOnEquipItem = new HashMap<Integer, Set<Integer>>();
-	private TIntObjectHashMap<TIntArrayList> questCanAct = new TIntObjectHashMap<TIntArrayList>();
-	private List<Integer> questOnDredgionReward = new ArrayList<Integer>();
-	private List<Integer> questOnKamarReward = new ArrayList<Integer>();
-	private List<Integer> questOnOphidanReward = new ArrayList<Integer>();
-	private List<Integer> questOnBastionReward = new ArrayList<Integer>();
-	private FastMap<BonusType, TIntArrayList> questOnBonusApply = new FastMap<BonusType, TIntArrayList>();
+	private Map<Integer, Integer> questOnFailCraft = new HashMap<>();
+	private Map<Integer, Set<Integer>> questOnEquipItem = new HashMap<>();
+	private TIntObjectHashMap<TIntArrayList> questCanAct = new TIntObjectHashMap<>();
+	private List<Integer> questOnDredgionReward = new ArrayList<>();
+	private List<Integer> questOnKamarReward = new ArrayList<>();
+	private List<Integer> questOnOphidanReward = new ArrayList<>();
+	private List<Integer> questOnBastionReward = new ArrayList<>();
+	private FastMap<BonusType, TIntArrayList> questOnBonusApply = new FastMap<>();
 	private TIntArrayList reachTarget = new TIntArrayList();
 	private TIntArrayList lostTarget = new TIntArrayList();
 	private TIntArrayList questOnEnterWindStream = new TIntArrayList();
 	private TIntArrayList questRideAction = new TIntArrayList();
 
+	private FastList<Integer> questsToRepeat = new FastList<>();
 	private QuestEngine() {
 	}
 
@@ -826,7 +828,7 @@ public class QuestEngine implements GameEngine {
 
 	public void registerOnEquipItem(int itemId, int questId) {
 		if (!questOnEquipItem.containsKey(itemId)) {
-			Set<Integer> questIds = new HashSet<Integer>();
+			Set<Integer> questIds = new HashSet<>();
 			questIds.add(questId);
 			questOnEquipItem.put(itemId, questIds);
 		} else {
@@ -999,7 +1001,7 @@ public class QuestEngine implements GameEngine {
 		if (handler == null || !(handler instanceof ConstantSpawnHandler)) {
 			return;
 		}
-		ConstantSpawnHandler checker = (ConstantSpawnHandler) handler;
+		ConstantSpawnHandler checker = handler;
 		HashSet<Integer> allNpcs = checker.getNpcIds();
 		if (allNpcs == null) {
 			return;
@@ -1127,6 +1129,7 @@ public class QuestEngine implements GameEngine {
 				for (Player player : World.getInstance().getAllPlayers()) {
 					for (QuestState qs : player.getQuestStateList().getAllQuestState()) {
 						if (qs != null && qs.canRepeat()) {
+							questsToRepeat.add(qs.getQuestId());
 							QuestTemplate template = DataManager.QUEST_DATA.getQuestById(qs.getQuestId());
 							if (template.isDaily()) {
 								player.getController().updateNearbyQuests();
@@ -1138,6 +1141,8 @@ public class QuestEngine implements GameEngine {
 						}
 					}
 					player.getNpcFactions().sendDailyQuest();
+					PacketSendUtility.sendPacket(player, new SM_QUEST_REPEAT(questsToRepeat));
+					FastList.recycle(questsToRepeat);
 				}
 			}
 		}, sendingDate.getTimeInMillis() - System.currentTimeMillis(), 1000 * 60 * 60 * 24);

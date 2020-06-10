@@ -25,7 +25,6 @@ import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 
 /**
@@ -166,7 +165,7 @@ public class _1040ScoutingtheScouts extends QuestHandler {
 							TeleportService2.teleportTo(player, 210020000, 2211, 811, 513);
 							qs.setQuestVarById(0, 7); // 7
 							updateQuestStatus(env);
-							TeleportService2.teleportTo(player, 210020000, 2211, 811, 513);							
+							TeleportService2.teleportTo(player, 210020000, 2211, 811, 513);
 							return true;
 						}
 					case SETPRO7:

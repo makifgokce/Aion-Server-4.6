@@ -17,14 +17,21 @@
 
 package com.aionemu.gameserver.services.item;
 
+import java.util.Collections;
+
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.items.storage.StorageType;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_CUBE_UPDATE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_DELETE_ITEM;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_DELETE_WAREHOUSE_ITEM;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INVENTORY_ADD_ITEM;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INVENTORY_UPDATE_ITEM;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_LEGION_EDIT;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_WAREHOUSE_ADD_ITEM;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_WAREHOUSE_UPDATE_ITEM;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-
-import java.util.Collections;
 
 /**
  * @author ATracer
@@ -35,6 +42,7 @@ public class ItemPacketService {
 
 		EQUIP_UNEQUIP(-1, false), // internal usage only
 		CHARGE(-2, false), // internal usage only
+		TUNING(76, true),
 		STATS_CHANGE(0, true), // soul healer pay, manastone socketing, armor/weapons/arrows
 		INC_ITEM_MERGE(0x01, true),
 		INC_KINAH_MERGE(0x05, true),
@@ -52,6 +60,9 @@ public class ItemPacketService {
 		INC_ITEM_REPURCHASE(0x51, true),
 		DEC_KINAH_CUBE(0x5A, true), // expand cube
 		DEC_PET_FOOD(0x5E, true),
+		EXCHANGE_ADD(0x27, true),
+		EXCHANGE_CANCEL(0x36, true),
+		EXCHANGE_KINAH(0x22, true),
 		PUT(0x13, true); // from other storage
 
 		private final int mask;
@@ -93,8 +104,11 @@ public class ItemPacketService {
 		ALL_SLOT(0x13), // all content of slot
 		BUY(0x1C),
 		ITEM_COLLECT(0x19), // Item collect
-		QUEST_WORK_ITEM(0x35),
-		QUESTIONNAIRE(0x40);
+		QUEST_WORK_ITEM(0x35), //Exchange cancel
+		EXCHANGE(0x21),
+		QUESTIONNAIRE(0x40),
+		PRIVATESTORE(0x43),
+		MAIL(0x54),;
 
 		private final int mask;
 
@@ -115,8 +129,10 @@ public class ItemPacketService {
 		DISCARD(0x15),
 		USE(0x17),
 		SELL(0x1F),
+		BREAK(0x23),
 		QUEST_COMPLETE(0x31),
 		QUEST_START(0x34),
+		EXCHANGE(0x26),
 		DECOMPOSE(0x66),
 		REGISTER(0x78);
 

@@ -45,7 +45,7 @@ public void apply(Stat2 stat) {
       return;
     }
     int enchantLvl = this.item.getEnchantLevel();
-    if (this.item.getItemTemplate().isAccessory() || this.item.getItemTemplate().isFeather()) {
+    if (this.item.getItemTemplate().isAccessory() || this.item.getItemTemplate().isPlume()) {
       enchantLvl = this.item.getAuthorize();
     }
     if (enchantLvl == 0) {
@@ -61,7 +61,7 @@ public void apply(Stat2 stat) {
     if (this.item.getItemTemplate().isWeapon()) {
       return getWeaponModifiers(enchantLvl);
     }
-    if (this.item.getItemTemplate().isAccessory()) {
+    if (this.item.getItemTemplate().isAccessory() || this.item.getItemTemplate().isPlume()) {
       return getAccessoryModifiers(enchantLvl);
     }
     if (this.item.getItemTemplate().isArmor()) {
@@ -107,7 +107,12 @@ public void apply(Stat2 stat) {
       case 7:
         return 55;
       }
-      return 0;
+    case MAXHP:
+        return 150 * autorizeLvl;
+    case PHYSICAL_ATTACK:
+        return 4 * autorizeLvl;
+    case BOOST_MAGICAL_SKILL:
+        return 20 * autorizeLvl;
 	default:
 		break;
     }
@@ -380,17 +385,6 @@ public void apply(Stat2 stat) {
           return 30 * (enchantLvl - 10);
         }
         return 0;
-	default:
-		break;
-      }
-    case FEATHER:
-      switch (this.stat) {
-      case MAXHP:
-        return 150 * enchantLvl;
-      case PHYSICAL_ATTACK:
-        return 4 * enchantLvl;
-      case BOOST_MAGICAL_SKILL:
-        return 20 * enchantLvl;
 	default:
 		break;
       }

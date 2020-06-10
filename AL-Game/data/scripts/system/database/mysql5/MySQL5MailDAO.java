@@ -17,6 +17,19 @@
 
 package mysql5;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.DB;
 import com.aionemu.commons.database.DatabaseFactory;
 import com.aionemu.commons.database.IUStH;
@@ -33,14 +46,6 @@ import com.aionemu.gameserver.model.gameobjects.player.Mailbox;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
 import com.aionemu.gameserver.model.items.storage.StorageType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author kosyachok
@@ -70,14 +75,14 @@ public class MySQL5MailDAO extends MailDAO {
 					String mailTitle = rset.getString("mail_title");
 					String mailMessage = rset.getString("mail_message");
 					int unread = rset.getInt("unread");
-					int attachedItemId = rset.getInt("attached_item_id");
+					int attachedItemObjId = rset.getInt("attached_item_id");
 					long attachedKinahCount = rset.getLong("attached_kinah_count");
 					LetterType letterType = LetterType.getLetterTypeById(rset.getInt("express"));
 					Timestamp recievedTime = rset.getTimestamp("recieved_time");
 					Item attachedItem = null;
-					if (attachedItemId != 0) {
+					if (attachedItemObjId != 0) {
 						for (Item item : mailboxItems) {
-							if (item.getObjectId() == attachedItemId) {
+							if (item.getObjectId() == attachedItemObjId) {
 								if (item.getItemTemplate().isArmor() || item.getItemTemplate().isWeapon()) {
 									DAOManager.getDAO(ItemStoneListDAO.class).load(Collections.singletonList(item));
 								}
@@ -98,7 +103,8 @@ public class MySQL5MailDAO extends MailDAO {
 	}
 
 	@Override
-	public boolean haveUnread(int playerId) {
+	public int mailCount(int playerId) {
+		int allMailsCount = 0;
 		Connection con = null;
 		try {
 			con = DatabaseFactory.getConnection();
@@ -106,23 +112,50 @@ public class MySQL5MailDAO extends MailDAO {
 			stmt.setInt(1, playerId);
 			ResultSet rset = stmt.executeQuery();
 			while (rset.next()) {
-				int unread = rset.getInt("unread");
-				if (unread == 1) {
-					return true;
+				if (rset.getInt("unread") == 1 || rset.getInt("unread") == 0) {
+					allMailsCount ++;
 				}
 			}
 			rset.close();
 			stmt.close();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Could not read mail for player: " + playerId + " from DB: " + e.getMessage(), e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
-		return false;
+		return allMailsCount;
+	}
+
+	@Override
+	public int unreadedMails(int playerId) {
+		int unreadedMails = 0;
+		Connection con = null;
+		try {
+			con = DatabaseFactory.getConnection();
+			PreparedStatement stmt = con.prepareStatement("SELECT * FROM mail WHERE mail_recipient_id = ? ORDER BY recieved_time DESC LIMIT 100");
+			stmt.setInt(1, playerId);
+			ResultSet rset = stmt.executeQuery();
+			while (rset.next()) {
+				if (rset.getInt("unread") == 1) {
+					unreadedMails ++;
+				}
+			}
+			rset.close();
+			stmt.close();
+		}
+		catch (Exception e) {
+			log.error("Could not read mail for player: " + playerId + " from DB: " + e.getMessage(), e);
+		}
+		finally {
+			DatabaseFactory.close(con);
+		}
+		return unreadedMails;
 	}
 
 	private List<Item> loadMailboxItems(final int playerId) {
-		final List<Item> mailboxItems = new ArrayList<Item>();
+		final List<Item> mailboxItems = new ArrayList<>();
 
 		DB.select("SELECT * FROM inventory WHERE `item_owner` = ? AND `item_location` = 127", new ParamReadStH() {
 			@Override
@@ -151,13 +184,14 @@ public class MySQL5MailDAO extends MailDAO {
 					int optionalFusionSocket = rset.getInt("optional_fusion_socket");
 					int charge = rset.getInt("charge");
 					int randomBonus = rset.getInt("rnd_bonus");
+					int bns_enchant = rset.getInt("bns_enchant");
 					int rndCount = rset.getInt("rnd_count");
 					int packCount = rset.getInt("pack_count");
 					int isPacked = rset.getInt("is_packed");
 					int authorize = rset.getInt("authorize");
 					Item item = new Item(itemUniqueId, itemId, itemCount, itemColor, colorExpireTime, itemCreator, expireTime, activationCount, isEquiped == 1,
 							isSoulBound == 1, slot, StorageType.MAILBOX.getId(), enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge,
-							randomBonus, rndCount, packCount, isPacked == 1, authorize);
+							randomBonus, bns_enchant, rndCount, packCount, isPacked == 1, authorize);
 					item.setPersistentState(PersistentState.UPDATED);
 					mailboxItems.add(item);
 				}

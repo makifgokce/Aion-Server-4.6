@@ -17,6 +17,9 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -33,6 +36,7 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class CM_DELETE_ITEM extends AionClientPacket {
 
 	public int itemObjectId;
+	private static final Logger log = LoggerFactory.getLogger("DELETE_ITEM_LOG");
 
 	public CM_DELETE_ITEM(int opcode, State state, State... restStates) {
 		super(opcode, state, restStates);
@@ -55,6 +59,7 @@ public class CM_DELETE_ITEM extends AionClientPacket {
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_UNBREAKABLE_ITEM(new DescriptionId(item.getNameId())));
 			} else {
 				inventory.delete(item, ItemDeleteType.DISCARD);
+				log.info("[DELETE_ITEM] > Player: " + player.getName() + " Item:" + item.getItemTemplate().getName() + " ("  + item.getItemId() + ") Count: " + item.getItemCount());
 			}
 		}
 	}

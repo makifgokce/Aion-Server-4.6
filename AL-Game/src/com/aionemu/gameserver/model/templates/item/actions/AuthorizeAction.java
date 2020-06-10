@@ -28,7 +28,6 @@ import com.aionemu.gameserver.model.TaskId;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.model.templates.item.actions.AuthorizeAction;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_INVENTORY_UPDATE_ITEM;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_USAGE_ANIMATION;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
@@ -42,9 +41,6 @@ public class AuthorizeAction extends AbstractItemAction {
 
 	@Override
   public boolean canAct(Player player, Item parentItem, Item targetItem) {
-		if (!targetItem.getItemTemplate().isAccessory() && !targetItem.getItemTemplate().isFeather()) {
-            return false;
-        }
         if (targetItem.getItemTemplate().getMaxAuthorize() == 0) {
             return false;
         }
@@ -69,24 +65,30 @@ public class AuthorizeAction extends AbstractItemAction {
 			}
 		};
         player.getObserveController().attach(observer);
+		final boolean isSuccess = isSuccess(player, targetItem);
         player.getController().addTask(TaskId.ITEM_USE, ThreadPoolManager.getInstance().schedule(new Runnable() {
             @Override
             public void run() {
                 if (player.getInventory().decreaseByItemId(parentItem.getItemId(), 1L)) {
-                    if (!AuthorizeAction.this.isSuccess(targetItem.getAuthorize())) {
+                    if (!isSuccess) {
                         PacketSendUtility.broadcastPacketAndReceive(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), player.getObjectId(), parentItem.getObjectId(), parentItem.getItemId(), 0, 2, 0));
                         targetItem.setAuthorize(0);
-                    if (targetItem.getItemTemplate().isFeather()) {
+                    if (targetItem.getItemTemplate().isPlume()) {
 					if (targetItem.isEquipped())
 						player.getEquipment().getEquippedItemByObjId(targetItem.getObjectId()).decreaseItemCount(targetItem.getItemCount());
 					  else
 						player.getInventory().decreaseByObjectId(targetItem.getObjectId(), targetItem.getItemCount());
 					}
-                        PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ITEM_AUTHORIZE_FAILED(targetItem.getNameId()));
-                    } else {
+						if (targetItem.getItemTemplate().isPlume()){
+							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_STR_MSG_ITEM_AUTHORIZE_FAILED_TSHIRT(targetItem.getNameId()));
+						} else {
+							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ITEM_AUTHORIZE_FAILED(targetItem.getNameId()));
+						}
+					} else {
                         PacketSendUtility.broadcastPacketAndReceive(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), player.getObjectId(), parentItem.getObjectId(), parentItem.getItemId(), 0, 1, 0));
                         targetItem.setAuthorize(targetItem.getAuthorize() + 1);
-                        PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ITEM_AUTHORIZE_SUCCEEDED(targetItem.getNameId(), targetItem.getAuthorize()));
+                        PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_ITEM_AUTHORIZE_SUCCEEDED(targetItem.getNameId(), 1));
+
                     }
                     PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, targetItem));
                     player.getObserveController().removeObserver(observer);
@@ -104,21 +106,20 @@ public class AuthorizeAction extends AbstractItemAction {
         }, 5000L));
     }
 
-	public boolean isSuccess(int authorize) {
-		if (authorize <= 0)
+	public boolean isSuccess(Player player, Item targetItem) {
+		int rnd = Rnd.get(0, 1000);
+		int succ = targetItem.getItemTemplate().isPlume() ? (targetItem.getAuthorize() > 4 ? 400 : 700) : 700;
+		if (rnd < succ) {
+			if (player.getAccessLevel() > 2) {
+				PacketSendUtility.sendMessage(player, "Success! Rnd: " + rnd + " Suc: " + succ);
+			}
 			return true;
-
-		double rnd;
-		try {
-			rnd = 1000 *  Math.exp(-0.150 * authorize);
 		}
-		catch (Exception e) {
-			rnd = 0;
+		else {
+			if(player.getAccessLevel() > 2) {
+				PacketSendUtility.sendMessage(player, "Fail! Rnd: " + rnd + " Suc: " + succ);
+			}
+			return false;
 		}
-
-		if (rnd < 200)
-			rnd = 200;
-
-		return Rnd.get(0, 1000) < rnd;
 	}
 }

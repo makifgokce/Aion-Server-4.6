@@ -20,9 +20,7 @@ package com.aionemu.gameserver.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aionemu.commons.objects.filter.ObjectFilter;
 import com.aionemu.gameserver.model.EmotionType;
-import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.PrivateStore;
@@ -33,6 +31,7 @@ import com.aionemu.gameserver.model.trade.TradeList;
 import com.aionemu.gameserver.model.trade.TradePSItem;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_PRIVATE_STORE_NAME;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.services.item.ItemService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 
@@ -70,10 +69,14 @@ public class PrivateStoreService {
 		 */
 		for (int i = 0; i < tradePSItems.length; i++) {
 			Item item = getItemByObjId(activePlayer, tradePSItems[i].getItemObjId());
-			if (item != null && item.isTradeable(activePlayer)) {
-				if (validateItem(store, item, tradePSItems[i])) {
-					store.addItemToSell(tradePSItems[i].getItemObjId(), tradePSItems[i]);
-				}
+			if (item == null) {
+				return;
+			}
+			if (!item.isTradeable() && !item.isPacked()) {
+				return;
+			}
+			if (validateItem(store, item, tradePSItems[i])) {
+				store.addItemToSell(tradePSItems[i].getItemObjId(), tradePSItems[i]);
 			}
 		}
 	}
@@ -171,7 +174,7 @@ public class PrivateStoreService {
 					TradePSItem storeItem = store.getTradeItemByObjId(tradeItem.getItemId());
 					// Fix "Private store stackable items dupe" by Asanka
 					if (item.getItemCount() < tradeItem.getCount()) {
-						PacketSendUtility.sendMessage(buyer, "You cannot buy more than player can sell.");
+						PacketSendUtility.sendPacket(buyer, new SM_SYSTEM_MESSAGE(1300345));
 						return;
 					}
 
@@ -317,29 +320,12 @@ public class PrivateStoreService {
 	/**
 	 * @param activePlayer
 	 */
-	public static void openPrivateStore(Player activePlayer, String name) {
-		final int senderRace = activePlayer.getRace().getRaceId();
-		final Player playerActive = activePlayer;
+	public static void openPrivateStore(final Player activePlayer, String name) {
 		if (name != null) {
 			activePlayer.getStore().setStoreMessage(name);
-			if (CustomConfig.SPEAKING_BETWEEN_FACTIONS) {
-				PacketSendUtility.broadcastPacket(playerActive, new SM_PRIVATE_STORE_NAME(playerActive.getObjectId(), name), true);
-			} else {
-				PacketSendUtility.broadcastPacket(playerActive, new SM_PRIVATE_STORE_NAME(playerActive.getObjectId(), name), true, new ObjectFilter<Player>() {
-					@Override
-					public boolean acceptObject(Player object) {
-						return ((senderRace == object.getRace().getRaceId() && !object.getBlockList().contains(playerActive.getObjectId())) || object.isGM());
-					}
-				});
-				PacketSendUtility.broadcastPacket(playerActive, new SM_PRIVATE_STORE_NAME(playerActive.getObjectId(), ""), false, new ObjectFilter<Player>() {
-					@Override
-					public boolean acceptObject(Player object) {
-						return senderRace != object.getRace().getRaceId() && !object.getBlockList().contains(playerActive.getObjectId()) && !object.isGM();
-					}
-				});
-			}
+				PacketSendUtility.broadcastPacket(activePlayer, new SM_PRIVATE_STORE_NAME(activePlayer.getObjectId(), name), true);
 		} else {
-			PacketSendUtility.broadcastPacket(playerActive, new SM_PRIVATE_STORE_NAME(playerActive.getObjectId(), ""), true);
+			PacketSendUtility.broadcastPacket(activePlayer, new SM_PRIVATE_STORE_NAME(activePlayer.getObjectId(), ""), true);
 		}
 	}
 }

@@ -39,15 +39,12 @@ public class GSConfig {
 	public static String LOGINSERVER_NAME;
 
 	/* Server Version */
-	@Property(key = "gameserver.version", defaultValue = "4.3")
+	@Property(key = "gameserver.version", defaultValue = "4.6")
 	public static String SERVER_VERSION;
 
 	/* Players Max Level */
 	@Property(key = "gameserver.players.max.level", defaultValue = "65")
 	public static int PLAYER_MAX_LEVEL;
-
-	@Property(key = "gameserver.lang", defaultValue = "en")
-	public static String LANG;
 
 	/* Time Zone name (used for events & timed spawns) */
 	@Property(key = "gameserver.timezone", defaultValue = "")
@@ -104,4 +101,13 @@ public class GSConfig {
 
 	@Property(key = "gameserver.startClass.maxLevel", defaultValue = "10")
 	public static int STARTCLASS_MAXLEVEL;
+	
+	/**
+     * Memory Optimization Configs
+     */
+    @Property(key = "gameserver.gc.enable", defaultValue = "true")
+    public static boolean ENABLE_MEMORY_GC;
+
+    @Property(key = "gameserver.gc.optimization.time", defaultValue = "5")
+    public static int GC_OPTIMIZATION_TIME;    
 }

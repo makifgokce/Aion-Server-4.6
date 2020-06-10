@@ -701,28 +701,29 @@ public class AttackUtil {
 
 			@Override
 			public void visit(Player observer) {
-				if (observer.getTarget() == target)
+				if (observer.getTarget() == target) {
 					cancelCast(observer, target);
+				}
 			}
-
 		});
 
 		target.getKnownList().doOnAllNpcs(new Visitor<Npc>() {
 
 			@Override
 			public void visit(Npc observer) {
-				if (observer.getTarget() == target)
+				if (observer.getTarget() == target) {
 					cancelCast(observer, target);
+				}
 			}
-
 		});
 
 	}
 
 	private static void cancelCast(Creature creature, Creature target) {
 		if (target != null && creature.getCastingSkill() != null)
-			if (creature.getCastingSkill().getFirstTarget().equals(target))
+			if (creature.getCastingSkill().getFirstTarget().equals(target)){
 				creature.getController().cancelCurrentSkill();
+			}
 	}
 
 	/**
@@ -742,18 +743,16 @@ public class AttackUtil {
 				if (validateSee && observer.getTarget() == object) {
 					if (!observer.canSee(object)) {
 						observer.setTarget(null);
-						// retail packet (//fsc 0x44 dhdd 0 0 0 0) right after
-						// SM_PLAYER_STATE
+						// retail packet (//fsc 0x44 dhdd 0 0 0 0) right after SM_PLAYER_STATE
 						PacketSendUtility.sendPacket(observer, new SM_TARGET_SELECTED(observer));
 					}
-				} else if (observer.getTarget() == object) {
+				}
+				else if (observer.getTarget() == object) {
 					observer.setTarget(null);
-					// retail packet (//fsc 0x44 dhdd 0 0 0 0) right after
-					// SM_PLAYER_STATE
+					// retail packet (//fsc 0x44 dhdd 0 0 0 0) right after SM_PLAYER_STATE
 					PacketSendUtility.sendPacket(observer, new SM_TARGET_SELECTED(observer));
 				}
 			}
-
 		});
 	}
 

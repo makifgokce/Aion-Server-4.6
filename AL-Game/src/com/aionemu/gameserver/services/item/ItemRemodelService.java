@@ -101,12 +101,12 @@ public class ItemRemodelService {
 			return;
 		}
 
-		if (!keepItem.isRemodelable(player)) {
+		if (!keepItem.isRemodelable()) {
 			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300478, new DescriptionId(keepItem.getItemTemplate().getNameId())));
 			return;
 		}
 
-		if (!extractItem.isRemodelable(player)) {
+		if (!extractItem.isRemodelable()) {
 			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300482, new DescriptionId(extractItem.getItemTemplate().getNameId())));
 			return;
 		}

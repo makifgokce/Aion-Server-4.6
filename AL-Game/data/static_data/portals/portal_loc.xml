@@ -391,12 +391,15 @@
     <portal_loc world_id="600050000" loc_id="6000511" x="378.5648" y="383.5258" z="282.2296" h="41"/>
     <portal_loc world_id="600050000" loc_id="6000512" x="381.25195" y="2728.4653" z="143.03445" h="52"/>
     <!-- Danaria -->
-    <portal_loc world_id="600060000" loc_id="6000600" x="2336.5361" y="1556.8862" z="109.15017" h="81"/>
+    <portal_loc world_id="600060000" loc_id="6000600" x="1892.1915" y="1828.5804" z="148.75" h="99"/>
     <portal_loc world_id="600060000" loc_id="6000601" x="500.3247" y="1810.3014" z="388.29594" h="43"/>
     <portal_loc world_id="600060000" loc_id="6000602" x="2517.223" y="1729.2374" z="137.17685" h="9"/>
     <portal_loc world_id="600060000" loc_id="6000603" x="2545.4749" y="1700.9052" z="141.10408" h="55"/>
     <portal_loc world_id="600060000" loc_id="6000604" x="983.3579" y="2777.7236" z="298.0" h="31"/>
     <portal_loc world_id="600060000" loc_id="6000605" x="841.92554" y="267.43423" z="465.125" h="8"/>
+    <portal_loc world_id="600060000" loc_id="6006006" x="2580.5293" y="1661.5387" z="113.27828"/>
+    <portal_loc world_id="600060000" loc_id="6006007" x="1048.353" y="2818.272" z="303.98062"/>
+    <portal_loc world_id="600060000" loc_id="6006008" x="842.47144" y="248.15646" z="465.77887"/>
     <!-- Idian Depths -->
     <portal_loc world_id="600070000" loc_id="6000700" x="728.5588" y="890.47754" z="514.7932" h="6"/> <!-- Asmodians Base Camp -->
     <portal_loc world_id="600070000" loc_id="6000701" x="670.1918" y="644.75397" z="514.8737" h="41"/> <!-- Elyos Base Camp -->
@@ -404,7 +407,7 @@
     <portal_loc world_id="600070000" loc_id="6000703" x="485.2039" y="298.32468" z="569.93085" h="95"/> <!-- Exit B -->
     <portal_loc world_id="600070000" loc_id="6000704" x="403.63693" y="1056.1416" z="556.4098" h="60"/> <!-- Exit C -->
     <portal_loc world_id="600070000" loc_id="6000705" x="975.61847" y="497.2588" z="560.5769" h="60"/> <!-- Exit D -->
-    <portal_loc world_id="600070000" loc_id="6000706" x="665.29926" y="662.4283" z="514.90674" h="119"/>
+    <portal_loc world_id="600070000" loc_id="6000706" x="670.4083" y="644.73883" z="514.8737"/>
     <portal_loc world_id="600070000" loc_id="6000707" x="704.69104" y="143.82144" z="520.0553" h="28"/> <!-- 73. Asmodians Base Camp -->
     <portal_loc world_id="600070000" loc_id="6000708" x="602.6178" y="1351.256" z="505.49887" h="92"/> <!-- 74. Elyos Base Camp -->
     <portal_loc world_id="600070000" loc_id="6000709" x="145.28494" y="467.94507" z="579.53564" h="29"/> <!-- 75. Elyos Base Camp -->
@@ -448,8 +451,8 @@
     <portal_loc world_id="300590000" loc_id="3005900" x="759.60364" y="560.3337" z="573.0" h="82"/>
     <!-- The Hexway -->
     <portal_loc world_id="300700000" loc_id="3007000" x="672.8951" y="606.1681" z="321.19" h="46"/>
-    <!-- Infinity Shard -->
-    <portal_loc world_id="300800000" loc_id="3008000" x="139" y="158" z="131" h="7"/>  <!-- infinity shard entrance  -->
+    <!-- Katalamize -->
+    <portal_loc world_id="300800000" loc_id="3008000" x="150.67998" y="145.70366" z="124.42" h="66"/>  <!-- infinity shard entrance  -->
     <!-- Steel Rose Cargo (Solo) -->
     <portal_loc world_id="301010000" loc_id="3010100" x="283.64517" y="452.97903" z="902.6228" h="30"/>
     <portal_loc world_id="301010000" loc_id="3010101" x="461.73" y="491.32" z="877.61"/>

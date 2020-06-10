@@ -31,6 +31,8 @@ import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
 import com.aionemu.gameserver.world.zone.ZoneName;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import javolution.util.FastList;
 
 /**
@@ -55,11 +57,11 @@ public class Auction extends AdminCommand {
 				onFail(admin, null);
 				return;
 			}
-			String param = params[1].toUpperCase();
+			String param = params[1].toUpperCase(Locale.forLanguageTag("en"));
 			List<House> housesToRemove = new ArrayList<House>();
 
 			if ("HOUSE".equals(param.split("_")[0])) {
-				House house = HousingService.getInstance().getHouseByName(params[1].toUpperCase());
+				House house = HousingService.getInstance().getHouseByName(params[1].toUpperCase(Locale.forLanguageTag("en")));
 				if (house == null || house.getStatus() != HouseStatus.SELL_WAIT) {
 					PacketSendUtility.sendMessage(admin, "No such house!");
 				}
@@ -119,7 +121,7 @@ public class Auction extends AdminCommand {
 
 			HouseType houseType = null;
 			try {
-				houseType = HouseType.fromValue(params[2].toUpperCase());
+				houseType = HouseType.fromValue(params[2].toUpperCase(Locale.forLanguageTag("en")));
 			} catch (Exception e) {
 			}
 
@@ -185,7 +187,7 @@ public class Auction extends AdminCommand {
 				return;
 			}
 
-			String param = params[1].toUpperCase();
+			String param = params[1].toUpperCase(Locale.forLanguageTag("en"));
 			Race race;
 			if ("ALL".equals(param) || "PC_ALL".equals(param)) {
 				race = Race.PC_ALL;
@@ -200,7 +202,7 @@ public class Auction extends AdminCommand {
 
 			HouseType houseType = null;
 			try {
-				houseType = HouseType.fromValue(params[2].toUpperCase());
+				houseType = HouseType.fromValue(params[2].toUpperCase(Locale.forLanguageTag("en")));
 			} catch (Exception e) {
 			}
 

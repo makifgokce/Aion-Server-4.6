@@ -17,18 +17,20 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.services.BrokerService;
+import com.aionemu.gameserver.utils.MathUtil;
 
 /**
  * @author kosyachok
  */
 public class CM_BROKER_LIST extends AionClientPacket {
 
-	@SuppressWarnings("unused")
-	private int brokerId;
+	private int npcObjId;
 	private int sortType;
 	private int page;
 	private int listMask;
@@ -39,7 +41,7 @@ public class CM_BROKER_LIST extends AionClientPacket {
 
 	@Override
 	protected void readImpl() {
-		this.brokerId = readD();
+		this.npcObjId = readD();
 		this.sortType = readC(); // 1 - name; 2 - level; 4 - totalPrice; 6 - price for piece
 		this.page = readH();
 		this.listMask = readH();
@@ -49,6 +51,9 @@ public class CM_BROKER_LIST extends AionClientPacket {
 	protected void runImpl() {
 		Player player = getConnection().getActivePlayer();
 
-		BrokerService.getInstance().showRequestedItems(player, listMask, sortType, page, null);
+		VisibleObject obj = player.getKnownList().getObject(npcObjId);
+		if (obj != null && obj instanceof Npc && MathUtil.isInRange(player, obj, 6)) {
+			BrokerService.getInstance().showRequestedItems(player, listMask, sortType, page, null);
+		}
 	}
 }

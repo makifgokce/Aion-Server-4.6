@@ -33,7 +33,7 @@ import com.aionemu.gameserver.skillengine.model.Effect;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ShieldMasteryEffect")
-public class ShieldMasteryEffect extends BufEffect {
+public class ShieldMasteryEffect extends BuffEffect {
 
 	@Override
 	public void startEffect(Effect effect) {

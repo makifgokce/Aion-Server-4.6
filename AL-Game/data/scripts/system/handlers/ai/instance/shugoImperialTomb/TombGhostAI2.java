@@ -14,11 +14,9 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package ai.instance.shugoImperialTomb;
 
 import ai.AggressiveNpcAI2;
-
 import com.aionemu.gameserver.ai2.AIName;
 import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
@@ -27,19 +25,18 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 /**
  * @author Swig
  */
-@AIName("tombghost")
-// 219505, 219506, 219507
+@AIName("tombghost") //219505, 219506, 219507
 public class TombGhostAI2 extends AggressiveNpcAI2 {
 
-	@Override
-	public boolean canThink() {
-		return false;
-	}
+    @Override
+    public boolean canThink() {
+        return false;
+    }
 
-	@Override
-	protected void handleSpawned() {
-		super.handleSpawned();
-		getOwner().setState(1);
-		PacketSendUtility.broadcastPacket(getOwner(), new SM_EMOTION(getOwner(), EmotionType.START_EMOTE2, 0, getObjectId()));
-	}
+    @Override
+    protected void handleSpawned() {
+        super.handleSpawned();
+        getOwner().setState(1);
+        PacketSendUtility.broadcastPacket(getOwner(), new SM_EMOTION(getOwner(), EmotionType.START_EMOTE2, 0, getObjectId()));
+    }
 }

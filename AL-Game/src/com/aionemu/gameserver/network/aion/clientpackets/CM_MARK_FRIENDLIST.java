@@ -45,7 +45,7 @@ public class CM_MARK_FRIENDLIST extends AionClientPacket {
 	protected void runImpl() {
 		final Player activePlayer = getConnection().getActivePlayer();
 		if (activePlayer != null) {
-			if (!activePlayer.getFriendList().getIsFriendListSent()) {
+			if (!activePlayer.getCommonData().getFriendList().getIsFriendListSent()) {
 				getConnection().sendPacket(new SM_FRIEND_LIST());
 			}
 			getConnection().sendPacket(new SM_MARK_FRIENDLIST());

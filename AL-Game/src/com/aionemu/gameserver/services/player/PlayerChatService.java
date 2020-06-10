@@ -44,25 +44,25 @@ public class PlayerChatService {
 	 * @param player
 	 */
 	public static boolean isFlooding(final Player player) {
-		player.setLastMessageTime();
+        player.setLastMessageTime();
 
-		if (player.floodMsgCount() > SecurityConfig.FLOOD_MSG) {
-			player.setGagged(true);
-			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_FLOODING);
-			player.getController().cancelTask(TaskId.GAG);
-			player.getController().addTask(TaskId.GAG, ThreadPoolManager.getInstance().schedule(new Runnable() {
-				@Override
-				public void run() {
-					player.setGagged(false);
-					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CAN_CHAT_NOW);
-				}
-			}, 2 * 60000L));
+        if (player.floodMsgCount() > SecurityConfig.FLOOD_MSG) {
+            player.setGagged(true);
+            PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_FLOODING);
+            player.getController().cancelTask(TaskId.GAG);
+            player.getController().addTask(TaskId.GAG, ThreadPoolManager.getInstance().schedule(new Runnable() {
+                @Override
+                public void run() {
+                    player.setGagged(false);
+                    PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CAN_CHAT_NOW);
+                }
+            }, 2 * 60000L));
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 	public static void chatLogging(Player player, ChatType type, String message) {
 		switch (type) {

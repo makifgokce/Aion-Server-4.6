@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npc_drops>
+	<npc_drop npc_id="205540">
+		<drop_group name="ACCESSORY_COMMON" use_category="true">
+			<drop item_id="125002076" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="125002077" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="125002074" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="125002075" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="121000868" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Turquoise Necklace" />
+			<drop item_id="121000866" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Malevite Necklace" />
+			<drop item_id="121000867" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Corundum Necklace" />
+			<drop item_id="122001083" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Corundum Ring" />
+			<drop item_id="122001082" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Malevite Ring" />
+			<drop item_id="122001084" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Turquoise Ring" />
+			<drop item_id="123000968" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Leather Belt" />
+			<drop item_id="123000969" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Sash" />
+			<drop item_id="120000951" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Turquoise Earrings" />
+			<drop item_id="120000950" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Corundum Earrings" />
+			<drop item_id="120000949" chance="3.40" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Chaos Malevite Earrings" />
+		</drop_group>
+		<drop_group name="ACCESSORY_RARE" use_category="true">
+			<drop item_id="125002668" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???"/>
+			<drop item_id="125002669" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???"/>
+			<drop item_id="125002666" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???"/>
+			<drop item_id="125002667" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???"/>
+			<drop item_id="121001076" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Turquoise Necklace of the Forgotten"/>
+			<drop item_id="121001077" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Elatrite Necklace of the Forgotten"/>
+			<drop item_id="121001075" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Corundum Necklace of the Forgotten"/>
+			<drop item_id="122001318" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Elatrite Ring of the Forgotten"/>
+			<drop item_id="122001316" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Corundum Ring of the Forgotten"/>
+			<drop item_id="122001317" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Turquoise Ring of the Forgotten"/>
+			<drop item_id="123001127" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Leather Belt of the Forgotten"/>
+			<drop item_id="123001128" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Sash of the Forgotten"/>
+			<drop item_id="120001158" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Turquoise Earrings of the Forgotten"/>
+			<drop item_id="120001159" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Elatrite Earrings of the Forgotten"/>
+			<drop item_id="120001157" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Corundum Earrings of the Forgotten"/>
+		</drop_group>
+		<drop_group name="ACCESSORY_LEGEND" use_category="true">
+			<drop item_id="125002085" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="125002084" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="125002083" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="125002082" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="???" />
+			<drop item_id="121000872" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Malevite Necklace" />
+			<drop item_id="121000873" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Corundum Necklace" />
+			<drop item_id="121000874" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Turquoise Necklace" />
+			<drop item_id="122001090" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Turquoise Ring" />
+			<drop item_id="122001088" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Malevite Ring" />
+			<drop item_id="122001089" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Corundum Ring" />
+			<drop item_id="123000972" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Leather Belt" />
+			<drop item_id="123000973" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Sash" />
+			<drop item_id="120000957" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Turquoise Earrings" />
+			<drop item_id="120000956" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Corundum Earrings" />
+			<drop item_id="120000955" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Malevite Earrings" />
+		</drop_group>
+		<drop_group name="ARMOR_COMMON" use_category="true">
+			<drop item_id="114601132" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Sabatons" />
+			<drop item_id="114601130" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Sabatons" />
+			<drop item_id="114601131" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Sabatons" />
+			<drop item_id="114101226" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoes" />
+			<drop item_id="114101225" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoes" />
+			<drop item_id="114101224" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoes" />
+			<drop item_id="111501167" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Handguards" />
+			<drop item_id="111501169" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Handguards" />
+			<drop item_id="111501168" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Handguards" />
+			<drop item_id="113501186" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Chausses" />
+			<drop item_id="113501185" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Chausses" />
+			<drop item_id="113501184" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Chausses" />
+			<drop item_id="110501209" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Hauberk" />
+			<drop item_id="110501208" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Hauberk" />
+			<drop item_id="110501210" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Hauberk" />
+			<drop item_id="112601125" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoulderplates" />
+			<drop item_id="112601124" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoulderplates" />
+			<drop item_id="112601126" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoulderplates" />
+			<drop item_id="110101304" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Tunic" />
+			<drop item_id="110101305" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Tunic" />
+			<drop item_id="110101303" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Tunic" />
+			<drop item_id="114301230" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Boots" />
+			<drop item_id="114301231" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Boots" />
+			<drop item_id="114301232" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Boots" />
+			<drop item_id="113601138" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Greaves" />
+			<drop item_id="113601139" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Greaves" />
+			<drop item_id="113601137" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Greaves" />
+			<drop item_id="112501112" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Spaulders" />
+			<drop item_id="112501113" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Spaulders" />
+			<drop item_id="112501114" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Spaulders" />
+			<drop item_id="113101197" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Leggings" />
+			<drop item_id="113101198" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Leggings" />
+			<drop item_id="113101199" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Leggings" />
+			<drop item_id="113301201" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Breeches" />
+			<drop item_id="113301200" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Breeches" />
+			<drop item_id="113301199" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Breeches" />
+			<drop item_id="112101136" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Pauldrons" />
+			<drop item_id="112101137" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Pauldrons" />
+			<drop item_id="112101138" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Pauldrons" />
+			<drop item_id="111301173" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Vambrace" />
+			<drop item_id="111301174" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Vambrace" />
+			<drop item_id="111301175" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Vambrace" />
+			<drop item_id="110301232" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Jerkin" />
+			<drop item_id="110301231" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Jerkin" />
+			<drop item_id="110301230" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Jerkin" />
+			<drop item_id="112301121" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoulderguards" />
+			<drop item_id="112301120" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoulderguards" />
+			<drop item_id="112301119" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Shoulderguards" />
+			<drop item_id="110601178" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Breastplate" />
+			<drop item_id="110601179" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Breastplate" />
+			<drop item_id="110601177" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Breastplate" />
+			<drop item_id="111601148" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Gauntlets" />
+			<drop item_id="111601146" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Gauntlets" />
+			<drop item_id="111601147" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Gauntlets" />
+			<drop item_id="114501188" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Brogans" />
+			<drop item_id="114501189" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Brogans" />
+			<drop item_id="114501190" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Brogans" />
+			<drop item_id="111101179" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Gloves" />
+			<drop item_id="111101178" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Gloves" />
+			<drop item_id="111101180" chance="2.02" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Balaurbone Gloves" />
+		</drop_group>
+		<drop_group name="ARMOR_RARE" use_category="true">
+			<drop item_id="114600886" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Sabatons" />
+			<drop item_id="114600885" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Sabatons" />
+			<drop item_id="114600884" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Sabatons" />
+			<drop item_id="114100961" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoes" />
+			<drop item_id="114100963" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoes" />
+			<drop item_id="114100962" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoes" />
+			<drop item_id="111500915" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Handguards" />
+			<drop item_id="111500914" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Handguards" />
+			<drop item_id="111500913" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Handguards" />
+			<drop item_id="113500919" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Chausses" />
+			<drop item_id="113500918" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Chausses" />
+			<drop item_id="113500920" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Chausses" />
+			<drop item_id="110500948" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Hauberk" />
+			<drop item_id="110500947" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Hauberk" />
+			<drop item_id="110500946" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Hauberk" />
+			<drop item_id="112600882" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoulderplates" />
+			<drop item_id="112600880" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoulderplates" />
+			<drop item_id="112600881" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoulderplates" />
+			<drop item_id="110101031" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Tunic" />
+			<drop item_id="110101030" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Tunic" />
+			<drop item_id="110101029" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Tunic" />
+			<drop item_id="114300983" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Boots" />
+			<drop item_id="114300982" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Boots" />
+			<drop item_id="114300984" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Boots" />
+			<drop item_id="113600889" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Greaves" />
+			<drop item_id="113600890" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Greaves" />
+			<drop item_id="113600891" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Greaves" />
+			<drop item_id="112500865" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Spaulders" />
+			<drop item_id="112500866" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Spaulders" />
+			<drop item_id="112500867" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Spaulders" />
+			<drop item_id="113100935" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Leggings" />
+			<drop item_id="113100936" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Leggings" />
+			<drop item_id="113100937" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Leggings" />
+			<drop item_id="113300949" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Breeches" />
+			<drop item_id="113300948" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Breeches" />
+			<drop item_id="113300950" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Breeches" />
+			<drop item_id="111300927" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Vambrace" />
+			<drop item_id="111300929" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Vambrace" />
+			<drop item_id="111300928" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Vambrace" />
+			<drop item_id="112100882" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Pauldrons" />
+			<drop item_id="112100880" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Pauldrons" />
+			<drop item_id="112100881" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Pauldrons" />
+			<drop item_id="110300979" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Jerkin" />
+			<drop item_id="110300978" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Jerkin" />
+			<drop item_id="110300980" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Jerkin" />
+			<drop item_id="112300879" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoulderguards" />
+			<drop item_id="112300878" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoulderguards" />
+			<drop item_id="112300880" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Shoulderguards" />
+			<drop item_id="110600928" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Breastplate" />
+			<drop item_id="110600926" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Breastplate" />
+			<drop item_id="110600927" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Breastplate" />
+			<drop item_id="111600906" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Gauntlets" />
+			<drop item_id="111600907" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Gauntlets" />
+			<drop item_id="111600905" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Gauntlets" />
+			<drop item_id="114500925" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Brogans" />
+			<drop item_id="114500927" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Brogans" />
+			<drop item_id="114500926" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Brogans" />
+			<drop item_id="111100924" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Gloves" />
+			<drop item_id="111100923" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Gloves" />
+			<drop item_id="111100922" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Horrific Gloves" />
+		</drop_group>
+		<drop_group name="ARMOR_LEGEND" use_category="true">
+			<drop item_id="114600887" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Sabatons" />
+			<drop item_id="114600889" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Sabatons" />
+			<drop item_id="114600888" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Sabatons" />
+			<drop item_id="114100965" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoes" />
+			<drop item_id="114100964" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoes" />
+			<drop item_id="114100966" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoes" />
+			<drop item_id="111500918" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Handguards" />
+			<drop item_id="111500917" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Handguards" />
+			<drop item_id="111500916" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Handguards" />
+			<drop item_id="113500921" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Chausses" />
+			<drop item_id="113500923" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Chausses" />
+			<drop item_id="113500922" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Chausses" />
+			<drop item_id="110500951" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Hauberk" />
+			<drop item_id="110500950" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Hauberk" />
+			<drop item_id="110500949" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Hauberk" />
+			<drop item_id="112600883" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoulderplates" />
+			<drop item_id="112600884" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoulderplates" />
+			<drop item_id="112600885" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoulderplates" />
+			<drop item_id="110101034" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Tunic" />
+			<drop item_id="110101033" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Tunic" />
+			<drop item_id="110101032" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Tunic" />
+			<drop item_id="114300987" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Boots" />
+			<drop item_id="114300986" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Boots" />
+			<drop item_id="114300985" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Boots" />
+			<drop item_id="113600892" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Greaves" />
+			<drop item_id="113600893" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Greaves" />
+			<drop item_id="113600894" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Greaves" />
+			<drop item_id="112500868" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Spaulders" />
+			<drop item_id="112500869" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Spaulders" />
+			<drop item_id="112500870" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Spaulders" />
+			<drop item_id="113100938" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Leggings" />
+			<drop item_id="113100939" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Leggings" />
+			<drop item_id="113100940" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Leggings" />
+			<drop item_id="113300953" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Breeches" />
+			<drop item_id="113300952" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Breeches" />
+			<drop item_id="113300951" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Breeches" />
+			<drop item_id="111300931" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Vambrace" />
+			<drop item_id="111300930" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Vambrace" />
+			<drop item_id="111300932" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Vambrace" />
+			<drop item_id="112100883" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Pauldrons" />
+			<drop item_id="112100884" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Pauldrons" />
+			<drop item_id="112100885" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Pauldrons" />
+			<drop item_id="110300983" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Jerkin" />
+			<drop item_id="110300982" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Jerkin" />
+			<drop item_id="110300981" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Jerkin" />
+			<drop item_id="112300881" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoulderguards" />
+			<drop item_id="112300882" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoulderguards" />
+			<drop item_id="112300883" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Shoulderguards" />
+			<drop item_id="110600931" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Breastplate" />
+			<drop item_id="110600930" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Breastplate" />
+			<drop item_id="110600929" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Breastplate" />
+			<drop item_id="111600910" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Gauntlets" />
+			<drop item_id="111600908" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Gauntlets" />
+			<drop item_id="111600909" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Gauntlets" />
+			<drop item_id="114500930" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Brogans" />
+			<drop item_id="114500928" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Brogans" />
+			<drop item_id="114500929" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Brogans" />
+			<drop item_id="111100927" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Gloves" />
+			<drop item_id="111100926" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Gloves" />
+			<drop item_id="111100925" chance="0.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Catastrophic Gloves" />
+		</drop_group>
+		<drop_group name="ARMOR_UNIQUE" use_category="true">
+			<drop item_id="114600466" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="114100520" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="111500493" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="113500492" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="110500514" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="112600461" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="110100575" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="113600476" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="112500456" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="114300533" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="113100503" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="113300519" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="111300506" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="112100468" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="110300536" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="112300468" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="110600509" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="111600480" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="114500499" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="111100504" chance="0.036" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="FLUX_COMMON" use_category="true">
+			<drop item_id="152011075" chance="8.10" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Special Greater Accessory Flux" />
+			<drop item_id="152011070" chance="8.10" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Special Greater Armour Flux" />
+			<drop item_id="152011065" chance="8.10" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Special Greater Weapon Flux" />
+		</drop_group>
+		<drop_group name="FLUX_RARE" use_category="true">
+			<drop item_id="152011076" chance="4.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Worthy Special Greater Accessory Flux" />
+			<drop item_id="152011071" chance="4.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Worthy Special Greater Armour Flux" />
+			<drop item_id="152011066" chance="4.50" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Worthy Special Greater Weapon Flux" />
+		</drop_group>
+		<drop_group name="FLUX_LEGEND" use_category="true">
+			<drop item_id="152011072" chance="3.60" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Expert Special Greater Armour Flux" />
+			<drop item_id="152011077" chance="3.60" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Expert Special Greater Accessory Flux" />
+			<drop item_id="152011067" chance="3.60" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Expert Special Greater Weapon Flux" />
+		</drop_group>
+		<drop_group name="FLUX_UNIQUE" use_category="true">
+			<drop item_id="152011073" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Master Special Greater Armour Flux" />
+			<drop item_id="152011078" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Master Special Greater Accessory Flux" />
+			<drop item_id="152011068" chance="1.01" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Master Special Greater Weapon Flux" />
+		</drop_group>
+		<drop_group name="MANASTONES_LVL60" use_category="true" race="PC_ALL">
+			<drop item_id="167000358" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Attack +3" />
+			<drop item_id="167000518" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Attack +5" />
+			<drop item_id="167000543" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: HP +70:" />
+			<drop item_id="167000544" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: MP +70:" />
+			<drop item_id="167000545" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Accuracy +22:" />
+			<drop item_id="167000546" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Evasion +14:" />
+			<drop item_id="167000547" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Magic Boost +22:" />
+			<drop item_id="167000548" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Parry +22:" />
+			<drop item_id="167000549" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Block +22:" />
+			<drop item_id="167000550" chance="18.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Crit Strike +14:" />
+			<drop item_id="167000551" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: HP +95:" />
+			<drop item_id="167000552" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: MP +95:" />
+			<drop item_id="167000553" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Accuracy +27:" />
+			<drop item_id="167000554" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Evasion +17:" />
+			<drop item_id="167000555" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Magic Boost +27:" />
+			<drop item_id="167000556" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Parry +27:" />
+			<drop item_id="167000557" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Block +27:" />
+			<drop item_id="167000558" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Crit Strike +17:" />
+			<drop item_id="167000559" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Maximum Flight Time +7:" />
+			<drop item_id="167000560" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Magical Accuracy +14:" />
+			<drop item_id="167000561" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Resist Magic +14:" />
+			<drop item_id="167000563" chance="6.00" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Manastone: Healing Boost +3:" />
+        </drop_group>
+		<drop_group name="KINAH" use_category="true">
+			<drop item_id="182400001" chance="31.412" min_amount="1800" max_amount="22500" no_reduce="false" eachmember="false" name="Kinah" />
+		</drop_group>
+		<drop_group name="WEAPON_COMMON" use_category="true">
+			<drop item_id="101800622" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101800620" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101800621" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500660" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500659" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500658" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000924" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000923" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000922" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200768" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200767" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200766" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000843" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000842" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000844" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700681" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700680" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700682" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300616" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300617" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300615" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600717" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600716" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600715" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000653" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000652" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000651" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900618" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900617" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900616" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100636" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100637" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100638" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900644" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900645" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900646" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500658" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500659" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500660" chance="1.8" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="WEAPON_RARE" use_category="true">
+			<drop item_id="101500931" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500930" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500929" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100201055" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100201054" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100201053" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700946" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700947" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700948" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300867" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300868" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300869" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600976" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600977" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600975" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100901" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100900" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100902" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900905" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900904" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900906" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500921" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500922" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500923" chance="0.9" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="WEAPON_LEGEND" use_category="true">
+			<drop item_id="101800628" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101800627" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101800626" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500665" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500664" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500666" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000928" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000929" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000930" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200772" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200773" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200774" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000850" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000848" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000849" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700688" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700687" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700686" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300622" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300623" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300621" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600721" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600722" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600723" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000658" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000659" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000657" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900623" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900622" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900624" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100643" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100642" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100644" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900650" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900651" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900652" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500666" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500664" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500665" chance="0.09" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="WEAPON_UNIQUE" use_category="true">
+			<drop item_id="101800312" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101500244" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="115000504" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100200339" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100000318" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101700256" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101300232" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100600258" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="102000326" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="101900313" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100100231" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100900235" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="100500242" chance="0.018" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="STIGMA_SHARDS_ELITE" use_category="true">
+			<drop item_id="141000001" chance="30.375" min_amount="2" max_amount="8" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="GODSTONES" use_category="true">
+			<drop item_id="168000041" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000043" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000042" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000045" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000044" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000047" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000046" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000035" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000034" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000036" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000039" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000048" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000049" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000050" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000072" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000075" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000074" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000073" chance="0.005" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000130" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000131" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000128" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000129" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000132" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000133" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000124" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000125" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000126" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000127" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000120" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000121" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000122" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000123" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000117" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000118" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="168000119" chance="0.001" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="POWER_SHARDS" use_category="true">
+			<drop item_id="169000009" chance="25.313" min_amount="1" max_amount="5" no_reduce="false" eachmember="false" />
+		</drop_group>
+		<drop_group name="STIGMA" use_category="true">
+			<drop item_id="140000906" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000896" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000920" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000932" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000949" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000871" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000656" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000657" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000635" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000634" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000609" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000610" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000586" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000544" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000543" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000542" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000516" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000517" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000515" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000512" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000494" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000483" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000485" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000484" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000506" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000511" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000466" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000471" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000430" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000423" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000421" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000420" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000419" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000394" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000390" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000384" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000408" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000355" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000356" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000364" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000365" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000373" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000378" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000383" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000337" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000336" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000343" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000344" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000311" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+			<drop item_id="140000317" chance="1.013" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" />
+		</drop_group>
+	</npc_drop>
+</npc_drops>

@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.clientpackets;
 
 import java.util.ArrayList;
@@ -22,13 +21,13 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.gameobjects.HouseObject;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.templates.item.actions.AbstractItemAction;
 import com.aionemu.gameserver.model.templates.item.actions.IHouseObjectDyeAction;
+import com.aionemu.gameserver.model.templates.item.actions.InstanceTimeClear;
 import com.aionemu.gameserver.model.templates.item.actions.ItemActions;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
@@ -41,12 +40,14 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author Avol
+ * @author GiGatR00n v4.7.5.x
+ * @rework FrozenKiller
  */
 public class CM_USE_ITEM extends AionClientPacket {
 
 	private static final Logger log = LoggerFactory.getLogger(CM_USE_ITEM.class);
 	public int uniqueItemId;
-    public int type, targetItemId, returnId;
+	public int type, targetItemId, syncId, returnId;
 
 	public CM_USE_ITEM(int opcode, State state, State... restStates) {
 		super(opcode, state, restStates);
@@ -62,10 +63,13 @@ public class CM_USE_ITEM extends AionClientPacket {
 		if (type == 2) {
 			targetItemId = readD();
 		}
-        if (type == 6) {
-            returnId = readD();
-        }
-    }
+		else if (type == 5) {
+			syncId = readD();
+		}
+		else if (type == 6) {
+			returnId = readD();
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -82,11 +86,11 @@ public class CM_USE_ITEM extends AionClientPacket {
 		Item targetItem = player.getInventory().getItemByObjId(targetItemId);
 		HouseObject<?> targetHouseObject = null;
 
-		if (item == null) {
-			log.warn(String.format("CHECKPOINT: null item use action: %d %d", player.getObjectId(), uniqueItemId));
+		if (item == null) { // Cancel
+			player.getController().cancelUseItem();
+			player.getController().onMove();
 			return;
 		}
-
 		if (targetItem == null) {
 			targetItem = player.getEquipment().getEquippedItemByObjId(targetItemId);
 		}
@@ -94,7 +98,7 @@ public class CM_USE_ITEM extends AionClientPacket {
 			targetHouseObject = player.getHouseRegistry().getObjectByObjId(targetItemId);
 		}
 
-		if (item.getItemTemplate().getTemplateId() == 165000001 && targetItem != null && targetItem.getItemTemplate().canExtract()) {
+		if (item.getItemTemplate().getTemplateId() == 165000001 && targetItem.getItemTemplate().canExtract()) {
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_ITEM_COLOR_ERROR);
 			return;
 		}
@@ -133,10 +137,10 @@ public class CM_USE_ITEM extends AionClientPacket {
 			return; // don't remove item
 		}
 		ItemActions itemActions = item.getItemTemplate().getActions();
-		ArrayList<AbstractItemAction> actions = new ArrayList<AbstractItemAction>();
+		ArrayList<AbstractItemAction> actions = new ArrayList<>();
 
 		if (itemActions == null) {
-			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_ITEM_IS_NOT_USABLE);
+			log.warn(String.format("CHECKPOINT: No Item use Action: %d %d", player.getObjectId(), item.getItemTemplate().getTemplateId()));
 			return;
 		}
 
@@ -144,10 +148,11 @@ public class CM_USE_ITEM extends AionClientPacket {
 			// check if the item can be used before placing it on the cooldown list.
 			if (targetHouseObject != null && itemAction instanceof IHouseObjectDyeAction) {
 				IHouseObjectDyeAction action = (IHouseObjectDyeAction) itemAction;
-				if (action.canAct(player, item, targetHouseObject)) {
+				if (action != null && action.canAct(player, item, targetHouseObject)) {
 					actions.add(itemAction);
 				}
-			} else if (itemAction.canAct(player, item, targetItem)) {
+			}
+			else if (itemAction.canAct(player, item, targetItem)) {
 				actions.add(itemAction);
 			}
 		}
@@ -176,12 +181,26 @@ public class CM_USE_ITEM extends AionClientPacket {
 			if (targetHouseObject != null && itemAction instanceof IHouseObjectDyeAction) {
 				IHouseObjectDyeAction action = (IHouseObjectDyeAction) itemAction;
 				action.act(player, item, targetHouseObject);
-            } else if (returnId != 0) {
-                //TODO multi return scroll
-			} else {
+			}
+			else if (type == 5) {
+				// Instance Reset Scroll's
+				if (itemAction instanceof InstanceTimeClear) {
+					InstanceTimeClear action = (InstanceTimeClear) itemAction;
+					int SelectedSyncId = syncId;
+					action.act(player, item, SelectedSyncId);
+				}
+			}
+			else if (type == 6) {
+				/** // Multi Returns Items (Scroll Teleporter)
+				if (itemAction instanceof MultiReturnAction) {
+					MultiReturnAction action = (MultiReturnAction) itemAction;
+					int SelectedMapIndex = returnId;
+					action.act(player, item, SelectedMapIndex);
+				}*/
+			}
+			else {
 				itemAction.act(player, item, targetItem);
 			}
 		}
-		PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(item.getItemTemplate().getNameId())));
 	}
 }

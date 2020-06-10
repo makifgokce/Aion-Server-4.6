@@ -1,75 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <siege_schedule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="siege_schedule.xsd">
-	<fortress id="1011"> <!-- GÃ¶tterfestung -->
-		<siegeTime>0 0 21 ? * SAT</siegeTime>
+	<!-- Kale Savaşı Saatleri / MON = Pazartesi / TUE = Salı / WED = Çarşamba / THU = Perşembe / FRI = Cuma / SAT = Cumartesi / SUN = Pazar / * = Hergün -->
+	<fortress id="1011"> <!-- Divine Fortress  (Pazar) 22:00 4.6 -->
+		<siegeTime>0 0 22 ? * SUN</siegeTime>
 	</fortress>
-	<fortress id="1131"> <!-- Siels-Westfestung -->
-		<siegeTime>0 0 11 ? * SAT</siegeTime>
+	<fortress id="1131"> <!-- Siel-West Fortress (Salı,Perşembe,Cuma,Cumartesi,Pazar) 16:00 4.6 -->
+		<siegeTime>0 0 16 ? * TUE,THU,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1132"> <!-- Siels Ostfestung -->
-		<siegeTime>0 0 11 ? * SAT</siegeTime>
+	<fortress id="1132"> <!-- Siel-East Fortress (Salı,Perşembe,Cuma,Cumartesi,Pazar) 16:00 4.6 -->
+		<siegeTime>0 0 16 ? * TUE,THU,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1141"> <!-- Schwefelbaum-Festung --> 
-		<siegeTime>0 0 11 ? * SAT</siegeTime>
+	<fortress id="1141"> <!-- Sulfur Fortress (Pazartesi,Çarşamba,Cuma,Cumartesi,Pazar) 16:00 4.6 --> 
+		<siegeTime>0 0 16 ? * MON,WED,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1211"> <!-- Festung von Roah -->
-		<siegeTime>0 0 11 ? * SAT</siegeTime>
+	<fortress id="1211"> <!-- Roah Fortress (Pazartesi,Çarşamba,Cuma,Cumartesi,Pazar) 16:00 4.6 -->
+		<siegeTime>0 0 16 ? * MON,WED,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1221"> <!-- Krotan-Festung -->
-		<siegeTime>0 0 11 ? * SUN</siegeTime>
+	<fortress id="1221"> <!-- Krotan Fortress (Pazartesi,Çarşamba,Perşembe,Cuma,Cumartesi,Pazar) 22:00 4.6 -->
+		<siegeTime>0 0 22 ? * MON,WED,THU,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1231"> <!-- Kysis-Festung -->
-		<siegeTime>0 0 11 ? * SUN</siegeTime>
+	<fortress id="1231"> <!-- Kysis Fortress (Salı,Çarşamba,Cuma,Cumartesi,Pazar) 22:00 4.6-->
+		<siegeTime>0 0 22 ? * TUE,WED,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1241"> <!-- Miren-Festung -->
-		<siegeTime>0 0 11 ? * SUN</siegeTime>
+	<fortress id="1241"> <!-- Miren Fortress (Pazartesi,Salı,Perşembe,Cuma,Cumartesi,Pazar) 22:00 4.6 -->
+		<siegeTime>0 0 22 ? * MON,TUE,THU,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="1251"> <!-- Asteria-Festung -->
-		<siegeTime>0 0 11 ? * SUN</siegeTime>
+	<fortress id="1251"> <!-- Asteria Fortress (Pazartesi,Çarşamba,Cuma,Cumartesi,Pazar) 16:00 4.6 -->
+		<siegeTime>0 0 16 ? * MON,WED,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="2011"> <!-- Inggison - Altdrackentempel -->
-		<siegeTime>0 0 21 ? * MON,WED,SUN</siegeTime>
-		<siegeTime>0 0 10 ? * THU,SAT</siegeTime>
+	<fortress id="2011"> <!-- Inggison - Temple of Scales (Pazartesi,Çarşamba,Perşembe,Cumartesi,Pazar) 19:00 4.6 -->
+		<siegeTime>0 0 19 ? * MON,WED,THU,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="2021"> <!-- Inggison - Altar der Gier -->
-		<siegeTime>0 0 21 ? * TUE,WED,SUN</siegeTime>
-		<siegeTime>0 0 10 ? * FRI,SAT</siegeTime>
+	<fortress id="2021"> <!-- Inggison - Altar of Avarice (Salı,Çarşamba,Cuma,Cumartesi,Pazar) 19:00 4.6 -->
+		<siegeTime>0 0 19 ? * TUE,WED,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="3011"> <!-- Gelkmaros - Vorgaltem-Turm -->
-		<siegeTime>0 0 21 ? * MON,WED,SUN</siegeTime>
-		<siegeTime>0 0 10 ? * THU,SAT</siegeTime>
+	<fortress id="3011"> <!-- Gelkmaros - Vorgaltem (Pazartesi,Çarşamba,Perşembe,Cumartesi,Pazar) 19:00 4.6 -->
+		<siegeTime>0 0 19 ? * MON,WED,THU,SAT,SUN</siegeTime>
 	</fortress>
-	<fortress id="3021"> <!-- Gelkmaros - Karmintempel -->
-		<siegeTime>0 0 21 ? * TUE,WED,SUN</siegeTime>
-		<siegeTime>0 0 10 ? * FRI,SAT</siegeTime>
+	<fortress id="3021"> <!-- Gelkmaros - Crimson Temple (Salı,Çarşamba,Cuma,Cumartesi,Pazar) 19:00 4.6 -->
+		<siegeTime>0 0 19 ? * TUE,WED,FRI,SAT,SUN</siegeTime>
 	</fortress>
-	<source id="4011"> <!-- Tiamaranta - Quelle des Risses -->
-		<siegeTime>0 55 13 ? * *</siegeTime>
+	<source id="4011"> <!-- Tiamaranta - Quelle des Risses (Hergün) 18:00 4.6 -->
 		<siegeTime>0 55 17 ? * *</siegeTime>
-		<siegeTime>0 55 20 ? * *</siegeTime>
 	</source>
-	<source id="4021"> <!-- Tiamaranta - Quelle der Schwerkraft -->
-		<siegeTime>0 55 13 ? * *</siegeTime>
+	<source id="4021"> <!-- Tiamaranta - Quelle der Schwerkraft (Hergün) 18:00 4.6 -->
 		<siegeTime>0 55 17 ? * *</siegeTime>
-		<siegeTime>0 55 20 ? * *</siegeTime>
 	</source>
-	<source id="4031"> <!-- Tiamaranta - Quelle der Wut -->
-		<siegeTime>0 55 13 ? * *</siegeTime>
+	<source id="4031"> <!-- Tiamaranta - Quelle der Wut (Hergün) 18:00 4.6 -->
 		<siegeTime>0 55 17 ? * *</siegeTime>
-		<siegeTime>0 55 20 ? * *</siegeTime>
 	</source>
-	<source id="4041"> <!-- Tiamaranta - Quelle der Versteinerung -->
-		<siegeTime>0 55 13 ? * *</siegeTime>
+	<source id="4041"> <!-- Tiamaranta - Quelle der Versteinerung (Hergün) 18:00 4.6 -->
 		<siegeTime>0 55 17 ? * *</siegeTime>
-		<siegeTime>0 55 20 ? * *</siegeTime>
 	</source>
-	<fortress id="5011"> <!-- Katalam - Sillus Festung-->
-		<siegeTime>0 0 21 ? * TUE,WED,SUN</siegeTime>
+	<fortress id="5011"> <!-- Nort Katalam - Sillus Fortress (Hergün) 20:00 4.6 -->
+		<siegeTime>0 0 20 ? * *</siegeTime>
 	</fortress>
-	<fortress id="6011"> <!-- Danaria - Bassen Festung-->
-		<siegeTime>0 0 21 ? * TUE,WED,SUN</siegeTime>
+	<fortress id="6011"> <!-- South Katalam - Bassen Fortress (Hergün) 20:00 4.6 -->
+		<siegeTime>0 0 20 ? * *</siegeTime>
 	</fortress>
-	<fortress id="6021"> <!-- Danaria - Prades Festung-->
-		<siegeTime>0 0 21 ? * TUE,WED,SUN</siegeTime>
+	<fortress id="6021"> <!-- South Katalam - Prades Fortress (Hergün) 20:00 4.6 -->
+		<siegeTime>0 0 20 ? * *</siegeTime>
 	</fortress>	
 </siege_schedule>

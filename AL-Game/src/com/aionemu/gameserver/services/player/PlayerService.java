@@ -30,7 +30,38 @@ import com.aionemu.gameserver.configs.main.CacheConfig;
 import com.aionemu.gameserver.controllers.FlyController;
 import com.aionemu.gameserver.controllers.PlayerController;
 import com.aionemu.gameserver.controllers.effect.PlayerEffectController;
-import com.aionemu.gameserver.dao.*;
+import com.aionemu.gameserver.dao.AbyssRankDAO;
+import com.aionemu.gameserver.dao.BlockListDAO;
+import com.aionemu.gameserver.dao.CraftCooldownsDAO;
+import com.aionemu.gameserver.dao.Free2PlayDAO;
+import com.aionemu.gameserver.dao.FriendListDAO;
+import com.aionemu.gameserver.dao.FriendRequestListDAO;
+import com.aionemu.gameserver.dao.HouseObjectCooldownsDAO;
+import com.aionemu.gameserver.dao.HousesDAO;
+import com.aionemu.gameserver.dao.InventoryDAO;
+import com.aionemu.gameserver.dao.ItemCooldownsDAO;
+import com.aionemu.gameserver.dao.ItemStoneListDAO;
+import com.aionemu.gameserver.dao.MailDAO;
+import com.aionemu.gameserver.dao.MotionDAO;
+import com.aionemu.gameserver.dao.OldNamesDAO;
+import com.aionemu.gameserver.dao.PlayerAppearanceDAO;
+import com.aionemu.gameserver.dao.PlayerBindPointDAO;
+import com.aionemu.gameserver.dao.PlayerCooldownsDAO;
+import com.aionemu.gameserver.dao.PlayerDAO;
+import com.aionemu.gameserver.dao.PlayerEffectsDAO;
+import com.aionemu.gameserver.dao.PlayerEmotionListDAO;
+import com.aionemu.gameserver.dao.PlayerLifeStatsDAO;
+import com.aionemu.gameserver.dao.PlayerMacrossesDAO;
+import com.aionemu.gameserver.dao.PlayerNpcFactionsDAO;
+import com.aionemu.gameserver.dao.PlayerPunishmentsDAO;
+import com.aionemu.gameserver.dao.PlayerQuestListDAO;
+import com.aionemu.gameserver.dao.PlayerRecipesDAO;
+import com.aionemu.gameserver.dao.PlayerRegisteredItemsDAO;
+import com.aionemu.gameserver.dao.PlayerSettingsDAO;
+import com.aionemu.gameserver.dao.PlayerSkillListDAO;
+import com.aionemu.gameserver.dao.PlayerTitleListDAO;
+import com.aionemu.gameserver.dao.PlayerVarsDAO;
+import com.aionemu.gameserver.dao.PortalCooldownsDAO;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.dataholders.PlayerInitialData;
 import com.aionemu.gameserver.dataholders.PlayerInitialData.LocationData;
@@ -40,7 +71,12 @@ import com.aionemu.gameserver.model.account.Account;
 import com.aionemu.gameserver.model.account.PlayerAccountData;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
-import com.aionemu.gameserver.model.gameobjects.player.*;
+import com.aionemu.gameserver.model.gameobjects.player.Equipment;
+import com.aionemu.gameserver.model.gameobjects.player.MacroList;
+import com.aionemu.gameserver.model.gameobjects.player.Mailbox;
+import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.player.PlayerAppearance;
+import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
 import com.aionemu.gameserver.model.house.House;
 import com.aionemu.gameserver.model.house.HouseRegistry;
 import com.aionemu.gameserver.model.house.HouseStatus;
@@ -113,7 +149,7 @@ public class PlayerService {
 	public static void storePlayer(Player player) {
 		DAOManager.getDAO(PlayerDAO.class).storePlayer(player);
 		DAOManager.getDAO(PlayerSkillListDAO.class).storeSkills(player);
-		DAOManager.getDAO(PlayerSettingsDAO.class).saveSettings(player);
+		DAOManager.getDAO(PlayerSettingsDAO.class).saveSettings(player.getCommonData());
 		DAOManager.getDAO(PlayerQuestListDAO.class).store(player);
 		DAOManager.getDAO(AbyssRankDAO.class).storeAbyssRank(player);
 		DAOManager.getDAO(PlayerPunishmentsDAO.class).storePlayerPunishments(player, PunishmentType.PRISON);
@@ -163,11 +199,13 @@ public class PlayerService {
 
 		player.setSkillList(DAOManager.getDAO(PlayerSkillListDAO.class).loadSkillList(playerObjId));
 		player.setKnownlist(new KnownList(player));
-		player.setFriendList(DAOManager.getDAO(FriendListDAO.class).load(player));
-		player.setBlockList(DAOManager.getDAO(BlockListDAO.class).load(player));
+		pcd.setFriendList(DAOManager.getDAO(FriendListDAO.class).load(pcd));
+		pcd.setFriendRequestList(DAOManager.getDAO(FriendRequestListDAO.class).load(pcd));
+		pcd.setBlockList(DAOManager.getDAO(BlockListDAO.class).load(pcd));
 		player.setTitleList(DAOManager.getDAO(PlayerTitleListDAO.class).loadTitleList(playerObjId));
-		DAOManager.getDAO(PlayerSettingsDAO.class).loadSettings(player);
+		DAOManager.getDAO(PlayerSettingsDAO.class).loadSettings(pcd);
 		DAOManager.getDAO(AbyssRankDAO.class).loadAbyssRank(player);
+		DAOManager.getDAO(Free2PlayDAO.class).loadF2pInfo(player, account.getId());
 		DAOManager.getDAO(PlayerNpcFactionsDAO.class).loadNpcFactions(player);
 		DAOManager.getDAO(MotionDAO.class).loadMotionList(player);
 		player.setVars(DAOManager.getDAO(PlayerVarsDAO.class).load(player.getObjectId()));
@@ -393,22 +431,22 @@ public class PlayerService {
      * @return number of deleted chars
 	 */
 	public static int deleteAccountsCharsFromDB(int accountId) {
-		List<Integer> charIds = DAOManager.getDAO(PlayerDAO.class).getPlayerOidsOnAccount(accountId);
-		for (int playerId : charIds) {
-			deletePlayerFromDB(playerId);
-		}
+        List<Integer> charIds = DAOManager.getDAO(PlayerDAO.class).getPlayerOidsOnAccount(accountId);
+        for (int playerId : charIds) {
+            deletePlayerFromDB(playerId);
+        }
 
-		return charIds.size();
-	}
-
+        return charIds.size();
+    }
 	/**
      * Updates deletion time in database
      *
      * @param accData PlayerAccountData
      */
 	private static void storeDeletionTime(PlayerAccountData accData) {
-		DAOManager.getDAO(PlayerDAO.class).updateDeletionTime(accData.getPlayerCommonData().getPlayerObjId(), accData.getDeletionDate());
-	}
+        DAOManager.getDAO(PlayerDAO.class).updateDeletionTime(accData.getPlayerCommonData().getPlayerObjId(),
+                accData.getDeletionDate());
+    }
 
 	/**
 	 * @param objectId

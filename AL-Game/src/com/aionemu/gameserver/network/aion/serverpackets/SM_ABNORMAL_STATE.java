@@ -41,7 +41,7 @@ public class SM_ABNORMAL_STATE extends AionServerPacket {
 		writeD(abnormals);
 		writeD(0);
 		writeD(0); // unk 4.5
-		writeC(0x7F); // unk 4.5 slots ??? can be 0x7F:127, 0x08:8, 0x40:64
+		writeC(127); // unk 4.5 slots ??? can be 0x7F:127, 0x08:8, 0x40:64 0x01: 1
 		writeH(effects.size());
 
 		for (Effect effect : effects) {

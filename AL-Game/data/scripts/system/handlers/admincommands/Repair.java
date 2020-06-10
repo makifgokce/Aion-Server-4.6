@@ -17,6 +17,8 @@
 
 package admincommands;
 
+import java.util.Locale;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.controllers.PlayerController;
 import com.aionemu.gameserver.dao.PlayerDAO;
@@ -45,7 +47,7 @@ public class Repair extends AdminCommand {
 			return;
 		}
 
-		if (player.getName().toLowerCase().equalsIgnoreCase(pcd.getName().toLowerCase())) {
+		if (player.getName().toLowerCase(Locale.forLanguageTag("en")).equalsIgnoreCase(pcd.getName().toLowerCase(Locale.forLanguageTag("en")))) {
 			PacketSendUtility.sendMessage(player, "You cannot Repair yourself");
 			return;
 		}

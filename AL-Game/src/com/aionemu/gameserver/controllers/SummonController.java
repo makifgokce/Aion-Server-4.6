@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.controllers;
 
+import org.apache.commons.lang.NullArgumentException;
+
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.gameobjects.Creature;
@@ -31,13 +33,13 @@ import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.TYPE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SUMMON_UPDATE;
 import com.aionemu.gameserver.restrictions.RestrictionsManager;
+import com.aionemu.gameserver.services.DuelService;
 import com.aionemu.gameserver.services.summons.SummonsService;
 import com.aionemu.gameserver.skillengine.SkillEngine;
 import com.aionemu.gameserver.skillengine.model.Skill;
 import com.aionemu.gameserver.taskmanager.tasks.PlayerMoveTaskManager;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
-import org.apache.commons.lang.NullArgumentException;
 
 /**
  * @author ATracer
@@ -131,9 +133,16 @@ public class SummonController extends CreatureController<Summon> {
 		if (getOwner().getMode() == SummonMode.RELEASE) {
 			return;
 		}
+		if (getOwner().getMaster() instanceof Player && creature instanceof Player) {
+			if(DuelService.getInstance().isDueling(getOwner().getMaster().getObjectId(), creature.getObjectId()) && damage > getOwner().getMaster().getLifeStats().getCurrentHp()) {
+				damage = getOwner().getLifeStats().getCurrentHp() - 1;
+				DuelService.getInstance().loseDuel(getOwner().getMaster());
+				getOwner().getController().cancelCurrentSkill();
+			}
+		}
 
 		super.onAttack(creature, skillId, type, damage, notifyAttack, log);
-		PacketSendUtility.broadcastPacket(getOwner(), new SM_ATTACK_STATUS(getOwner(), TYPE.REGULAR, 0, damage, log));
+		PacketSendUtility.broadcastPacket(getOwner(), new SM_ATTACK_STATUS(getOwner(), creature, TYPE.REGULAR, 0, damage, log));
 		PacketSendUtility.sendPacket(getOwner().getMaster(), new SM_SUMMON_UPDATE(getOwner()));
 	}
 

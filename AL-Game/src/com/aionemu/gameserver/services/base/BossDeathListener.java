@@ -10,12 +10,29 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.services.base;
+
+import java.util.Iterator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.gameserver.ai2.AbstractAI;
 import com.aionemu.gameserver.ai2.eventcallback.OnDieEventCallback;
@@ -29,8 +46,6 @@ import com.aionemu.gameserver.model.team2.alliance.PlayerAllianceGroup;
 import com.aionemu.gameserver.model.team2.group.PlayerGroup;
 import com.aionemu.gameserver.model.team2.league.League;
 import com.aionemu.gameserver.services.BaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -39,46 +54,47 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("rawtypes")
 public class BossDeathListener extends OnDieEventCallback {
 
-	private static final Logger log = LoggerFactory.getLogger(BossDeathListener.class);
+    private static final Logger log = LoggerFactory.getLogger(BossDeathListener.class);
 
-	private final Base<?> base;
+    private final Base<?> base;
 
-	public BossDeathListener(Base base) {
-		this.base = base;
-	}
+    public BossDeathListener(Base base) {
+        this.base = base;
+    }
 
-	@Override
-	public void onBeforeDie(AbstractAI obj) {
-		AionObject killer = base.getBoss().getAggroList().getMostDamage();
-		Npc boss = base.getBoss();
-		Race race = null;
+    @Override
+    public void onBeforeDie(AbstractAI obj) {
+        final AionObject killer = base.getBoss().getAggroList().getMostDamage();
+        Npc boss = base.getBoss();
+        Race race = null;
 
-		if (killer instanceof PlayerGroup) {
-			race = ((PlayerGroup) killer).getRace();
-		} else if (killer instanceof PlayerAlliance) {
-			race = ((PlayerAlliance) killer).getRace();
-		} else if (killer instanceof PlayerAllianceGroup) {
-			race = ((PlayerAllianceGroup) killer).getRace();
-		} else if (killer instanceof League) {
-			race = ((League) killer).getRace();
-			/*
-			 * for (PlayerAlliance playerAlliance : ((League)
-			 * killer).getMembers()) { }
-			 */
-		} else if (killer instanceof Player) {
-			race = ((Player) killer).getRace();
-		} else if (killer instanceof Creature) {
-			race = ((Creature) killer).getRace();
-		}
+        if (killer instanceof PlayerGroup) {
+            race = ((PlayerGroup) killer).getRace();
+        } else if (killer instanceof PlayerAlliance) {
+            race = ((PlayerAlliance) killer).getRace();
+        } else if (killer instanceof PlayerAllianceGroup) {
+            race = ((PlayerAllianceGroup) killer).getRace();
+        } else if (killer instanceof League) {
+            race = ((League) killer).getRace();
+			for (Iterator<PlayerAlliance> iterator = ((League) killer).getMembers().iterator(); iterator.hasNext();) {
+			}
+        } else if (killer instanceof Player) {
+            race = ((Player) killer).getRace();
+        } else if (killer instanceof Creature) {
+            if (((Creature) killer).getRace() !=  Race.DRAKAN || ((Creature) killer).getRace() !=  Race.ELYOS || ((Creature) killer).getRace() !=  Race.ASMODIANS) { //TEMP Fix because some NPC's have no Race in Template
+				race = Race.NPC;
+			} else {
+				race = ((Creature) killer).getRace();
+			}
+        }
 
-		base.setRace(race);
-		BaseService.getInstance().capture(base.getId(), base.getRace());
-		log.info("Legat kill ! BOSS: " + boss + " in BaseId: " + base.getBaseLocation().getId() + "killed by RACE: " + race);
+        base.setRace(race);
+        BaseService.getInstance().capture(base.getId(), base.getRace());
+        log.info("Legatu kill ! BOSS: " + boss + " in BaseId: " + base.getBaseLocation().getId() + " killed by RACE: " + race + " Killer: [ " + killer.getName() + " ]");
+    }
 
-		// Add activity point to group
-	}
+    @Override
+    public void onAfterDie(AbstractAI obj) {
+    }
 
-	@Override
-	public void onAfterDie(AbstractAI obj) {
-	}
 }

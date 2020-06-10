@@ -16,6 +16,13 @@
  */
 package com.aionemu.gameserver.model.templates.item.actions;
 
+import java.util.Iterator;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+
 import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.model.TaskId;
 import com.aionemu.gameserver.model.gameobjects.Item;
@@ -28,11 +35,6 @@ import com.aionemu.gameserver.services.EnchantService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
-import java.util.Iterator;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EnchantItemAction")
@@ -55,15 +57,7 @@ public class EnchantItemAction extends AbstractItemAction {
       return false;
     }
     if (msID == 167) {
-      if (parentItem.getItemTemplate().getCategory() == ItemCategory.SPECIALSTONE) {
-        if (targetWeapon == 1) {
-          if (targetItem.SpecialIsFull(false)) {
-            return false;
-          }
-        } else if (targetItem.SpecialIsFull(true)) {
-          return false;
-        }
-      } else if (targetWeapon == 1) {
+      if (targetWeapon == 1) {
         if (targetItem.getItemStonesSize() + 1 > targetItem.getSockets(false)) {
           return false;
         }
@@ -176,8 +170,8 @@ public void act(Player player, Item parentItem, Item targetItem) {
           (itemTemplate.getCategory() == ItemCategory.ENCHANTMENT) && (targetItem.getEnchantLevel() == 15) && (isSuccess)) {
           Iterator<Player> iter = World.getInstance().getPlayersIterator();
           while (iter.hasNext()) {
-            Player player2 = (Player)iter.next();
-            if (player2.getRace() == player.getRace()) {
+            Player player2 = iter.next();
+            if (player2.getRace() == player.getRace() && player2.getWorldId() == player.getWorldId()) {
               PacketSendUtility.sendPacket(player2, SM_SYSTEM_MESSAGE.STR_MSG_ENCHANT_ITEM_SUCCEEDED_15(player.getName(), targetItem.getItemTemplate().getNameId()));
             }
           }

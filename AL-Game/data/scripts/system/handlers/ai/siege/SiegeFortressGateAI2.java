@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package ai.siege;
 
 import com.aionemu.gameserver.ai2.AI2Actions;
@@ -37,33 +36,36 @@ import com.aionemu.gameserver.utils.PositionUtil;
 @AIName("fortressgate")
 public class SiegeFortressGateAI2 extends NpcAI2 {
 
-	@Override
-	protected void handleDialogStart(Player player) {
-		AI2Actions.addRequest(this, player, 160017, 0, new AI2Request() {
-			@Override
-			public void acceptRequest(Creature requester, Player responder) {
-				if (MathUtil.isInRange(requester, responder, 10)) {
-					TeleportService2.moveToTargetWithDistance(requester, responder, PositionUtil.isBehind(requester, responder) ? 0 : 1, 3);
-				} else {
-					PacketSendUtility.sendBrightYellowMessageOnCenter(responder, "You too far away");
-				}
-			}
-		});
-	}
+    @Override
+    protected void handleDialogStart(Player player) {
+        AI2Actions.addRequest(this, player, 160017, 0, new AI2Request() {
+            @Override
+            public void acceptRequest(Creature requester, Player responder) {
+                if (MathUtil.isInRange(requester, responder, 10)) {
+                    TeleportService2.moveToTargetWithDistance(requester, responder,
+                            PositionUtil.isBehind(requester, responder) ? 0 : 1, 3);
+                } else {
+                    PacketSendUtility.sendBrightYellowMessageOnCenter(responder, "You too far away");
+                }
+            }
+        });
+    }
 
-	@Override
-	protected void handleDialogFinish(Player player) {
-	}
+    @Override
+    protected void handleDialogFinish(Player player) {
+    }
 
-	@Override
-	protected AIAnswer pollInstance(AIQuestion question) {
-		switch (question) {
-			case SHOULD_DECAY:
-				return AIAnswers.NEGATIVE;
-			case SHOULD_RESPAWN:
-				return AIAnswers.NEGATIVE;
-			default:
-				return null;
-		}
-	}
+    @Override
+    protected AIAnswer pollInstance(AIQuestion question) {
+        switch (question) {
+            case SHOULD_DECAY:
+                return AIAnswers.NEGATIVE;
+            case SHOULD_RESPAWN:
+                return AIAnswers.NEGATIVE;
+			case SHOULD_REWARD_AP:
+                return AIAnswers.POSITIVE;
+            default:
+                return null;
+        }
+    }
 }

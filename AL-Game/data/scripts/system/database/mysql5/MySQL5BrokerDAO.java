@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import com.aionemu.commons.database.ReadStH;
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.dao.BrokerDAO;
 import com.aionemu.gameserver.dao.InventoryDAO;
+import com.aionemu.gameserver.dao.ItemStoneListDAO;
 import com.aionemu.gameserver.dao.MySQL5DAOUtils;
 import com.aionemu.gameserver.model.broker.BrokerRace;
 import com.aionemu.gameserver.model.gameobjects.BrokerItem;
@@ -45,7 +47,7 @@ public class MySQL5BrokerDAO extends BrokerDAO {
 
 	@Override
 	public List<BrokerItem> loadBroker() {
-		final List<BrokerItem> brokerItems = new ArrayList<BrokerItem>();
+		final List<BrokerItem> brokerItems = new ArrayList<>();
 
 		final List<Item> items = getBrokerItems();
 
@@ -73,6 +75,9 @@ public class MySQL5BrokerDAO extends BrokerDAO {
 					if (!isSold) {
 						for (Item brItem : items) {
 							if (itemPointer == brItem.getObjectId()) {
+								if (brItem.getItemTemplate().isArmor() || brItem.getItemTemplate().isWeapon()) {
+									DAOManager.getDAO(ItemStoneListDAO.class).load(Collections.singletonList(brItem));
+								}
 								item = brItem;
 								break;
 							}
@@ -87,9 +92,9 @@ public class MySQL5BrokerDAO extends BrokerDAO {
 
 		return brokerItems;
 	}
-
-	private List<Item> getBrokerItems() {
-		final List<Item> brokerItems = new ArrayList<Item>();
+	@Override
+	public List<Item> getBrokerItems() {
+		final List<Item> brokerItems = new ArrayList<>();
 
 		DB.select("SELECT * FROM inventory WHERE `item_location` = 126", new ReadStH() {
 			@Override
@@ -112,13 +117,15 @@ public class MySQL5BrokerDAO extends BrokerDAO {
 					int optionalFusionSocket = rset.getInt("optional_fusion_socket");
 					int charge = rset.getInt("charge");
 					int randomBonus = rset.getInt("rnd_bonus");
+					int bns_enchant = rset.getInt("bns_enchant");
 					int rndCount = rset.getInt("rnd_count");
 					int packCount = rset.getInt("pack_count");
+					int isPacked = rset.getInt("is_packed");
 					int authorize = rset.getInt("authorize");
 
 					brokerItems.add(new Item(itemUniqueId, itemId, itemCount, itemColor, colorExpireTime, itemCreator, expireTime, activationCount, false,
-							false, slot, location, enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge, randomBonus, rndCount,
-							packCount, false, authorize));
+							false, slot, location, enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge, randomBonus, bns_enchant, rndCount,
+							packCount, isPacked == 1, authorize));
 				}
 			}
 		});

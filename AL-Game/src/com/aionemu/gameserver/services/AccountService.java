@@ -24,9 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.dao.DAOManager;
-import com.aionemu.gameserver.GameServer;
 import com.aionemu.gameserver.configs.main.CacheConfig;
-import com.aionemu.gameserver.configs.main.GSConfig;
 import com.aionemu.gameserver.dao.InventoryDAO;
 import com.aionemu.gameserver.dao.LegionMemberDAO;
 import com.aionemu.gameserver.dao.PlayerAppearanceDAO;
@@ -44,7 +42,6 @@ import com.aionemu.gameserver.model.items.storage.PlayerStorage;
 import com.aionemu.gameserver.model.items.storage.Storage;
 import com.aionemu.gameserver.model.items.storage.StorageType;
 import com.aionemu.gameserver.model.team.legion.LegionMember;
-import com.aionemu.gameserver.services.item.ItemService;
 import com.aionemu.gameserver.services.player.PlayerService;
 import com.aionemu.gameserver.utils.collections.cachemap.CacheMap;
 import com.aionemu.gameserver.utils.collections.cachemap.CacheMapFactory;
@@ -98,28 +95,23 @@ public class AccountService {
 	 * @param account
 	 */
 	public static void removeDeletedCharacters(Account account) {
-		/* Removes chars that should be removed */
-		Iterator<PlayerAccountData> it = account.iterator();
-		while (it.hasNext()) {
-			PlayerAccountData pad = it.next();
-			Race race = pad.getPlayerCommonData().getRace();
-			int deletionTime = pad.getDeletionTimeInSeconds() * 1000;
-			if (deletionTime != 0 && deletionTime <= System.currentTimeMillis()) {
-				it.remove();
-				account.decrementCountOf(race);
-				PlayerService.deletePlayerFromDB(pad.getPlayerCommonData().getPlayerObjId());
-				if (GSConfig.ENABLE_RATIO_LIMITATION && pad.getPlayerCommonData().getLevel() >= GSConfig.RATIO_MIN_REQUIRED_LEVEL) {
-					if (account.getNumberOf(race) == 0) {
-						GameServer.updateRatio(pad.getPlayerCommonData().getRace(), -1);
-					}
-				}
-			}
-		}
-		if (account.isEmpty()) {
-			removeAccountWH(account.getId());
-			account.getAccountWarehouse().clear();
-		}
-	}
+        /* Removes chars that should be removed */
+        Iterator<PlayerAccountData> it = account.iterator();
+        while (it.hasNext()) {
+            PlayerAccountData pad = it.next();
+            Race race = pad.getPlayerCommonData().getRace();
+            long deletionTime = (long) pad.getDeletionTimeInSeconds() * (long) 1000;
+            if (deletionTime != 0 && deletionTime <= System.currentTimeMillis()) {
+                it.remove();
+                account.decrementCountOf(race);
+                PlayerService.deletePlayerFromDB(pad.getPlayerCommonData().getPlayerObjId());
+            }
+        }
+        if (account.isEmpty()) {
+            removeAccountWH(account.getId());
+            account.getAccountWarehouse().clear();
+        }
+    }
 
 	private static void removeAccountWH(int accountId) {
 		DAOManager.getDAO(InventoryDAO.class).deleteAccountWH(accountId);
@@ -166,7 +158,7 @@ public class AccountService {
 
 			if (account.getAccountWarehouse() == null) {
 				Storage accWarehouse = DAOManager.getDAO(InventoryDAO.class).loadStorage(playerId, StorageType.ACCOUNT_WAREHOUSE);
-				ItemService.loadItemStones(accWarehouse.getItems());
+				//ItemService.loadItemStones(accWarehouse.getItems());
 				account.setAccountWarehouse(accWarehouse);
 			}
 		}

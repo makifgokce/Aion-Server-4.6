@@ -18,15 +18,14 @@
 package com.aionemu.gameserver.model.drop;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Set;
 
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.dataholders.DataManager;
-import com.aionemu.gameserver.dataholders.ItemData;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.templates.item.ItemTemplate;
-import java.util.Collection;
 
 /**
  * @author MrPoke

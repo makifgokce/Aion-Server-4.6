@@ -63,32 +63,6 @@ public class AdminConfig {
 	@Property(key = "gameserver.administration.trade.item.restriction", defaultValue = "false")
 	public static boolean ENABLE_TRADEITEM_RESTRICTION;
 
-	/**
-	 * Custom TAG based on access level
-	 */
-	@Property(key = "gameserver.customtag.enable", defaultValue = "true")
-	public static boolean CUSTOMTAG_ENABLE;
-	@Property(key = "gameserver.customtag.access1", defaultValue = "<Supporter> %s")
-	public static String CUSTOMTAG_ACCESS1;
-	@Property(key = "gameserver.customtag.access2", defaultValue = "<Jr-GM> %s")
-	public static String CUSTOMTAG_ACCESS2;
-	@Property(key = "gameserver.customtag.access3", defaultValue = "<GM> %s")
-	public static String CUSTOMTAG_ACCESS3;
-	@Property(key = "gameserver.customtag.access4", defaultValue = "<Head-GM %s")
-	public static String CUSTOMTAG_ACCESS4;
-	@Property(key = "gameserver.customtag.access5", defaultValue = "<Admin> %s")
-	public static String CUSTOMTAG_ACCESS5;
-	@Property(key = "gameserver.customtag.access6", defaultValue = "<S-Admin L1> %s")
-	public static String CUSTOMTAG_ACCESS6;
-	@Property(key = "gameserver.customtag.access7", defaultValue = "<S-Admin L2> %s")
-	public static String CUSTOMTAG_ACCESS7;
-	@Property(key = "gameserver.customtag.access8", defaultValue = "<S-Admin L3> %s")
-	public static String CUSTOMTAG_ACCESS8;
-	@Property(key = "gameserver.customtag.access9", defaultValue = "<S-CoOwner> %s")
-	public static String CUSTOMTAG_ACCESS9;
-	@Property(key = "gameserver.customtag.access10", defaultValue = "<S-Owner> %s")
-	public static String CUSTOMTAG_ACCESS10;
-
 	@Property(key = "gameserver.admin.announce.levels", defaultValue = "*")
 	public static String ANNOUNCE_LEVEL_LIST;
 
@@ -106,4 +80,8 @@ public class AdminConfig {
 	public static boolean GUARD_WINDOW_TRUE;
 	@Property(key = "gameserver.administration.guardwindow.timekick", defaultValue = "60 * 1000")
 	public static int TIME_KICK;
+
+
+	@Property(key = "gameserver.not-open.twoclienwindow", defaultValue = "false")
+	public static boolean NO_OPEN_NEW_WINDOW;
 }

@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.gameobjects.Npc;
@@ -168,7 +169,7 @@ public class SpawnUpdate extends AdminCommand {
 			if (params[1].equalsIgnoreCase("w")) {
 				String walkerId = null;
 				if (params.length == 3) {
-					walkerId = params[2].toUpperCase();
+					walkerId = params[2].toUpperCase(Locale.forLanguageTag("en"));
 				}
 				if (walkerId != null) {
 					WalkerTemplate template = DataManager.WALKER_DATA.getWalkerTemplate(walkerId);

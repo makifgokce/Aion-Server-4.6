@@ -19,9 +19,6 @@ package com.aionemu.gameserver.spawnengine;
 
 import java.util.HashSet;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
-
 import com.aionemu.gameserver.model.TaskId;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
@@ -29,12 +26,14 @@ import com.aionemu.gameserver.model.templates.spawns.SpawnGroup2;
 import com.aionemu.gameserver.model.templates.spawns.SpawnTemplate;
 import com.aionemu.gameserver.model.templates.spawns.TemporarySpawn;
 
+import javolution.util.FastMap;
+
 /**
  * @author xTz
  */
 public class TemporarySpawnEngine {
 
-	private static final FastMap<SpawnGroup2, HashSet<Integer>> temporarySpawns = new FastMap<SpawnGroup2, HashSet<Integer>>();
+	private static final FastMap<SpawnGroup2, HashSet<Integer>> temporarySpawns = new FastMap<>();
 
 	public static void spawnAll() {
 		spawn(true);
@@ -49,21 +48,20 @@ public class TemporarySpawnEngine {
 		for (SpawnGroup2 spawn : temporarySpawns.keySet()) {
 			for (SpawnTemplate template : spawn.getSpawnTemplates()) {
 				if (!template.getTemporarySpawn().isInSpawnTime()) {
-					FastList<VisibleObject> objects = template.getVisibleObjects();
-					if (objects == null) {
-						continue;
-					}
-					for (VisibleObject object : objects) {
-						if (object instanceof Npc) {
-							Npc npc = (Npc) object;
-							npc.getController().cancelTask(TaskId.RESPAWN);
-						}
-						if (object.isSpawned()) {
-							object.getController().onDelete();
-						}
-						spawn.setTemplateUse(object.getInstanceId(), template, false);
-					}
-					objects.clear();
+					VisibleObject object = template.getVisibleObject();
+                    if (object == null) {
+                        continue;
+                    }
+                    if (object instanceof Npc) {
+                        Npc npc = (Npc) object;
+                        if (!npc.getLifeStats().isAlreadyDead() && template.hasPool()) {
+                            spawn.setTemplateUse(npc.getInstanceId(), template, false);
+                        }
+                        npc.getController().cancelTask(TaskId.RESPAWN);
+                    }
+                    if (object.isSpawned()) {
+                        object.getController().onDelete();
+                    }
 				}
 			}
 		}
@@ -105,7 +103,7 @@ public class TemporarySpawnEngine {
 	public static void addSpawnGroup(SpawnGroup2 spawn, int instanceId) {
 		HashSet<Integer> instances = temporarySpawns.get(spawn);
 		if (instances == null) {
-			instances = new HashSet<Integer>();
+			instances = new HashSet<>();
 			temporarySpawns.put(spawn, instances);
 		}
 		instances.add(instanceId);

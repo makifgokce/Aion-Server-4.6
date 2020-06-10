@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <decomposable_selectitems xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<decomposable_selectitem item_id="188052389" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052389" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="GLADIATOR">
 			<item id="100001551" count="1" name="Grendal's Sword"/>
 			<item id="100901206" count="1" name="Grendal's Greatsword"/>
@@ -11,7 +11,7 @@
 			<item id="115001592" count="1" name="Grendal's Shield"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052391" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052391" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="TEMPLAR">
 			<item id="100001551" count="1" name="Grendal's Sword"/>
 			<item id="100901206" count="1" name="Grendal's Greatsword"/>
@@ -19,66 +19,66 @@
 			<item id="115001592" count="1" name="Grendal's Shield"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052395" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052395" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="ASSASSIN">
 			<item id="100001551" count="1" name="Grendal's Sword"/>
 			<item id="100201354" count="1" name="Grendal's Dagger"/>
 			<item id="101701236" count="1" name="Grendal's Bow"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052395" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052395" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="RANGER">
 			<item id="100001551" count="1" name="Grendal's Sword"/>
 			<item id="100201354" count="1" name="Grendal's Dagger"/>
 			<item id="101701236" count="1" name="Grendal's Bow"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052399" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052399" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="SORCERER">
 			<item id="100501186" count="1" name="Grendal's Orb"/>
 			<item id="100601275" count="1" name="Grendal's Spellbook"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052399" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052399" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="SPIRIT_MASTER">
 			<item id="100501186" count="1" name="Grendal's Orb"/>
 			<item id="100601275" count="1" name="Grendal's Spellbook"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052403" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052403" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="CLERIC">
 			<item id="100101185" count="1" name="Grendal's Mace"/>
 			<item id="100101186" count="1" name="Grendal's Warhammer"/>
-			<item id="101501216" count="1" name="Grendal's Staff"/>
-			<item id="101501231" count="1" name="Grendal's Cane"/>
+			<item id="101501216" count="1" name="Grendal's Staff (Chanter)"/>
+			<item id="101501231" count="1" name="Grendal's Staff (Cleric)"/>
 			<item id="115001592" count="1" name="Grendal's Shield"/>
 			<item id="115001593" count="1" name="Grendal's Scale Shield"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052403" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052403" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="CHANTER">
 			<item id="100101185" count="1" name="Grendal's Mace"/>
 			<item id="100101186" count="1" name="Grendal's Warhammer"/>
-			<item id="101501216" count="1" name="Grendal's Staff"/>
-			<item id="101501231" count="1" name="Grendal's Cane"/>
+			<item id="101501216" count="1" name="Grendal's Staff (Chanter)"/>
+			<item id="101501231" count="1" name="Grendal's Staff (Cleric)"/>
 			<item id="115001592" count="1" name="Grendal's Shield"/>
 			<item id="115001593" count="1" name="Grendal's Scale Shield"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052409" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052409" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="GUNNER">
-			<item id="101801017" count="1" name="Grendal's Pistol"/>
-			<item id="101900980" count="1" name="Grendal's Aethercannon"/>
+			<item id="101801017" count="1" name="Grendal's Aether Revolver"/>
+			<item id="101900980" count="1" name="Grendal's Aether Cannon"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052413" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052413" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="BARD">
-			<item id="102001043" count="1" name="Grendal's Harp"/>
+			<item id="102001043" count="1" name="Grendal's Stringed Instrument"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052757" decomposeable_selectitem_name="Grendal's Eternal Weapon Box">
+	<decomposable_selectitem item_id="188052757" decomposeable_selectitem_name="Grendal's Eternal Weapons Chest">
 		<items player_class="RIDER">
-			<item id="102100819" count="1" name="Grendal's Cipher-Blade"/>
+			<item id="102100819" count="1" name="Grendal's Aether Key"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052390" decomposeable_selectitem_name="Grendal's Mythical Weapons Chest">
@@ -128,7 +128,7 @@
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052404" decomposeable_selectitem_name="Grendal's Mythical Weapons Chest">
 		<items player_class="CLERIC">
-			<item id="101501232" count="1" name="Mad Grendal's Staff"/>
+			<item id="101501232" count="1" name="Mad Grendal's Staff (Cleric)"/>
 			<item id="100101188" count="1" name="Mad Grendal's Warhammer"/>
 			<item id="100101187" count="1" name="Mad Grendal's Mace"/>
 			<item id="115001594" count="1" name="Mad Grendal's Shield"/>
@@ -137,7 +137,7 @@
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052404" decomposeable_selectitem_name="Grendal's Mythical Weapons Chest">
 		<items player_class="CHANTER">
-			<item id="101501217" count="1" name="Mad Grendal's Staff"/>
+			<item id="101501217" count="1" name="Mad Grendal's Staff (Chanter)"/>
 			<item id="100101188" count="1" name="Mad Grendal's Warhammer"/>
 			<item id="100101187" count="1" name="Mad Grendal's Mace"/>
 			<item id="115001594" count="1" name="Mad Grendal's Shield"/>
@@ -162,22 +162,22 @@
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052393" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="GLADIATOR">
-			<item id="110601475" count="1" name="Grendal's Breastplate"/>
-			<item id="111601438" count="1" name="Grendal's Gauntlets"/>
-			<item id="112601419" count="1" name="Grendal's Shoulderplates"/>
-			<item id="113601421" count="1" name="Grendal's Greaves"/>
-			<item id="114601426" count="1" name="Grendal's Sabatons"/>
-			<item id="125003649" count="1" name="Grendal's Plate Helm"/>
+			<item id="110601475" count="1" name="Grendal's Breastplate (Gladiator)"/>
+			<item id="111601438" count="1" name="Grendal's Gauntlets (Gladiator)"/>
+			<item id="112601419" count="1" name="Grendal's Shoulderplates (Gladiator)"/>
+			<item id="113601421" count="1" name="Grendal's Greaves (Gladiator)"/>
+			<item id="114601426" count="1" name="Grendal's Sabatons (Gladiator)"/>
+			<item id="125003649" count="1" name="Grendal's Plate Helm (Gladiator)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052393" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="TEMPLAR">
-			<item id="110601442" count="1" name="Grendal's Breastplate"/>
-			<item id="111601404" count="1" name="Grendal's Gauntlets"/>
-			<item id="112601386" count="1" name="Grendal's Shoulderplates"/>
-			<item id="113601388" count="1" name="Grendal's Greaves"/>
-			<item id="114601392" count="1" name="Grendal's Sabatons"/>
-			<item id="125003502" count="1" name="Grendal's Plate Helm"/>
+			<item id="110601442" count="1" name="Grendal's Breastplate (Templar)"/>
+			<item id="111601404" count="1" name="Grendal's Gauntlets (Templar)"/>
+			<item id="112601386" count="1" name="Grendal's Shoulderplates (Templar)"/>
+			<item id="113601388" count="1" name="Grendal's Greaves (Templar)"/>
+			<item id="114601392" count="1" name="Grendal's Sabatons (Templar)"/>
+			<item id="125003502" count="1" name="Grendal's Plate Helm (Templar)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052397" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
@@ -186,7 +186,7 @@
 			<item id="111301446" count="1" name="Grendal's Vambraces"/>
 			<item id="112301390" count="1" name="Grendal's Shoulderguards"/>
 			<item id="113301470" count="1" name="Grendal's Breeches"/>
-			<item id="114301507" count="1" name="Grendal's Boots"/>
+			<item id="114301507" count="1" name="Grendal's Leather Shoes"/>
 			<item id="125003508" count="1" name="Grendal's Leather Hat"/>
 		</items>
 	</decomposable_selectitem>
@@ -196,7 +196,7 @@
 			<item id="111301446" count="1" name="Grendal's Vambraces"/>
 			<item id="112301390" count="1" name="Grendal's Shoulderguards"/>
 			<item id="113301470" count="1" name="Grendal's Breeches"/>
-			<item id="114301507" count="1" name="Grendal's Boots"/>
+			<item id="114301507" count="1" name="Grendal's Leather Shoes"/>
 			<item id="125003508" count="1" name="Grendal's Leather Hat"/>
 		</items>
 	</decomposable_selectitem>
@@ -222,72 +222,72 @@
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052405" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="CLERIC">
-			<item id="110501463" count="1" name="Grendal's Hauberk"/>
-			<item id="111501420" count="1" name="Grendal's Handguards"/>
-			<item id="112501362" count="1" name="Grendal's Spaulders"/>
-			<item id="113501436" count="1" name="Grendal's Chausses"/>
-			<item id="114501445" count="1" name="Grendal's Chainmail Sabatons"/>
-			<item id="125003505" count="1" name="Grendal's Chain Helm"/>
+			<item id="110501463" count="1" name="Grendal's Hauberk (Cleric)"/>
+			<item id="111501420" count="1" name="Grendal's Handguards (Cleric)"/>
+			<item id="112501362" count="1" name="Grendal's Spaulders (Cleric)"/>
+			<item id="113501436" count="1" name="Grendal's Chausses (Cleric)"/>
+			<item id="114501445" count="1" name="Grendal's Chainmail Sabatons (Cleric)"/>
+			<item id="125003505" count="1" name="Grendal's Chain Helm (Cleric)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052407" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="CHANTER">
-			<item id="110501462" count="1" name="Grendal's Hauberk"/>
-			<item id="111501419" count="1" name="Grendal's Chainmail Gauntlets"/>
-			<item id="112501361" count="1" name="Grendal's Spaulders"/>
-			<item id="113501435" count="1" name="Grendal's Chausses"/>
-			<item id="114501444" count="1" name="Grendal's Chainmail Sabatons"/>
-			<item id="125003504" count="1" name="Grendal's Chain Helm"/>
+			<item id="110501462" count="1" name="Grendal's Hauberk (Chanter)"/>
+			<item id="111501419" count="1" name="Grendal's Chainmail Gauntlets (Chanter)"/>
+			<item id="112501361" count="1" name="Grendal's Spaulders (Chanter)"/>
+			<item id="113501435" count="1" name="Grendal's Chausses (Chanter)"/>
+			<item id="114501444" count="1" name="Grendal's Chainmail Sabatons (Chanter)"/>
+			<item id="125003504" count="1" name="Grendal's Chain Helm (Chanter)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052411" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="GUNNER">
-			<item id="110301507" count="1" name="Grendal's Jerkin"/>
-			<item id="111301447" count="1" name="Grendal's Vambraces"/>
-			<item id="112301391" count="1" name="Grendal's Shoulderguards"/>
-			<item id="113301471" count="1" name="Grendal's Breeches"/>
-			<item id="114301508" count="1" name="Grendal's Boots"/>
-			<item id="125003509" count="1" name="Grendal's Leather Hat"/>
+			<item id="110301507" count="1" name="Grendal's Jerkin (Gunner)"/>
+			<item id="111301447" count="1" name="Grendal's Vambraces (Gunner)"/>
+			<item id="112301391" count="1" name="Grendal's Shoulderguards (Gunner)"/>
+			<item id="113301471" count="1" name="Grendal's Breeches (Gunner)"/>
+			<item id="114301508" count="1" name="Grendal's Boots (Gunner)"/>
+			<item id="125003509" count="1" name="Grendal's Leather Hat (Gunner)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052415" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="BARD">
-			<item id="110101617" count="1" name="Grendal's Tunic"/>
-			<item id="111101458" count="1" name="Grendal's Gloves"/>
-			<item id="112101412" count="1" name="Grendal's Pauldrons"/>
-			<item id="113101468" count="1" name="Grendal's Leggings"/>
-			<item id="114101505" count="1" name="Grendal's Shoes"/>
-			<item id="125003513" count="1" name="Grendal's Cloth Headband"/>
+			<item id="110101617" count="1" name="Grendal's Tunic (Bard)"/>
+			<item id="111101458" count="1" name="Grendal's Gloves (Bard)"/>
+			<item id="112101412" count="1" name="Grendal's Pauldrons (Bard)"/>
+			<item id="113101468" count="1" name="Grendal's Leggings (Bard)"/>
+			<item id="114101505" count="1" name="Grendal's Shoes (Bard)"/>
+			<item id="125003513" count="1" name="Grendal's Cloth Headband (Bard)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052759" decomposeable_selectitem_name="Grendal's Eternal Armour Chest">
 		<items player_class="RIDER">
-			<item id="110550939" count="1" name="Grendal's Hauberk"/>
-			<item id="111501497" count="1" name="Grendal's Chainmail Fighting Gauntlets"/>
-			<item id="112501439" count="1" name="Grendal's Chainmail Spaulders"/>
-			<item id="113501515" count="1" name="Grendal's Chausses"/>
-			<item id="114501524" count="1" name="Grendal's Chainmail Sabatons"/>
-			<item id="125003790" count="1" name="Grendal's Chainmail Helm"/>
+			<item id="110550939" count="1" name="Grendal's Hauberk (Aethertech)"/>
+			<item id="111501497" count="1" name="Grendal's Chainmail Fighting Gauntlets (Aethertech)"/>
+			<item id="112501439" count="1" name="Grendal's Chainmail Spaulders (Aethertech)"/>
+			<item id="113501515" count="1" name="Grendal's Chausses (Aethertech)"/>
+			<item id="114501524" count="1" name="Grendal's Chainmail Sabatons (Aethertech)"/>
+			<item id="125003790" count="1" name="Grendal's Chainmail Helm (Aethertech)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052394" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
 		<items player_class="GLADIATOR">
-			<item id="110601476" count="1" name="Mad Grendal's Breastplate"/>
-			<item id="111601439" count="1" name="Mad Grendal's Gauntlets"/>
-			<item id="112601420" count="1" name="Mad Grendal's Shoulderplates"/>
-			<item id="113601422" count="1" name="Mad Grendal's Greaves"/>
-			<item id="114601427" count="1" name="Mad Grendal's Sabatons"/>
-			<item id="125003650" count="1" name="Mad Grendal's Plate Helm"/>
+			<item id="110601476" count="1" name="Mad Grendal's Breastplate (Gladiator)"/>
+			<item id="111601439" count="1" name="Mad Grendal's Gauntlets (Gladiator)"/>
+			<item id="112601420" count="1" name="Mad Grendal's Shoulderplates (Gladiator)"/>
+			<item id="113601422" count="1" name="Mad Grendal's Greaves (Gladiator)"/>
+			<item id="114601427" count="1" name="Mad Grendal's Sabatons (Gladiator)"/>
+			<item id="125003650" count="1" name="Mad Grendal's Plate Helm (Gladiator)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052394" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
 		<items player_class="TEMPLAR">
-			<item id="110601443" count="1" name="Mad Grendal's Breastplate"/>
-			<item id="111601405" count="1" name="Mad Grendal's Gauntlets"/>
-			<item id="112601387" count="1" name="Mad Grendal's Shoulderplates"/>
-			<item id="113601389" count="1" name="Mad Grendal's Greaves"/>
-			<item id="114601393" count="1" name="Mad Grendal's Sabatons"/>
-			<item id="125003503" count="1" name="Mad Grendal's Plate Helm"/>
+			<item id="110601443" count="1" name="Mad Grendal's Breastplate (Templar)"/>
+			<item id="111601405" count="1" name="Mad Grendal's Gauntlets (Templar)"/>
+			<item id="112601387" count="1" name="Mad Grendal's Shoulderplates (Templar)"/>
+			<item id="113601389" count="1" name="Mad Grendal's Greaves (Templar)"/>
+			<item id="114601393" count="1" name="Mad Grendal's Sabatons (Templar)"/>
+			<item id="125003503" count="1" name="Mad Grendal's Plate Helm (Templar)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052398" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
@@ -330,57 +330,57 @@
 			<item id="125003514" count="1" name="Mad Grendal's Cloth Headband"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052406" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
+	<decomposable_selectitem item_id="188052406" decomposeable_selectitem_name="Grendal's Mythical Armour Box">
 		<items player_class="CLERIC">
-			<item id="110501465" count="1" name="Mad Grendal's Hauberk"/>
-			<item id="111501422" count="1" name="Mad Grendal's Handguards"/>
-			<item id="112501364" count="1" name="Mad Grendal's Spaulders"/>
-			<item id="113501438" count="1" name="Mad Grendal's Chausses"/>
-			<item id="114501447" count="1" name="Mad Grendal's Chainmail Sabatons"/>
-			<item id="125003507" count="1" name="Mad Grendal's Chain Helm"/>
+			<item id="110501465" count="1" name="Mad Grendal's Hauberk (Cleric)"/>
+			<item id="111501422" count="1" name="Mad Grendal's Handguards (Cleric)"/>
+			<item id="112501364" count="1" name="Mad Grendal's Spaulders (Cleric)"/>
+			<item id="113501438" count="1" name="Mad Grendal's Chausses (Cleric)"/>
+			<item id="114501447" count="1" name="Mad Grendal's Chainmail Sabatons (Cleric)"/>
+			<item id="125003507" count="1" name="Mad Grendal's Chain Helm (Cleric)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052408" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
 		<items player_class="CHANTER">
-			<item id="110501464" count="1" name="Mad Grendal's Hauberk"/>
-			<item id="111501421" count="1" name="Mad Grendal's Handguards"/>
-			<item id="112501363" count="1" name="Mad Grendal's Spaulders"/>
-			<item id="113501437" count="1" name="Mad Grendal's Chausses"/>
-			<item id="114501446" count="1" name="Mad Grendal's Chainmail Sabatons"/>
-			<item id="125003506" count="1" name="Mad Grendal's Chain Helm"/>
+			<item id="110501464" count="1" name="Mad Grendal's Hauberk (Chanter)"/>
+			<item id="111501421" count="1" name="Mad Grendal's Handguards (Chanter)"/>
+			<item id="112501363" count="1" name="Mad Grendal's Spaulders (Chanter)"/>
+			<item id="113501437" count="1" name="Mad Grendal's Chausses (Chanter)"/>
+			<item id="114501446" count="1" name="Mad Grendal's Chainmail Sabatons (Chanter)"/>
+			<item id="125003506" count="1" name="Mad Grendal's Chain Helm (Chanter)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052412" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
 		<items player_class="GUNNER">
-			<item id="110301509" count="1" name="Mad Grendal's Jerkin"/>
-			<item id="111301449" count="1" name="Mad Grendal's Vambraces"/>
-			<item id="112301393" count="1" name="Mad Grendal's Shoulderguards"/>
-			<item id="113301473" count="1" name="Mad Grendal's Breeches"/>
-			<item id="114301510" count="1" name="Mad Grendal's Boots"/>
-			<item id="125003511" count="1" name="Mad Grendal's Leather Hat"/>
+			<item id="110301509" count="1" name="Mad Grendal's Jerkin (Gunner)"/>
+			<item id="111301449" count="1" name="Mad Grendal's Vambraces (Gunner)"/>
+			<item id="112301393" count="1" name="Mad Grendal's Shoulderguards (Gunner)"/>
+			<item id="113301473" count="1" name="Mad Grendal's Breeches (Gunner)"/>
+			<item id="114301510" count="1" name="Mad Grendal's Boots (Gunner)"/>
+			<item id="125003511" count="1" name="Mad Grendal's Leather Hat (Gunner)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052416" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
 		<items player_class="BARD">
-			<item id="110101619" count="1" name="Mad Grendal's Tunic"/>
-			<item id="111101460" count="1" name="Mad Grendal's Gloves"/>
-			<item id="112101414" count="1" name="Mad Grendal's Pauldrons"/>
-			<item id="113101470" count="1" name="Mad Grendal's Leggings"/>
-			<item id="114101507" count="1" name="Mad Grendal's Shoes"/>
-			<item id="125003515" count="1" name="Mad Grendal's Cloth Headband"/>
+			<item id="110101619" count="1" name="Mad Grendal's Tunic (Bard)"/>
+			<item id="111101460" count="1" name="Mad Grendal's Gloves (Bard)"/>
+			<item id="112101414" count="1" name="Mad Grendal's Pauldrons (Bard)"/>
+			<item id="113101470" count="1" name="Mad Grendal's Leggings (Bard)"/>
+			<item id="114101507" count="1" name="Mad Grendal's Shoes (Bard)"/>
+			<item id="125003515" count="1" name="Mad Grendal's Cloth Headband (Bard)"/>
 		</items>
 	</decomposable_selectitem>
 	<decomposable_selectitem item_id="188052760" decomposeable_selectitem_name="Grendal's Mythical Armour Chest">
 		<items player_class="RIDER">
-			<item id="110550940" count="1" name="Mad Grendal's Hauberk"/>
-			<item id="111501498" count="1" name="Mad Grendal's Chainmail Fighting Gauntlets"/>
-			<item id="112501440" count="1" name="Mad Grendal's Chainmail Spaulders"/>
-			<item id="113501516" count="1" name="Mad Grendal's Chausses"/>
-			<item id="114501525" count="1" name="Mad Grendal's Chainmail Sabatons"/>
-			<item id="125003791" count="1" name="Mad Grendal's Chainmail Helm"/>
+			<item id="110550940" count="1" name="Mad Grendal's Hauberk (Aethertech)"/>
+			<item id="111501498" count="1" name="Mad Grendal's Chainmail Fighting Gauntlets (Aethertech)"/>
+			<item id="112501440" count="1" name="Mad Grendal's Chainmail Spaulders (Aethertech)"/>
+			<item id="113501516" count="1" name="Mad Grendal's Chausses (Aethertech)"/>
+			<item id="114501525" count="1" name="Mad Grendal's Chainmail Sabatons (Aethertech)"/>
+			<item id="125003791" count="1" name="Mad Grendal's Chainmail Helm (Aethertech)"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052438" decomposeable_selectitem_name="Danuar Reliquary Expedition's Weapon Box">
+	<decomposable_selectitem item_id="188052438" decomposeable_selectitem_name="Weapons Chest of the Runadium Expedition Group">
 		<items player_class="GLADIATOR">
 			<item id="100001553" count="1" name="Sword of the Runadium Expedition Group"/>
 			<item id="100901208" count="1" name="Greatsword of the Runadium Expedition Group"/>
@@ -441,7 +441,7 @@
 			<item id="102100821" count="1" name="Aether Key of the Runadium Expedition Group"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188052474" decomposeable_selectitem_name="Infinity Shard Equipment Box">
+	<decomposable_selectitem item_id="188052474" decomposeable_selectitem_name="Equipment Chest of the Katalamize Expedition Group">
 		<items player_class="GLADIATOR">
 			<item id="110601450" count="1" name="Katalamize Breastplate"/>
 			<item id="113601396" count="1" name="Katalamize Plate Greaves"/>
@@ -742,7 +742,7 @@
 			<item id="111301652" count="1" name="Dynatum Leather Gauntlets"/>
 			<item id="112301591" count="1" name="Dynatum Leather Spaulders"/>
 			<item id="113301683" count="1" name="Dynatum Leather Breaches"/>
-			<item id="114301720" count="1" name="Dynatum Leather Shoes"/>
+			<item id="114301720" count="1" name="Dynatum Leather Boots"/>
 			<item id="125003877" count="1" name="Dynatum Leather Hat"/>
 		</items>
 		<items player_class="BARD">
@@ -840,7 +840,7 @@
 			<item id="111301653" count="1" name="Unique Dynatum Leather Gloves"/>
 			<item id="112301592" count="1" name="Unique Dynatum Leather Spaulders"/>
 			<item id="113301684" count="1" name="Unique Dynatum Leather Breeches"/>
-			<item id="114301721" count="1" name="Unique Dynatum Leather Shoes"/>
+			<item id="114301721" count="1" name="Unique Dynatum Leather Boots"/>
 			<item id="125003878" count="1" name="Unique Dynatum Leather Hat"/>
 		</items>
 		<items player_class="RIDER">
@@ -852,20 +852,20 @@
 			<item id="125003882" count="1" name="Unique Dynatum Chainmail Helm"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188053295" decomposeable_selectitem_name="Empyrean Plume Chest">
+	<decomposable_selectitem item_id="188053295" decomposeable_selectitem_name="Box of Feathers of the Lord">
 		<items>
-			<item id="187100015" count="1" race="ELYOS"/>
-			<item id="187100016" count="1" race="ELYOS"/>
-			<item id="187100017" count="1" race="ASMODIANS"/>
-			<item id="187100018" count="1" race="ASMODIANS"/>
+			<item id="187100015" count="1" race="ELYOS" name="Kaisinel's Feather: Attack"/>
+			<item id="187100016" count="1" race="ELYOS" name="Kaisinel's Feather: Magic Boost"/>
+			<item id="187100017" count="1" race="ASMODIANS" name="Marchutan's Feather: Attack"/>
+			<item id="187100018" count="1" race="ASMODIANS" name="Marchutan's Feather: Magic Boost"/>
 		</items>
 	</decomposable_selectitem>
-	<decomposable_selectitem item_id="188053321" decomposeable_selectitem_name="[Event] Empyrean Plume Chest">
+	<decomposable_selectitem item_id="188053321" decomposeable_selectitem_name="[Event] Box of Feathers of the Lord">
 		<items>
-			<item id="187100015" count="1" race="ELYOS"/>
-			<item id="187100016" count="1" race="ELYOS"/>
-			<item id="187100017" count="1" race="ASMODIANS"/>
-			<item id="187100018" count="1" race="ASMODIANS"/>
+			<item id="187100015" count="1" race="ELYOS" name="Kaisinel's Feather: Attack"/>
+			<item id="187100016" count="1" race="ELYOS" name="Kaisinel's Feather: Magic Boost"/>
+			<item id="187100017" count="1" race="ASMODIANS" name="Marchutan's Feather: Attack"/>
+			<item id="187100018" count="1" race="ASMODIANS" name="Marchutan's Feather: Magic Boost"/>
 		</items>
 	</decomposable_selectitem>
 </decomposable_selectitems>

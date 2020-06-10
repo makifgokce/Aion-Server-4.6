@@ -17,6 +17,8 @@
 
 package admincommands;
 
+import java.util.Locale;
+
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_MOTION;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_INFO;
@@ -46,7 +48,7 @@ public class GMMode extends AdminCommand {
 			return;
 		}
 
-		if (params[0].toLowerCase().equals("on")) {
+		if (params[0].toLowerCase(Locale.forLanguageTag("en")).equals("on")) {
 			if (!admin.isGmMode()) {
 				admin.setGmMode(true);
 				admin.setWispable();

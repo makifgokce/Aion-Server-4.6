@@ -143,7 +143,7 @@ public class StatFunctions {
 		if (target.getName().equals("controllera") || target.getName().equals("controllerb"))
 			apNpcRate = 0f;
 
-		return (int) (lvlDiff ? 1 : RewardType.AP_NPC.calcReward(player, (int) Math.floor(15 * apPercentage * apNpcRate / 100)));
+		return (int) (lvlDiff ? 1 : RewardType.AP_NPC.calcReward(player, (int) Math.floor(target.getLevel() * apPercentage * apNpcRate / 100)));
 	}
 
 	/**
@@ -326,7 +326,7 @@ public class StatFunctions {
 	 */
 	public static int calculateHate(Creature creature, int value) {
 		Stat2 stat = new AdditionStat(StatEnum.BOOST_HATE, value, creature, 0.1f);
-		return (int) (creature.getGameStats().getStat(StatEnum.BOOST_HATE, stat).getCurrent());
+		return (creature.getGameStats().getStat(StatEnum.BOOST_HATE, stat).getCurrent());
 	}
 
 	/**
@@ -358,7 +358,7 @@ public class StatFunctions {
 		 */
 
 		if (target instanceof Npc)
-			return target.getAi2().modifyDamage((int) resultDamage);
+			return target.getAi2().modifyDamage(resultDamage);
 		if (attacker instanceof Npc)
 			return attacker.getAi2().modifyOwnerDamage(resultDamage);
 
@@ -550,8 +550,8 @@ public class StatFunctions {
 
 		if (magicBoost < 0) {
 			magicBoost = 0;
-		} else if (magicBoost > 2900) {
-			magicBoost = 2901;
+		} else if (magicBoost > 9999) {
+			magicBoost = 9999;
 		}
 
 		int knowledge = useKnowledge ? sgs.getKnowledge().getCurrent() : 100;
@@ -605,7 +605,7 @@ public class StatFunctions {
 		critical = attacked.getGameStats().getPositiveReverseStat(StatEnum.MAGICAL_CRITICAL_RESIST, critical);
 
 		// add critical Prob
-		critical *= (float) criticalProb / 100f;
+		critical *= criticalProb / 100f;
 
 		double criticalRate;
 
@@ -852,7 +852,7 @@ public class StatFunctions {
 		critical = attacked.getGameStats().getPositiveReverseStat(StatEnum.PHYSICAL_CRITICAL_RESIST, critical);
 
 		// add critical Prob
-		critical *= (float) criticalProb / 100f;
+		critical *= criticalProb / 100f;
 
 		double criticalRate;
 
@@ -914,7 +914,7 @@ public class StatFunctions {
 			float dmgPerMeter = player.getLifeStats().getMaxHp() * FallDamageConfig.FALL_DAMAGE_PERCENTAGE / 100f;
 			int damage = (int) (distance * dmgPerMeter);
 			player.getLifeStats().reduceHp(damage, player);
-			PacketSendUtility.sendPacket(player, new SM_ATTACK_STATUS(player, SM_ATTACK_STATUS.TYPE.FALL_DAMAGE, 0, -damage));
+			PacketSendUtility.sendPacket(player, new SM_ATTACK_STATUS(player, player, SM_ATTACK_STATUS.TYPE.FALL_DAMAGE, 0, -damage));
 		}
 
 		return false;

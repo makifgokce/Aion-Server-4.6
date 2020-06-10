@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aionemu.gameserver.configs.main.CustomConfig;
-import com.aionemu.gameserver.configs.main.MembershipConfig;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_FRIEND_NOTIFY;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_FRIEND_UPDATE;
 
@@ -41,7 +40,7 @@ public class FriendList implements Iterable<Friend> {
 	private Status status = Status.OFFLINE;
 	private volatile byte friendListSent = 0;
 	private final Queue<Friend> friends;
-	private Player player;
+	private PlayerCommonData playerCd;
 
 	/**
 	 * Constructs an empty friend list for the given player
@@ -49,8 +48,8 @@ public class FriendList implements Iterable<Friend> {
 	 * @param player
 	 *            Player who has this friendlist
 	 */
-	public FriendList(Player player) {
-		this(player, new ConcurrentLinkedQueue<Friend>());
+	public FriendList(PlayerCommonData playerCd) {
+		this(playerCd, new ConcurrentLinkedQueue<Friend>());
 	}
 
 	/**
@@ -61,9 +60,9 @@ public class FriendList implements Iterable<Friend> {
 	 * @param friends
 	 *            Friends on the list
 	 */
-	public FriendList(Player owner, Collection<Friend> newFriends) {
-		this.friends = new ConcurrentLinkedQueue<Friend>(newFriends);
-		this.player = owner;
+	public FriendList(PlayerCommonData playerCd, Collection<Friend> newFriends) {
+		this.friends = new ConcurrentLinkedQueue<>(newFriends);
+		this.playerCd = playerCd;
 	}
 
 	/**
@@ -138,8 +137,7 @@ public class FriendList implements Iterable<Friend> {
 	}
 
 	public boolean isFull() {
-		int MAX_FRIENDS = player.havePermission(MembershipConfig.ADVANCED_FRIENDLIST_ENABLE) ? MembershipConfig.ADVANCED_FRIENDLIST_SIZE
-				: CustomConfig.FRIENDLIST_SIZE;
+		int MAX_FRIENDS = CustomConfig.FRIENDLIST_SIZE;
 		return getSize() >= MAX_FRIENDS;
 	}
 
@@ -177,15 +175,15 @@ public class FriendList implements Iterable<Friend> {
 					log.warn("[AT] friendlist connection is null");
 					continue;
 				}
-				friendPlayer.getFriendList().getFriend(pcd.getPlayerObjId()).setPCD(pcd);
-				friendPlayer.getClientConnection().sendPacket(new SM_FRIEND_UPDATE(player.getObjectId()));
+				friendPlayer.getCommonData().getFriendList().getFriend(pcd.getPlayerObjId()).setPCD(pcd);
+				friendPlayer.getClientConnection().sendPacket(new SM_FRIEND_UPDATE(playerCd.getPlayerObjId()));
 
 				if (previousStatus == Status.OFFLINE) {
 					// Show LOGIN message
-					friendPlayer.getClientConnection().sendPacket(new SM_FRIEND_NOTIFY(SM_FRIEND_NOTIFY.LOGIN, player.getName()));
+					friendPlayer.getClientConnection().sendPacket(new SM_FRIEND_NOTIFY(SM_FRIEND_NOTIFY.LOGIN, playerCd.getName()));
 				} else if (status == Status.OFFLINE) {
 					// Show LOGOUT message
-					friendPlayer.getClientConnection().sendPacket(new SM_FRIEND_NOTIFY(SM_FRIEND_NOTIFY.LOGOUT, player.getName()));
+					friendPlayer.getClientConnection().sendPacket(new SM_FRIEND_NOTIFY(SM_FRIEND_NOTIFY.LOGOUT, playerCd.getName()));
 				}
 			}
 		}

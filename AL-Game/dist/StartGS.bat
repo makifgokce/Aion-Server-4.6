@@ -1,4 +1,7 @@
 @ECHO off
+mode con:cols=150
+color 0A
+SET PATH="C:\Program Files\Java\jdk1.7.0_51\bin"
 TITLE Aion Lightning - Game Server Console
 :START
 CLS

@@ -45,6 +45,7 @@ import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.stats.calc.Stat2;
 import com.aionemu.gameserver.model.stats.container.StatEnum;
 import com.aionemu.gameserver.model.templates.item.ItemTemplate;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_CASTSPELL;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_CASTSPELL_RESULT;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_USAGE_ANIMATION;
@@ -107,7 +108,7 @@ public class Skill {
 	private long castStartTime;
 	private String chainCategory = null;
 	private volatile boolean isMultiCast = false;
-	private List<ChargedSkill> chargeSkillList = new ArrayList<ChargedSkill>();
+	private List<ChargedSkill> chargeSkillList = new ArrayList<>();
 
 	public enum SkillMethod {
 
@@ -139,7 +140,7 @@ public class Skill {
 	 * @param firstTarget
 	 */
 	public Skill(SkillTemplate skillTemplate, Creature effector, int skillLvl, Creature firstTarget, ItemTemplate itemTemplate) {
-		this.effectedList = new ArrayList<Creature>();
+		this.effectedList = new ArrayList<>();
 		this.conditionChangeListener = new StartMovingListener();
 		this.firstTarget = firstTarget;
 		this.skillLevel = skillLvl;
@@ -440,7 +441,7 @@ public class Skill {
 		// adjust servertime with motion play speed
 		if (motion.getSpeed() != 100) {
 			serverTime /= 100f;
-			serverTime *= (float) motion.getSpeed();
+			serverTime *= motion.getSpeed();
 		}
 
 		Stat2 attackSpeed = player.getGameStats().getAttackSpeed();
@@ -464,7 +465,7 @@ public class Skill {
 			if (clientTime < finalTime) {
 				// check for no animation Hacks
 				if (SecurityConfig.NO_ANIMATION) {
-					float checkTme = (float) clientTime / serverTime;
+					float checkTme = clientTime / serverTime;
 					// check if values are too low
 					if (clientTime < 0 || checkTme < SecurityConfig.NO_ANIMATION_VALUE) {
 						if (SecurityConfig.NO_ANIMATION_KICK) {
@@ -503,36 +504,45 @@ public class Skill {
 	 * Start casting of skill
 	 */
 	protected void startCast() {
-		int targetObjId = firstTarget != null ? firstTarget.getObjectId() : 0;
+        int targetObjId = firstTarget != null ? firstTarget.getObjectId() : 0;
 
-		if (skillMethod == SkillMethod.CAST || skillMethod == SkillMethod.CHARGE) {
-			switch (targetType) {
-				case 0: // PlayerObjectId as Target
-					PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel,
-							targetType, targetObjId, this.duration, skillTemplate.isCharge()));
-					if (effector instanceof Npc && firstTarget instanceof Player) {
-						NpcAI2 ai = (NpcAI2) effector.getAi2();
-						if (ai.poll(AIQuestion.CAN_SHOUT)) {
-							ShoutEventHandler.onCast(ai, firstTarget);
-						}
-					}
-					break;
+        if (skillMethod == SkillMethod.CAST || skillMethod == SkillMethod.CHARGE) {
+            switch (targetType) {
+                case 0: // PlayerObjectId as Target
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel, targetType, targetObjId, this.duration, skillTemplate.isCharge()));
+                    if (firstTarget.getObjectId() != effector.getObjectId()) {
+                    	PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ATTACK_STATUS(effector, firstTarget, SM_ATTACK_STATUS.TYPE.REGULAR, 0, 0, SM_ATTACK_STATUS.LOG.REGULAR));
+                    	//effector.getMoveController().skillMovement();
+                    }
+                    if (effector instanceof Npc && firstTarget instanceof Player) {
+                        NpcAI2 ai = (NpcAI2) effector.getAi2();
+                        if (ai.poll(AIQuestion.CAN_SHOUT)) {
+                            ShoutEventHandler.onCast(ai, firstTarget);
+                        }
+                    }
+                    break;
 
-				case 3: // Target not in sight?
-					PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel,
-							targetType, 0, this.duration, skillTemplate.isCharge()));
-					break;
+                case 3: // Target not in sight?
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel, targetType, 0, this.duration, skillTemplate.isCharge()));
+                    if (firstTarget.getObjectId() != effector.getObjectId()) {
+                    	PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ATTACK_STATUS(effector, firstTarget, SM_ATTACK_STATUS.TYPE.REGULAR, 0, 0, SM_ATTACK_STATUS.LOG.REGULAR));
+                    	//effector.getMoveController().skillMovement();
+                    }
+                    break;
 
-				case 1: // XYZ as Target
-					PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel,
-							targetType, x, y, z, this.duration));
-					break;
-			}
-		} else if (skillMethod == SkillMethod.ITEM && duration > 0) {
-			PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(),
-					(this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), this.duration, 0, 0));
-		}
-	}
+                case 1: // XYZ as Target
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL(effector.getObjectId(), skillTemplate.getSkillId(), skillLevel, targetType, x, y, z, this.duration));
+                    if (firstTarget.getObjectId() != effector.getObjectId()) {
+                    	PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ATTACK_STATUS(effector, firstTarget, SM_ATTACK_STATUS.TYPE.REGULAR, 0, 0, SM_ATTACK_STATUS.LOG.REGULAR));
+                    	//effector.getMoveController().skillMovement();
+                    }
+                    break;
+            }
+        } else if (skillMethod == SkillMethod.ITEM && duration > 0) {
+            PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(),
+                    (this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), this.duration, 0, 0));
+        }
+    }
 
 	/**
 	 * Set this skill as canceled
@@ -600,7 +610,7 @@ public class Skill {
 		int resistCount = 0;
 		boolean blockedChain = false;
 		boolean blockedStance = false;
-		final List<Effect> effects = new ArrayList<Effect>();
+		final List<Effect> effects = new ArrayList<>();
 		if (skillTemplate.getEffects() != null) {
 			boolean blockAOESpread = false;
 			for (Creature effected : effectedList) {
@@ -609,6 +619,7 @@ public class Skill {
 					if (effect.getEffectResult() == EffectResult.CONFLICT) {
 						blockedStance = true;
 					}
+
 				}
 				// Force RESIST status if AOE spell spread must be blocked
 				if (blockAOESpread) {
@@ -724,6 +735,7 @@ public class Skill {
 		if (effector instanceof Npc) {
 			SkillAttackManager.afterUseSkill((NpcAI2) ((Npc) effector).getAi2());
 		}
+
 	}
 
 	public void applyEffect(List<Effect> effects) {
@@ -747,31 +759,31 @@ public class Skill {
 	 * @param effects
 	 */
 	private void sendCastspellEnd(int spellStatus, int dashStatus, List<Effect> effects) {
-		if (skillMethod == SkillMethod.CAST || skillMethod == SkillMethod.CHARGE) {
-			switch (targetType) {
-				case 0: // PlayerObjectId as Target
-					PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus,
-							dashStatus));
-					break;
+        if (skillMethod == SkillMethod.CAST || skillMethod == SkillMethod.CHARGE) {
+            switch (targetType) {
+                case 0: // PlayerObjectId as Target
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus, dashStatus));
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ATTACK_STATUS(firstTarget, effector, SM_ATTACK_STATUS.TYPE.REGULAR, 0, 0, SM_ATTACK_STATUS.LOG.REGULAR));
+                    break;
 
-				case 3: // Target not in sight?
-					PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus,
-							dashStatus));
-					break;
+                case 3: // Target not in sight?
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus, dashStatus));
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ATTACK_STATUS(firstTarget, effector, SM_ATTACK_STATUS.TYPE.REGULAR, 0, 0, SM_ATTACK_STATUS.LOG.REGULAR));
+                    break;
 
-				case 1: // XYZ as Target
-					PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus,
-							dashStatus, targetType));
-					break;
-			}
-		} else if (skillMethod == SkillMethod.ITEM) {
-			PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(),
-					(this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), 0, 1, 0));
-			if (effector instanceof Player) {
-				PacketSendUtility.sendPacket((Player) effector, SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(getItemTemplate().getNameId())));
-			}
-		}
-	}
+                case 1: // XYZ as Target
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_CASTSPELL_RESULT(this, effects, serverTime, chainSuccess, spellStatus, dashStatus, targetType));
+                    PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ATTACK_STATUS(firstTarget, effector, SM_ATTACK_STATUS.TYPE.REGULAR, 0, 0, SM_ATTACK_STATUS.LOG.REGULAR));
+                    break;
+            }
+        } else if (skillMethod == SkillMethod.ITEM) {
+            PacketSendUtility.broadcastPacketAndReceive(effector, new SM_ITEM_USAGE_ANIMATION(effector.getObjectId(), firstTarget.getObjectId(),
+                    (this.itemObjectId == 0 ? 0 : this.itemObjectId), itemTemplate.getTemplateId(), 0, 1, 0));
+            if (effector instanceof Player) {
+                PacketSendUtility.sendPacket((Player) effector, SM_SYSTEM_MESSAGE.STR_USE_ITEM(new DescriptionId(getItemTemplate().getNameId())));
+            }
+        }
+    }
 
 	/**
 	 * Schedule actions/effects of skill (channeled skills)
@@ -1129,6 +1141,10 @@ public class Skill {
 	public void setChainCategory(String chainCategory) {
 		this.chainCategory = chainCategory;
 	}
+
+	public String getChainCategory() {
+    	return this.chainCategory;
+    }
 
 	public SkillMethod getSkillMethod() {
 		return this.skillMethod;

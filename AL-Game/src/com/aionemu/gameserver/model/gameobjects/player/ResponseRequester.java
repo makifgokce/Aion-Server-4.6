@@ -19,9 +19,8 @@ package com.aionemu.gameserver.model.gameobjects.player;
 
 import java.util.HashMap;
 
-import org.slf4j.LoggerFactory;
-
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the asking of and responding to <tt>SM_QUESTION_WINDOW</tt>
@@ -31,7 +30,7 @@ import org.slf4j.Logger;
 public class ResponseRequester {
 
 	private Player player;
-	private HashMap<Integer, RequestResponseHandler> map = new HashMap<Integer, RequestResponseHandler>();
+	private HashMap<Integer, RequestResponseHandler> map = new HashMap<>();
 	private static Logger log = LoggerFactory.getLogger(ResponseRequester.class);
 
 	public ResponseRequester(Player player) {
@@ -83,5 +82,14 @@ public class ResponseRequester {
 		}
 
 		map.clear();
+	}
+
+	public synchronized void deny(int messageId) {
+		for (RequestResponseHandler handler : map.values()) {
+			if (map.containsKey(messageId)) {
+				map.remove(messageId);
+				handler.handle(player, 0);
+			}
+		}
 	}
 }

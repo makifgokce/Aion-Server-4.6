@@ -74,8 +74,8 @@ public class CM_HOUSE_TELEPORT extends AionClientPacket {
 		if (actionId == 1) {
 			playerId2 = playerId1;
 		} else if (actionId == 3) {
-			List<Integer> relationIds = new ArrayList<Integer>();
-			Iterator<Friend> friends = player1.getFriendList().iterator();
+			List<Integer> relationIds = new ArrayList<>();
+			Iterator<Friend> friends = player1.getCommonData().getFriendList().iterator();
 			int address = 0;
 
 			while (friends.hasNext()) {

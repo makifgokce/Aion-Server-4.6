@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.model.templates.item;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -24,7 +23,6 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author MrPoke
- *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TradeinItem")
@@ -33,13 +31,13 @@ public class TradeinItem {
 	@XmlAttribute
 	protected int id;
 	@XmlAttribute
-	protected int price;
+	protected int count;
 
 	public int getId() {
 		return id;
 	}
 
-	public int getPrice() {
-		return price;
+	public int getCount() {
+		return count;
 	}
 }

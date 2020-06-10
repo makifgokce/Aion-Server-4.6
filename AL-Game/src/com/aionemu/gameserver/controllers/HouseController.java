@@ -19,8 +19,6 @@ package com.aionemu.gameserver.controllers;
 
 import java.util.List;
 
-import javolution.util.FastMap;
-
 import com.aionemu.gameserver.controllers.observer.ActionObserver;
 import com.aionemu.gameserver.controllers.observer.ObserverType;
 import com.aionemu.gameserver.dataholders.DataManager;
@@ -42,6 +40,8 @@ import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
+
+import javolution.util.FastMap;
 
 /**
  * @author Rolandas
@@ -129,7 +129,7 @@ public class HouseController extends VisibleObjectController<House> {
 					if (objId == getOwner().getOwnerId()) {
 						continue;
 					}
-					if (!kickFriends && kicker != null && kicker.getFriendList().getFriend(objId) != null) {
+					if (!kickFriends && kicker != null && kicker.getCommonData().getFriendList().getFriend(objId) != null) {
 						continue;
 					}
 					Player visitor = World.getInstance().findPlayer(objId);

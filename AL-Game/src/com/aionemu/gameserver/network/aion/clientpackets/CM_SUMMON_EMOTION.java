@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +59,7 @@ public class CM_SUMMON_EMOTION extends AionClientPacket {
 
 		// Unknown Summon Emotion Type
 		if (emotionType == EmotionType.UNK) {
-			log.error("Unknown emotion type? 0x" + Integer.toHexString(emotionTypeId).toUpperCase());
+			log.error("Unknown emotion type? 0x" + Integer.toHexString(emotionTypeId).toUpperCase(Locale.forLanguageTag("en")));
 		}
 
 		Summon summon = player.getSummon();

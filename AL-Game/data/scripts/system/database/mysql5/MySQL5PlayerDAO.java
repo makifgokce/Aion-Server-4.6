@@ -17,6 +17,25 @@
 
 package mysql5;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.DB;
 import com.aionemu.commons.database.DatabaseFactory;
 import com.aionemu.commons.database.IUStH;
@@ -36,20 +55,14 @@ import com.aionemu.gameserver.model.account.PlayerAccountData;
 import com.aionemu.gameserver.model.gameobjects.player.Mailbox;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
+import com.aionemu.gameserver.model.templates.portal.InstanceExit;
+import com.aionemu.gameserver.services.instance.InstanceService;
 import com.aionemu.gameserver.world.MapRegion;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.WorldPosition;
 import com.google.common.collect.Maps;
-import com.aionemu.gameserver.services.instance.InstanceService;
-import com.aionemu.gameserver.model.templates.portal.InstanceExit;
-import javolution.util.FastMap;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.*;
-import java.util.Map.Entry;
+import javolution.util.FastMap;
 
 /**
  * @author SoulKeeper, Saelya
@@ -137,7 +150,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 		try {
 			con = DatabaseFactory.getConnection();
 			PreparedStatement stmt = con
-					.prepareStatement("UPDATE players SET name=?, exp=?, recoverexp=?, x=?, y=?, z=?, heading=?, world_id=?, gender=?, race=?, player_class=?, last_online=?, quest_expands=?, npc_expands=?, advanced_stigma_slot_size=?, warehouse_size=?, note=?, title_id=?, bonus_title_id=?, dp=?, soul_sickness=?, mailbox_letters=?, reposte_energy=?, bg_points=?, mentor_flag_time=?, initial_gamestats=?, world_owner=? WHERE id=?");
+					.prepareStatement("UPDATE players SET name=?, exp=?, recoverexp=?, x=?, y=?, z=?, heading=?, world_id=?, gender=?, race=?, player_class=?, last_online=?, quest_expands=?, npc_expands=?, item_expands=?, advanced_stigma_slot_size=?, warehouse_npc_expands=?, warehouse_quest_expands=?, warehouse_item_expands=?, note=?, title_id=?, bonus_title_id=?, dp=?, soul_sickness=?, mailbox_letters=?, reposte_energy=?, bg_points=?, mentor_flag_time=?, initial_gamestats=?, world_owner=?, serverId=? WHERE id=?");
 
 			log.debug("[DAO: MySQL5PlayerDAO] storing player " + player.getObjectId() + " " + player.getName());
 			PlayerCommonData pcd = player.getCommonData();
@@ -155,29 +168,33 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 			stmt.setTimestamp(12, pcd.getLastOnline());
 			stmt.setInt(13, player.getQuestExpands());
 			stmt.setInt(14, player.getNpcExpands());
-			stmt.setInt(15, pcd.getAdvancedStigmaSlotSize());
-			stmt.setInt(16, player.getWarehouseSize());
-			stmt.setString(17, pcd.getNote());
-			stmt.setInt(18, pcd.getTitleId());
-			stmt.setInt(19, pcd.getBonusTitleId());
-			stmt.setInt(20, pcd.getDp());
-			stmt.setInt(21, pcd.getDeathCount());
+			stmt.setInt(15, player.getItemExpands());
+			stmt.setInt(16, pcd.getAdvancedStigmaSlotSize());
+			stmt.setInt(17, player.getWarehouseNpcExpands());
+			stmt.setInt(18, player.getWarehouseQuestExpands());
+			stmt.setInt(19, player.getWarehouseItemExpands());
+			stmt.setString(20, pcd.getNote());
+			stmt.setInt(21, pcd.getTitleId());
+			stmt.setInt(22, pcd.getBonusTitleId());
+			stmt.setInt(23, pcd.getDp());
+			stmt.setInt(24, pcd.getDeathCount());
 			Mailbox mailBox = player.getMailbox();
 			int mails = mailBox != null ? mailBox.size() : pcd.getMailboxLetters();
-			stmt.setInt(22, mails);
-			stmt.setLong(23, pcd.getCurrentReposteEnergy());
-			stmt.setInt(24, player.getCommonData().getBattleGroundPoints());
-			stmt.setInt(25, pcd.getMentorFlagTime());
-			stmt.setInt(26, pcd.isInitialGameStats());
+			stmt.setInt(25, mails);
+			stmt.setLong(26, pcd.getCurrentReposteEnergy());
+			stmt.setInt(27, player.getCommonData().getBattleGroundPoints());
+			stmt.setInt(28, pcd.getMentorFlagTime());
+			stmt.setInt(29, pcd.isInitialGameStats());
 			if (player.getPosition().getWorldMapInstance() == null) { // FIXME!
 				log.error("Error saving player: " + player.getObjectId() + " " + player.getName()
 						+ ", world map instance is null. Setting world owner to 0. Position: " + player.getWorldId() + " " + player.getX() + " "
 						+ player.getY() + " " + player.getZ());
-				stmt.setInt(27, 0);
+				stmt.setInt(30, 0);
 			} else {
-				stmt.setInt(27, player.getPosition().getWorldMapInstance().getOwnerId());
+				stmt.setInt(30, player.getPosition().getWorldMapInstance().getOwnerId());
 			}
-			stmt.setInt(28, player.getObjectId());
+			stmt.setInt(31, pcd.getServerId());
+			stmt.setInt(32, player.getObjectId());
 			stmt.execute();
 			stmt.close();
 		} catch (Exception e) {
@@ -189,7 +206,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 			PlayerCommonData cached = playerCommonData.get(player.getObjectId());
 			if (cached != null) {
 				playerCommonData.putEntry(player.getCommonData().getPlayerObjId(), player.getCommonData());
-				playerCommonDataByName.putEntry(player.getName().toLowerCase(), player.getCommonData());
+				playerCommonDataByName.putEntry(player.getName().toLowerCase(Locale.forLanguageTag("en")), player.getCommonData());
 			}
 		}
 	}
@@ -203,8 +220,8 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 		try {
 			con = DatabaseFactory.getConnection();
 			PreparedStatement preparedStatement = con
-					.prepareStatement("INSERT INTO players(id, `name`, account_id, account_name, x, y, z, heading, world_id, gender, race, player_class , quest_expands, npc_expands, warehouse_size, online) "
-							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+					.prepareStatement("INSERT INTO players(`id`, `name`, `account_id`, `account_name`, `x`, `y`, `z`, `heading`, `world_id`, `gender`, `race`, `player_class` , `quest_expands`, `npc_expands`, `item_expands` , `warehouse_npc_expands`, `warehouse_quest_expands`, `warehouse_item_expands`, `serverId`, `online`) "
+							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
 
 			log.debug("[DAO: MySQL5PlayerDAO] saving new player: " + pcd.getPlayerObjId() + " " + pcd.getName());
 
@@ -222,7 +239,11 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 			preparedStatement.setString(12, pcd.getPlayerClass().toString());
 			preparedStatement.setInt(13, pcd.getQuestExpands());
 			preparedStatement.setInt(14, pcd.getNpcExpands());
-			preparedStatement.setInt(15, pcd.getWarehouseSize());
+			preparedStatement.setInt(15, pcd.getItemExpands());
+			preparedStatement.setInt(16, pcd.getWarehouseNpcExpands());
+			preparedStatement.setInt(17, pcd.getWarehouseQuestExpands());
+			preparedStatement.setInt(18, pcd.getWarehouseItemExpands());
+			preparedStatement.setInt(19, pcd.getServerId());
 			preparedStatement.execute();
 			preparedStatement.close();
 		} catch (Exception e) {
@@ -233,7 +254,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 		}
 		if (CacheConfig.CACHE_COMMONDATA) {
 			playerCommonData.put(pcd.getPlayerObjId(), pcd);
-			playerCommonDataByName.put(pcd.getName().toLowerCase(), pcd);
+			playerCommonDataByName.put(pcd.getName().toLowerCase(Locale.forLanguageTag("en")), pcd);
 		}
 		return true;
 	}
@@ -244,7 +265,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 		if (player != null) {
 			return player.getCommonData();
 		}
-		PlayerCommonData pcd = playerCommonDataByName.get(name.toLowerCase());
+		PlayerCommonData pcd = playerCommonDataByName.get(name.toLowerCase(Locale.forLanguageTag("en")));
 		if (pcd != null) {
 			return pcd;
 		}
@@ -304,10 +325,13 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 				cd.setNote(resultSet.getString("note"));
 				cd.setQuestExpands(resultSet.getInt("quest_expands"));
 				cd.setNpcExpands(resultSet.getInt("npc_expands"));
+				cd.setItemExpands(resultSet.getInt("item_expands"));
 				cd.setAdvancedStigmaSlotSize(resultSet.getInt("advanced_stigma_slot_size"));
 				cd.setTitleId(resultSet.getInt("title_id"));
 				cd.setBonusTitleId(resultSet.getInt("bonus_title_id"));
-				cd.setWarehouseSize(resultSet.getInt("warehouse_size"));
+				cd.setWarehouseNpcExpands(resultSet.getInt("warehouse_npc_expands"));
+				cd.setWarehouseQuestExpands(resultSet.getInt("warehouse_quest_expands"));
+				cd.setWarehouseItemExpands(resultSet.getInt("warehouse_item_expands"));
 				cd.setOnline(resultSet.getBoolean("online"));
 				cd.setMailboxLetters(resultSet.getInt("mailbox_letters"));
 				if (System.currentTimeMillis() - cd.getLastOnline().getTime() > 300000)
@@ -368,6 +392,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 				cd.setMentorFlagTime(resultSet.getInt("mentor_flag_time"));
 				cd.setInitialGameStats(resultSet.getInt("initial_gamestats"));
 				cd.setLastTransferTime(resultSet.getLong("last_transfer_time"));
+				cd.setServerId(resultSet.getInt("serverId"));
 			} else {
 				log.info("Missing PlayerCommonData from db " + playerObjId);
 			}
@@ -382,7 +407,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 		if (success) {
 			if (CacheConfig.CACHE_COMMONDATA) {
 				playerCommonData.put(playerObjId, cd);
-				playerCommonDataByName.put(cd.getName().toLowerCase(), cd);
+				playerCommonDataByName.put(cd.getName().toLowerCase(Locale.forLanguageTag("en")), cd);
 			}
 			return cd;
 		}
@@ -403,7 +428,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 		if (CacheConfig.CACHE_COMMONDATA) {
 			PlayerCommonData pcd = playerCommonData.remove(playerId);
 			if (pcd != null) {
-				playerCommonDataByName.remove(pcd.getName().toLowerCase());
+				playerCommonDataByName.remove(pcd.getName().toLowerCase(Locale.forLanguageTag("en")));
 			}
 		}
 		DB.executeUpdateAndClose(statement);
@@ -414,7 +439,7 @@ public class MySQL5PlayerDAO extends PlayerDAO {
 	 */
 	@Override
 	public List<Integer> getPlayerOidsOnAccount(final int accountId) {
-		final List<Integer> result = new ArrayList<Integer>();
+		final List<Integer> result = new ArrayList<>();
 		boolean success = DB.select("SELECT id FROM players WHERE account_id = ?", new ParamReadStH() {
 			@Override
 			public void handleRead(ResultSet resultSet) throws SQLException {

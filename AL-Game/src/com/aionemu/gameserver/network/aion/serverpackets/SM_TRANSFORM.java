@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
 import com.aionemu.gameserver.dataholders.DataManager;
@@ -34,6 +33,8 @@ public class SM_TRANSFORM extends AionServerPacket {
 	private int modelId;
 	private boolean applyEffect;
 	private int panelId;
+	private int itemId;
+	private int skillId = 0;
 
 	public SM_TRANSFORM(Creature creature, boolean applyEffect) {
 		this.creature = creature;
@@ -42,12 +43,23 @@ public class SM_TRANSFORM extends AionServerPacket {
 		this.applyEffect = applyEffect;
 	}
 
-	public SM_TRANSFORM(Creature creature, int panelId, boolean applyEffect) {
+	public SM_TRANSFORM(Creature creature, int panelId, boolean applyEffect, int itemId) {
 		this.creature = creature;
 		this.state = creature.getState();
 		modelId = creature.getTransformModel().getModelId();
 		this.panelId = panelId;
 		this.applyEffect = applyEffect;
+		this.itemId = itemId;
+	}
+	
+	public SM_TRANSFORM(Creature creature, int panelId, boolean applyEffect, int itemId, int skillId) {
+		this.creature = creature;
+		this.state = creature.getState();
+		modelId = creature.getTransformModel().getModelId();
+		this.panelId = panelId;
+		this.applyEffect = applyEffect;
+		this.itemId = itemId;
+		this.skillId = skillId;
 	}
 
 	@Override
@@ -67,15 +79,21 @@ public class SM_TRANSFORM extends AionServerPacket {
 		writeC(0);
 		writeC(npcTemplate != null && !isMoveNpc(npcTemplate.getTemplateId()) && npcTemplate.getStatsTemplate().getRunSpeed() == 0 ? 1 : 0);
 		writeD(panelId); // display panel
+		writeD(itemId); // ItemId
+		writeC(0); // 0 and 1
+		writeH(skillId);
 	}
 
-    /* Exception for Steam Tachysphere and Rentus Tanks
-     * FIXME!: fix handling and remove! */
+	/*
+	 * Exception for Steam Tachysphere and Rentus Tanks FIXME!: fix handling and remove!
+	 */
 	private boolean isMoveNpc(int npcId) {
 		switch (npcId) {
 			case 217384:
 			case 218611:
 			case 218610:
+			case 731533: // Magma Tachysphere [A]
+			case 731534: // Magma Tachysphere [B]
 				return true;
 		}
 		return false;

@@ -10,11 +10,23 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.services.siegeservice;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -26,20 +38,20 @@ import com.aionemu.gameserver.services.abyss.AbyssPointsService;
  */
 public class GloryPointsListener extends AbyssPointsService.AddGPGlobalCallback {
 
-	private final Siege<?> siege;
+    private final Siege<?> siege;
 
-	public GloryPointsListener(Siege<?> siege) {
-		this.siege = siege;
-	}
+    public GloryPointsListener(Siege<?> siege) {
+        this.siege = siege;
+    }
 
-	@Override
-	public void onGloryPointsAdded(Player player, int gloryPoints) {
-		SiegeLocation fortress = siege.getSiegeLocation();
+    @Override
+    public void onGloryPointsAdded(Player player, int gloryPoints) {
+        SiegeLocation fortress = siege.getSiegeLocation();
 
-		// Make sure that only GP earned near this fortress will be added
-		// Abyss points can be added only while in the siege zones
-		if (fortress.isInsideLocation(player)) {
-			siege.addGloryPoints(player, gloryPoints);
-		}
-	}
+        // Make sure that only GP earned near this fortress will be added
+        // Abyss points can be added only while in the siege zones
+        if (fortress.isInsideLocation(player)) {
+            siege.addGloryPoints(player, gloryPoints);
+        }
+    }
 }

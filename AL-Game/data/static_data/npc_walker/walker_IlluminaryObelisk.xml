@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<npc_walker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="npc_walker.xsd">
+	<walker_template pool="1" route_id="EasternShieldGenerator" formation="POINT" rows="2,1">
+		<routestep step="1" x="256.0" y="316.0" z="325.0"/>
+		<routestep step="2" x="256.0" y="316.0" z="323.2587"/>
+		<routestep step="3" x="256.0" y="301.0" z="321.1567"/>
+	</walker_template>
+</npc_walker>

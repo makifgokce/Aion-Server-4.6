@@ -79,7 +79,7 @@ public class CM_DUEL_REQUEST extends AionClientPacket {
 				sendPacket(SM_SYSTEM_MESSAGE.STR_DUEL_PARTNER_IN_DUEL_ALREADY(target.getName()));
 				return;
 			}
-			if (targetPlayer.getPlayerSettings().isInDeniedStatus(DeniedStatus.DUEL)) {
+			if (targetPlayer.getCommonData().getPlayerSettings().isInDeniedStatus(DeniedStatus.DUEL)) {
 				sendPacket(SM_SYSTEM_MESSAGE.STR_MSG_REJECTED_DUEL(targetPlayer.getName()));
 				return;
 			}

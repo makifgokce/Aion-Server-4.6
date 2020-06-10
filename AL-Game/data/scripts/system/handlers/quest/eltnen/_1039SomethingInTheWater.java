@@ -18,6 +18,7 @@
 package quest.eltnen;
 
 import com.aionemu.gameserver.model.DialogAction;
+import com.aionemu.gameserver.model.TeleportAnimation;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.HandlerResult;
@@ -25,6 +26,8 @@ import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
+import com.aionemu.gameserver.services.teleport.TeleportService2;
+import com.aionemu.gameserver.world.WorldMapType;
 import com.aionemu.gameserver.world.zone.ZoneName;
 
 /**
@@ -102,6 +105,8 @@ public class _1039SomethingInTheWater extends QuestHandler {
 							}
 						}
 						case SETPRO2: {
+							TeleportService2.teleportTo(player, WorldMapType.ELTNEN.getId(), 1910.5366f, 2018.574f, 361.5f, (byte) 83,
+							TeleportAnimation.BEAM_ANIMATION);
 							return defaultCloseDialog(env, 2, 3, 0, 0, 182201010, 1); // 3
 						}
 						default:

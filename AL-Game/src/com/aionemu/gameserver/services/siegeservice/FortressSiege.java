@@ -38,6 +38,7 @@ import com.aionemu.gameserver.model.templates.siegelocation.SiegeReward;
 import com.aionemu.gameserver.model.templates.zone.ZoneType;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
+import com.aionemu.gameserver.services.abyss.AbyssPointsService;
 import com.aionemu.gameserver.services.LegionService;
 import com.aionemu.gameserver.services.SiegeService;
 import com.aionemu.gameserver.services.mail.AbyssSiegeLevel;
@@ -302,6 +303,25 @@ public class FortressSiege extends Siege<FortressLocation> {
 				}
 				MailFormatter.sendAbyssRewardMail(getSiegeLocation(), pcd, level, result, System.currentTimeMillis(), topGrade.getItemId(), topGrade.getCount()
 						* SiegeConfig.SIEGE_MEDAL_RATE, 0);
+					if(getSiegeLocationId() != 1131 && getSiegeLocationId() != 1132 && getSiegeLocationId() != 1141 && getSiegeLocationId() != 1211 && getSiegeLocationId() != 1251 && getSiegeLocationId() != 2011 && getSiegeLocationId() != 2021 && getSiegeLocationId() !=  3011 && getSiegeLocationId() != 3021){
+						switch (level) {//gp reward for fotress occupation
+                    case HERO_DECORATION:
+                        AbyssPointsService.addGp(pcd.getPlayer(), 300);
+                        break;
+                    case MEDAL:
+                        AbyssPointsService.addGp(pcd.getPlayer(), 200);
+                        break;
+                    case ELITE_SOLDIER:
+                        AbyssPointsService.addGp(pcd.getPlayer(), 150);
+                        break;
+                    case VETERAN_SOLDIER:
+                        AbyssPointsService.addGp(pcd.getPlayer(), 100);
+                        break;
+                    default:
+                        AbyssPointsService.addGp(pcd.getPlayer(), 50);
+                        break;
+						}
+					}
 			}
 		}
 		if (!isBossKilled()) {

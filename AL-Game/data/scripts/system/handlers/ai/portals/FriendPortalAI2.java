@@ -37,7 +37,7 @@ public class FriendPortalAI2 extends NpcAI2 {
 		SummonedHouseNpc me = (SummonedHouseNpc) getOwner();
 		int playerOwner = me.getCreator().getOwnerId();
 
-		boolean allowed = player.getObjectId() == playerOwner || player.getFriendList().getFriend(playerOwner) != null
+		boolean allowed = player.getObjectId() == playerOwner || player.getCommonData().getFriendList().getFriend(playerOwner) != null
 				|| (player.getLegion() != null && player.getLegion().isMember(playerOwner));
 
 		if (allowed) {

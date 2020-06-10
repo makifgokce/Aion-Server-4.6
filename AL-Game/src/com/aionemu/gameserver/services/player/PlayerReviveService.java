@@ -30,7 +30,13 @@ import com.aionemu.gameserver.model.team2.common.legacy.PlayerAllianceEvent;
 import com.aionemu.gameserver.model.team2.group.PlayerGroupService;
 import com.aionemu.gameserver.model.templates.item.ItemUseLimits;
 import com.aionemu.gameserver.model.vortex.VortexLocation;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_USAGE_ANIMATION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_MOTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TARGET_SELECTED;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TARGET_UPDATE;
 import com.aionemu.gameserver.services.SerialKillerService;
 import com.aionemu.gameserver.services.VortexService;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
@@ -54,11 +60,11 @@ public class PlayerReviveService {
 	}
 
 	public static final void skillRevive(Player player) {
-		if (!(player.getResStatus())) {
+		if (!player.getResStatus()) {
 			cancelRes(player);
 			return;
 		}
-		revive(player, 10, 10, true, player.getResurrectionSkill());
+		revive(player, 30, 30, true, player.getResurrectionSkill());
 		if (player.getIsFlyingBeforeDeath()) {
 			player.setState(CreatureState.FLYING);
 		}
@@ -123,7 +129,7 @@ public class PlayerReviveService {
 	}
 
 	public static final void bindRevive(Player player, int skillId) {
-		revive(player, 25, 25, true, skillId);
+		revive(player, 30, 30, true, skillId);
 		PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_REBIRTH_MASSAGE_ME);
 		// TODO: It is not always necessary.
 		// sendPacket(new SM_QUEST_LIST(activePlayer));
@@ -169,7 +175,7 @@ public class PlayerReviveService {
 			WorldPosition bind = kisk.getPosition();
 			kisk.resurrectionUsed();
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_REBIRTH_MASSAGE_ME);
-			revive(player, 25, 25, false, skillId);
+			revive(player, 30, 30, false, skillId);
 			player.getGameStats().updateStatsAndSpeedVisually();
 			player.unsetResPosState();
 			TeleportService2.moveToKiskLocation(player, bind);
@@ -190,7 +196,7 @@ public class PlayerReviveService {
 			bindRevive(player);
 			return;
 		}
-		revive(player, 25, 25, true, skillId);
+		revive(player, 30, 30, true, skillId);
 		PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_REBIRTH_MASSAGE_ME);
 		player.getGameStats().updateStatsAndSpeedVisually();
 		PacketSendUtility.sendPacket(player, new SM_PLAYER_INFO(player, false));
@@ -213,6 +219,9 @@ public class PlayerReviveService {
                 if (target != null && target.getObjectId() == player.getObjectId() && (visitor.getRace() != player.getRace())) {
 					visitor.setTarget(null);
 					PacketSendUtility.sendPacket(visitor, new SM_TARGET_SELECTED(null));
+					PacketSendUtility.broadcastPacket(visitor, new SM_TARGET_UPDATE(visitor));
+				} else if(visitor.getRace() == player.getRace()) {
+					PacketSendUtility.broadcastPacket(visitor, new SM_TARGET_UPDATE(visitor));
 				}
 			}
 		});
@@ -258,7 +267,7 @@ public class PlayerReviveService {
 			return;
 		}
 		// Tombstone Self-Rez retail verified 15%
-		revive(player, 15, 15, true, player.getResurrectionSkill());
+		revive(player, 30, 30, true, player.getResurrectionSkill());
 		// if player was flying before res, start flying
 		if (player.getIsFlyingBeforeDeath()) {
 			player.setState(CreatureState.FLYING);

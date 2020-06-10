@@ -20,13 +20,11 @@ package com.aionemu.gameserver.network.loginserver.serverpackets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javolution.util.FastList;
 
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.dao.InventoryDAO;
@@ -49,13 +47,15 @@ import com.aionemu.gameserver.model.gameobjects.player.title.TitleList;
 import com.aionemu.gameserver.model.items.GodStone;
 import com.aionemu.gameserver.model.items.ManaStone;
 import com.aionemu.gameserver.model.items.storage.StorageType;
-import com.aionemu.gameserver.model.skill.PlayerSkillList;
 import com.aionemu.gameserver.model.skill.PlayerSkillEntry;
+import com.aionemu.gameserver.model.skill.PlayerSkillList;
 import com.aionemu.gameserver.network.loginserver.LoginServerConnection;
 import com.aionemu.gameserver.network.loginserver.LsServerPacket;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.services.item.ItemService;
 import com.aionemu.gameserver.services.transfers.TransferablePlayer;
+
+import javolution.util.FastList;
 
 /**
  * @author KID
@@ -125,7 +125,7 @@ public class SM_PTRANSFER_CONTROL extends LsServerPacket {
 				writeD(player.getCommonData().getQuestExpands());
 				writeD(player.getCommonData().getNpcExpands());
 				writeD(player.getCommonData().getAdvancedStigmaSlotSize());
-				writeD(player.getCommonData().getWarehouseSize());
+				writeD(player.getCommonData().getWarehouseNpcExpands());
 
 				PlayerAppearance playerAppearance = player.getPlayerAppearance();
 				writeD(playerAppearance.getSkinRGB());
@@ -322,7 +322,7 @@ public class SM_PTRANSFER_CONTROL extends LsServerPacket {
 				PlayerSkillList skillList = player.getSkillList();
 
 				// discard stigma skills
-				List<PlayerSkillEntry> skills = new ArrayList<PlayerSkillEntry>();
+				List<PlayerSkillEntry> skills = new ArrayList<>();
 				for (PlayerSkillEntry sk : skillList.getAllSkills()) {
 					if (!sk.isStigma()) {
 						skills.add(sk);
@@ -342,7 +342,7 @@ public class SM_PTRANSFER_CONTROL extends LsServerPacket {
 					writeD(t.getRemainingTime());
 				}
 
-				PlayerSettings ps = player.getPlayerSettings();
+				PlayerSettings ps = player.getCommonData().getPlayerSettings();
 				writeD(ps.getUiSettings() == null ? 0 : ps.getUiSettings().length);
 				writeD(ps.getShortcuts() == null ? 0 : ps.getShortcuts().length);
 				if (ps.getUiSettings() != null) {

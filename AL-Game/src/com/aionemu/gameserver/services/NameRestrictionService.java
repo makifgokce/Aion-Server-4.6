@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.services;
 
+import java.util.Locale;
+
 import com.aionemu.gameserver.configs.main.NameConfig;
 
 /**
@@ -85,11 +87,11 @@ public class NameRestrictionService {
 		}
 
 		if (forbiddenSequences == null || forbiddenSequences.length == 0) {
-			forbiddenSequences = NameConfig.NAME_SEQUENCE_FORBIDDEN.toLowerCase().split(",");
+			forbiddenSequences = NameConfig.NAME_SEQUENCE_FORBIDDEN.toLowerCase(Locale.forLanguageTag("en")).split(",");
 		}
 
 		for (String s : forbiddenSequences) {
-			if (name.toLowerCase().contains(s)) {
+			if (name.toLowerCase(Locale.forLanguageTag("en")).contains(s)) {
 				return true;
 			}
 		}

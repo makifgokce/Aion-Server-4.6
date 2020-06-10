@@ -18,7 +18,6 @@
 package com.aionemu.gameserver.configs.main;
 
 import com.aionemu.commons.configuration.Property;
-import com.aionemu.gameserver.model.Race;
 
 public class CustomConfig {
 	/**
@@ -113,7 +112,7 @@ public class CustomConfig {
 	/**
 	 * Basic Quest limit size
 	 */
-	@Property(key = "gameserver.basic.cubesize.limit", defaultValue = "9")
+	@Property(key = "gameserver.basic.cubesize.limit", defaultValue = "12")
 	public static int BASIC_CUBE_SIZE_LIMIT;
 	/**
 	 * Npc Cube Expands limit size
@@ -352,8 +351,6 @@ public class CustomConfig {
 	public static boolean ABYSSXFORM_LOGOUT;
 	@Property(key = "gameserver.instance.duel.enable", defaultValue = "true")
 	public static boolean INSTANCE_DUEL_ENABLE;
-	@Property(key = "gameserver.ride.restriction.enable", defaultValue = "true")
-	public static boolean ENABLE_RIDE_RESTRICTION;
 
 	@Property(key = "gameserver.quest.questdatakills", defaultValue = "true")
 	public static boolean QUESTDATA_MONSTER_KILLS;
@@ -366,4 +363,16 @@ public class CustomConfig {
      */
     @Property(key = "gameserver.worldchannel.costs", defaultValue = "50000")
     public static int WORLD_CHANNEL_AP_COSTS;
+
+
+    /**
+     * Anti-Zerg system
+     */
+    @Property(key = "gameserver.antizerg.enable", defaultValue = "false")
+    public static boolean ANTI_ZERG_ENABLED;
+    @Property(key = "gameserver.antizerg.map", defaultValue = "")
+    public static String ANTI_ZERG_MAP;
+    @Property(key = "gameserver.antizerg.playercount", defaultValue = "3")
+    public static int ANTI_ZERG_COUNT;
+
 }

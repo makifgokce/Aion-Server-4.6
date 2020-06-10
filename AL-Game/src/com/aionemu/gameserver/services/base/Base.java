@@ -17,10 +17,15 @@
 
 package com.aionemu.gameserver.services.base;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.aionemu.commons.callbacks.EnhancedObject;
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.ai2.AbstractAI;
-import com.aionemu.gameserver.controllers.NpcController;
+import com.aionemu.gameserver.configs.main.BaseConfig;
+//import com.aionemu.gameserver.controllers.NpcController;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.TaskId;
@@ -31,14 +36,9 @@ import com.aionemu.gameserver.model.templates.npc.NpcTemplateType;
 import com.aionemu.gameserver.model.templates.spawns.SpawnGroup2;
 import com.aionemu.gameserver.model.templates.spawns.SpawnTemplate;
 import com.aionemu.gameserver.model.templates.spawns.basespawns.BaseSpawnTemplate;
-import com.aionemu.gameserver.services.BaseService;
 import com.aionemu.gameserver.spawnengine.SpawnEngine;
 import com.aionemu.gameserver.spawnengine.SpawnHandlerType;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -46,12 +46,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Base<BL extends BaseLocation> {
 
-	private Future<?> startAssault, stopAssault;
+	// private Future<?> startAssault, stopAssault;
 	private final BL baseLocation;
-	private List<Race> list = new ArrayList<Race>();
+	private List<Race> list = new ArrayList<>();
 	private final BossDeathListener bossDeathListener = new BossDeathListener(this);
-	private List<Npc> attackers = new ArrayList<Npc>();
-	private List<Npc> spawned = new ArrayList<Npc>();
+	// private List<Npc> attackers = new ArrayList<Npc>();
+	private List<Npc> spawned = new ArrayList<>();
 	private final AtomicBoolean finished = new AtomicBoolean();
 	private boolean started;
 	private Npc boss, flag;
@@ -78,7 +78,6 @@ public class Base<BL extends BaseLocation> {
 		if (doubleStart) {
 			return;
 		}
-
 		spawn();
 	}
 
@@ -118,19 +117,19 @@ public class Base<BL extends BaseLocation> {
 			}
 		}
 
-		delayedAssault();
+		// delayedAssault();
 		delayedSpawn(getRace());
 	}
-
+/**
 	private void delayedAssault() {
 		startAssault = ThreadPoolManager.getInstance().schedule(new Runnable() {
 			@Override
 			public void run() {
 				chooseAttackersRace();
 			}
-		}, Rnd.get(15, 20) * 60000); // Randomly every 15 - 20 min start assault
+		}, Rnd.get(BaseConfig.ASSAULT_MIN_DELAY, BaseConfig.ASSAULT_MAX_DELAY) * 60000); // Randomly every 15 - 20 min start assault
 	}
-
+*/
 	private void delayedSpawn(final Race race) {
 		ThreadPoolManager.getInstance().schedule(new Runnable() {
 			@Override
@@ -140,7 +139,7 @@ public class Base<BL extends BaseLocation> {
 				}
 			}
 
-		}, Rnd.get(20, 30) * 60000); // Randomly every 20 - 30 min boss spawn
+		}, Rnd.get(BaseConfig.BOSS_SPAWN_MIN_DELAY, BaseConfig.BOSS_SPAWN_MAX_DELAY) * 60000); // Randomly every 20 - 30 min boss spawn
 	}
 
 	protected void spawnBoss() {
@@ -158,7 +157,7 @@ public class Base<BL extends BaseLocation> {
 			}
 		}
 	}
-
+/**
 	protected void chooseAttackersRace() {
 		AtomicBoolean next = new AtomicBoolean(Math.random() < 0.5);
 		for (Race race : list) {
@@ -231,7 +230,7 @@ public class Base<BL extends BaseLocation> {
 		}
 		return false;
 	}
-
+*/
 	protected void despawn() {
 		setFlag(null);
 		for (Npc npc : getSpawned()) {
@@ -239,7 +238,7 @@ public class Base<BL extends BaseLocation> {
 			npc.getController().onDelete();
 		}
 		getSpawned().clear();
-
+/**
 		despawnAttackers();
 		if (startAssault != null) {
 			startAssault.cancel(true);
@@ -247,8 +246,9 @@ public class Base<BL extends BaseLocation> {
 		if (stopAssault != null) {
 			stopAssault.cancel(true);
 		}
+		*/
 	}
-
+/**
 	protected void despawnAttackers() {
         NpcController controller;
 		for (Npc attacker : getAttackers()) {
@@ -260,7 +260,7 @@ public class Base<BL extends BaseLocation> {
 		}
 		getAttackers().clear();
 	}
-
+*/
 	protected void addBossListeners() {
 		AbstractAI ai = (AbstractAI) getBoss().getAi2();
 		EnhancedObject eo = (EnhancedObject) ai;
@@ -312,11 +312,11 @@ public class Base<BL extends BaseLocation> {
 	public void setRace(Race race) {
 		baseLocation.setRace(race);
 	}
-
+	/**
 	public List<Npc> getAttackers() {
 		return attackers;
 	}
-
+	*/
 	public List<Npc> getSpawned() {
 		return spawned;
 	}

@@ -123,12 +123,16 @@
                     80325 [XML] [Event/Daily] Remedy for the Heart (Elyos)
                     80326 [XML] [Event/Daily] Remedy for the Body (Asmodians)
                     80327 [XML] [Event/Daily] Remedy for the Heart (Asmodians)
+					80344 [XML] [Event] Alchemist's Gift
                     80467 [XML] [Event] Cake containing the Lord's energy (Elyos)
                     80468 [XML] [Event] Cake containing the Lord's energy (Asmodians)
                     80469 [XML] [Event] Atreia, filled with the Lord's energy (Elyos)
                     80470 [XML] [Event] Atreia, filled with the Lord's energy (Asmodians)
                     80575 [XML] [Event] Snow in Atreia (Elyos)
+					80576 [XML] [Event] Another Chance (Elyos)
+					80577 [XML] [Event] Happy Snorinerk's Friend
                     80578 [XML] [Event] Snow in Atreia (Asmodians)
+					80579 [XML] [Event] Another Chance (Asmodians)
             [END] SUMMARY
     -->
     <!-- REPORTING QUESTS -->
@@ -142,6 +146,10 @@
     <report_to id="80327" start_npc_ids="831439" end_npc_ids="831448"/>
     <report_to id="80575" start_npc_ids="832041" end_npc_ids="832041"/>
     <report_to id="80578" start_npc_ids="832041" end_npc_ids="832041"/>
+    <report_to id="80577" start_npc_ids="832040" end_npc_ids="832040"/>
+	<report_to_many id="80344" start_npc_ids="831787" end_npc_ids="831787">
+        <npc_infos var="0" npc_id="831787" quest_dialog="2375" close_dialog="1009"/>
+    </report_to_many>
     <report_to_many id="80467" start_npc_ids="831859" end_npc_ids="831859">
         <npc_infos var="0" npc_id="831859" quest_dialog="2375" close_dialog="1009"/>
     </report_to_many>
@@ -252,6 +260,8 @@
     <item_collecting start_npc_ids="799763" id="80323"/>
     <item_collecting start_npc_ids="799763" id="80328"/>
     <item_collecting start_npc_ids="799763" id="80329"/>
+    <item_collecting start_npc_ids="832042" id="80576"/>
+    <item_collecting start_npc_ids="832042" id="80579"/>
     <!-- HUNTING QUESTS -->
     <monster_hunt start_npc_ids="202549" id="50021">
         <monster var="0" npc_ids="217161" end_var="15"/>

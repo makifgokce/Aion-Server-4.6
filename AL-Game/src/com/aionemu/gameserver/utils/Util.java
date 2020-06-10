@@ -18,8 +18,7 @@
 package com.aionemu.gameserver.utils;
 
 import java.nio.ByteBuffer;
-
-import com.aionemu.gameserver.configs.main.NameConfig;
+import java.util.Locale;
 
 /**
  * @author -Nemesiss-
@@ -32,7 +31,7 @@ public class Util {
 	public static void printSection(String s) {
 		s = "[ " + s + " ]";
 
-		while (s.length() < 79) {
+		while (s.length() < 120) {
 			s = "=" + s + "=";
 		}
 
@@ -42,17 +41,17 @@ public class Util {
 	public static void printSsSection(String s) {
 		s = "( " + s + " )";
 
-		while (s.length() < 79) {
+		while (s.length() < 120) {
 			s = "-" + s + "-";
 		}
 
 		System.out.println(s);
 	}
-
+	
 	public static void printProgressBarHeader(int size) {
 		StringBuilder header = new StringBuilder("0%[");
 		for (int i = 0; i < size; i++) {
-			header.append("-");
+			header.append("_");
 		}
 		header.append("]100%");
 		System.out.println(header);
@@ -60,7 +59,7 @@ public class Util {
 	}
 
 	public static void printCurrentProgress() {
-		System.out.print("+");
+		System.out.print("*");
 	}
 
 	public static void printEndProgress() {
@@ -110,6 +109,28 @@ public class Util {
 	}
 
 	/**
+     * Convert data from given ByteBuffer to hex
+     *
+     * @param data
+     * @return hex
+     */
+    public static String toHexStream(ByteBuffer data) {
+        StringBuilder result = new StringBuilder();
+        int counter = 0;
+        int b;
+        while (data.hasRemaining()) {
+            b = data.get() & 0xff;
+            result.append(String.format("%02X ", b));
+
+            counter++;
+            if (counter % 16 == 0) {
+                result.append("\n");
+            }
+        }
+        return result.toString();
+    }
+
+	/**
 	 * Gets last <tt>cnt</tt> read bytes from the <tt>data</tt> buffer and puts
 	 * into <tt>result</tt> buffer in special format:
 	 * <ul>
@@ -142,13 +163,10 @@ public class Util {
 	 */
 	public static String convertName(String name) {
 		if (!name.isEmpty()) {
-			if (NameConfig.ALLOW_CUSTOM_NAMES) {
-				return name;
-			} else {
-				return name.substring(0, 1).toUpperCase() + name.toLowerCase().substring(1);
-			}
+				return name.substring(0, 1).toUpperCase(Locale.forLanguageTag("en")) + name.toLowerCase(Locale.forLanguageTag("en")).substring(1);
 		} else {
 			return "";
 		}
 	}
+
 }

@@ -1,3 +1,0 @@
-Copy the data and src Folder to AL-Game and replace all Files!
-
-Compile!

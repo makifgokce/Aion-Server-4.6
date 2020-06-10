@@ -40,7 +40,6 @@ import com.aionemu.gameserver.model.items.ItemId;
 import com.aionemu.gameserver.model.items.ItemMask;
 import com.aionemu.gameserver.model.stats.calc.functions.StatFunction;
 import com.aionemu.gameserver.model.templates.VisibleObjectTemplate;
-import com.aionemu.gameserver.model.templates.item.ArmorType;
 import com.aionemu.gameserver.model.templates.item.actions.ItemActions;
 import com.aionemu.gameserver.model.templates.itemset.ItemSetTemplate;
 import com.aionemu.gameserver.model.templates.stats.ModifiersTemplate;
@@ -66,6 +65,8 @@ public class ItemTemplate extends VisibleObjectTemplate {
     @XmlAttribute(name = "descr")
     private String descr;
 
+	@XmlAttribute(name = "name_desc")
+    private String namedesc;
     @XmlElement(name = "actions", required = false)
     protected ItemActions actions;
 
@@ -169,6 +170,9 @@ public class ItemTemplate extends VisibleObjectTemplate {
 
     @XmlAttribute(name = "max_tempering")
     private int maxTemper;
+
+    @XmlAttribute(name = "max_enchant_bonus")
+	private int max_enchant_bonus;
 
     @XmlAttribute(name = "pack_count")
     protected int packCount;
@@ -394,8 +398,8 @@ public class ItemTemplate extends VisibleObjectTemplate {
     			category == ItemCategory.BELT;
     }
 
-    public boolean isFeather() {
-    	return armorType == ArmorType.FEATHER;
+    public boolean isPlume() {
+    	return category == ItemCategory.PLUME;
     }
 
     public boolean isKinah() {
@@ -460,6 +464,10 @@ public class ItemTemplate extends VisibleObjectTemplate {
 
     public int getMaxEnchantLevel() {
         return maxEnchant;
+    }
+
+    public int getMaxEnchantBonus() {
+    	return max_enchant_bonus;
     }
 
     public boolean hasLimitOne() {
@@ -628,11 +636,11 @@ public class ItemTemplate extends VisibleObjectTemplate {
     public boolean isAncientStone() {
         return category == ItemCategory.ANCIENT_MANASTONE;
     }
-
+/**
     public boolean isTemperingStone() {
         return category == ItemCategory.TEMPERSTONE;
     }
-
+*/
     public int getRobotId() {
         return robot_id;
     }
@@ -661,15 +669,33 @@ public class ItemTemplate extends VisibleObjectTemplate {
       }
     }
 
-    public int getMaxEnchantBonus() {
-    	if (enchantInfo == null) {
-        	return 0;
-    	} else {
-        return enchantInfo.getRndEnchantLevel();
-       }
-    }
-
     public String getDescr(){
         return descr;
     }
+
+	public String getNamedesc() {
+        return namedesc;
+    }
+
+	public boolean isScroll(int itemId) {
+		if (itemId > 164000046 && itemId < 164000080
+				|| itemId == 164000266
+				|| itemId > 164000113 && itemId < 164000135
+				|| itemId > 164000188 && itemId < 164000192
+				|| itemId > 164000254 && itemId < 164000261
+				|| itemId > 164000313 && itemId < 164001006
+				|| itemId > 164002001 && itemId < 164002019
+				|| itemId > 164002055 && itemId < 164002060
+				|| itemId > 164002110 && itemId < 164002128
+				|| itemId > 164002234 && itemId < 164002238
+				|| itemId > 164002270 && itemId < 164002273
+				|| itemId > 152231740 && itemId < 161001001) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public int getMaxManastoneSlots() {
+		return manastoneSlots + specialSlots + optionSlotBonus;
+	}
 }

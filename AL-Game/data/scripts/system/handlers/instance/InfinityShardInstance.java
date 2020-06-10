@@ -14,352 +14,488 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package instance;
 
-import com.aionemu.commons.utils.Rnd;
-import com.aionemu.gameserver.ai2.AIState;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
+
 import com.aionemu.gameserver.instance.handlers.GeneralInstanceHandler;
 import com.aionemu.gameserver.instance.handlers.InstanceID;
-import com.aionemu.gameserver.model.EmotionType;
-import com.aionemu.gameserver.model.actions.PlayerActions;
-import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_DIE;
-import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
-import com.aionemu.gameserver.services.NpcShoutsService;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
+import com.aionemu.gameserver.services.instance.InstanceService;
 import com.aionemu.gameserver.skillengine.SkillEngine;
-import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.WorldMapInstance;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import com.aionemu.gameserver.world.knownlist.Visitor;
 
 /**
- * @author DeathMagnestic
- * @author Cx3
- *
+ * @author nightm
+ * @reworked Himiko
  */
 @InstanceID(300800000)
 public class InfinityShardInstance extends GeneralInstanceHandler {
 
-	private int protection;
-	private boolean isInstanceDestroyed;
-	private Future<?> resonator;
-	private FastMap<Integer, Future<?>> skillTask = new FastMap<Integer, Future<?>>().shared();
-	private FastList<Integer> skillCount = FastList.newInstance();
+	private int ShieldGenerator = 0;
+	private int Protectors1 = 0;
+	private int Protectors2 = 0;
+	private int Protectors3 = 0;
+	private int Protectors4 = 0;
+	private int buff = 0;
+
+	private Future<?> spIda;
+	private Future<?> Cast;
+	private Future<?> CastBuff1;
+	private Future<?> CastBuff2;
+	private Future<?> CastBuff3;
+	private Future<?> CastBuff4;
+	private Future<?> CheckBuff;
+	private Future<?> CheckID;
+	private Future<?> Leave;
+	private Future<?> Destroy;
+	private WorldMapInstance InfinityShardInstance;
+
+	private Map<Integer, Integer> spawnsNpc = new HashMap<>();
 
 	@Override
 	public void onInstanceCreate(WorldMapInstance instance) {
 		super.onInstanceCreate(instance);
-		Npc hyperion = instance.getNpc(231073);
-		SkillEngine.getInstance().getSkill(hyperion, 21254, 60, hyperion).useNoAnimationSkill();
-		Npc idegenerator1 = instance.getNpc(231074);
-		SkillEngine.getInstance().getSkill(idegenerator1, 21371, 60, idegenerator1).useNoAnimationSkill();
-		Npc idegenerator2 = instance.getNpc(231078);
-		SkillEngine.getInstance().getSkill(idegenerator2, 21371, 60, idegenerator2).useNoAnimationSkill();
-		Npc idegenerator3 = instance.getNpc(231082);
-		SkillEngine.getInstance().getSkill(idegenerator3, 21371, 60, idegenerator3).useNoAnimationSkill();
-		Npc idegenerator4 = instance.getNpc(231086);
-		SkillEngine.getInstance().getSkill(idegenerator4, 21371, 60, idegenerator4).useNoAnimationSkill();
+		performSkillToTarget(231073, 231073, 21371);
+		performSkillToTarget(231074, 231074, 21371);
+		performSkillToTarget(231078, 231078, 21371);
+		performSkillToTarget(231082, 231082, 21371);
+		performSkillToTarget(231086, 231086, 21371);
+		spawnsNpc.put(1, 231092);
+		spawnsNpc.put(2, 231093);
+		spawnsNpc.put(3, 231094);
+		spawnsNpc.put(4, 231095);
+		InfinityShardInstance = instance;
+	}
+
+	private void startSp() {
+		if (spIda == null) {
+			spIda = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
+				@Override
+				public void run() {
+					spawnIda();
+				}
+			}, 30 * 1000 * 1, 30 * 1000 * 1);
+		}
+	}
+
+	private void startCheck() {
+		if (CheckBuff == null) {
+			CheckBuff = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
+				@Override
+				public void run() {
+					Check();
+				}
+			}, 60 * 1000 * 1, 60 * 1000 * 1);
+		}
+	}
+
+	private void startCheckID() {
+		if (CheckID == null) {
+			CheckID = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
+				@Override
+				public void run() {
+					CheckIDBuff();
+				}
+			}, 60 * 1000 * 1, 60 * 1000 * 1);
+		}
+	}
+
+	private void Check() {
+		Npc id1 = getNpc(231092);
+		Npc id2 = getNpc(231093);
+		Npc id3 = getNpc(231094);
+		Npc id4 = getNpc(231095);
+		Npc hyperion = getNpc(231073);
+		if ((id1 != null && id1.getEffectController().hasAbnormalEffect(21371)) && (id2 != null && id2.getEffectController().hasAbnormalEffect(21371)) && (id3 != null && id3.getEffectController().hasAbnormalEffect(21371)) && (id4 != null && id4.getEffectController().hasAbnormalEffect(21371))) {
+			SkillEngine.getInstance().getSkill(hyperion, 20983, 65, hyperion).useNoAnimationSkill();
+
+			// Delete Hyperion
+			ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+				@Override
+				public void run() {
+					Npc hyperion = getNpc(231073);
+					despawnNpc(hyperion);
+					spawn(730842, 143.37f, 135.30f, 112.17f, (byte) 55);
+					if (CheckBuff != null) {
+						CheckBuff.cancel(false);
+					}
+				}
+			}, 5 * 1000);
+		}
+	}
+
+	private void CheckIDBuff() {
+		Npc id1 = getNpc(231092);
+		Npc id2 = getNpc(231093);
+		Npc id3 = getNpc(231094);
+		Npc id4 = getNpc(231095);
+		if (id1 != null && id1.getEffectController().hasAbnormalEffect(21371)) {
+			performSkillToTarget(231073, 231073, 21416);
+		}
+		if (id2 != null && id2.getEffectController().hasAbnormalEffect(21371)) {
+			performSkillToTarget(231073, 231073, 21382);
+		}
+		if (id3 != null && id3.getEffectController().hasAbnormalEffect(21371)) {
+			performSkillToTarget(231073, 231073, 21384);
+		}
+		if (id4 != null && id4.getEffectController().hasAbnormalEffect(21371)) {
+			performSkillToTarget(231073, 231073, 21258);
+		}
+	}
+
+	private void DestroyInst() {
+		if (Destroy == null) {
+			Destroy = ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+				@Override
+				public void run() {
+					InstanceService.destroyInstance(InfinityShardInstance);
+				}
+			}, 120 * 1000 * 1); // 10 seconds changed to 2 minutes
+		}
+	}
+
+	private void Cast(int Nm) {
+		final int number = Nm;
+		sendMessage(1401790);
+		Cast = ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+			@Override
+			public void run() {
+				CargeCast(number);
+			}
+		}, 25 * 1000 * 1);
+
+	}
+
+	private void CastBuffHyperion(int Nm) {
+		final int number = Nm;
+		switch (number) {
+			case 1:
+				CastBuff1 = ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+					@Override
+					public void run() {
+						CastBuff(number);
+					}
+				}, 2 * 1000 * 1);
+				break;
+			case 2:
+				CastBuff2 = ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+					@Override
+					public void run() {
+						CastBuff(number);
+					}
+				}, 2 * 1000 * 1);
+				break;
+			case 3:
+				CastBuff3 = ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+					@Override
+					public void run() {
+						CastBuff(number);
+					}
+				}, 2 * 1000 * 1);
+				break;
+			case 4:
+				CastBuff4 = ThreadPoolManager.getInstance().schedule(new Runnable() {
+
+					@Override
+					public void run() {
+						CastBuff(number);
+					}
+				}, 2 * 1000 * 1);
+				break;
+		}
+	}
+
+	private void spawnIda() {
+		int i = 0;
+
+		for (int objId : spawnsNpc.values()) {
+			if (i == 1)
+				break;
+			if (instance.getNpc(objId) == null) {
+
+				switch (objId) {
+					case 231092:
+
+						spawn(231092, 147.95657f, 133.9761f, 128.65849f, (byte) 58);
+						performSkillToTarget(231092, 231073, 21257);
+						Cast(1);
+						i++;
+						break;
+					case 231093:
+
+						spawn(231093, 109.58858f, 141.61421f, 128.6585f, (byte) 89);
+						performSkillToTarget(231093, 231073, 21381);
+						Cast(2);
+						i++;
+						break;
+					case 231094:
+
+						spawn(231094, 134.70184f, 159.27972f, 134.62769f, (byte) 84);
+						performSkillToTarget(231094, 231073, 21383);
+						Cast(3);
+						i++;
+						break;
+					case 231095:
+
+						spawn(231095, 118.58971f, 115.9688f, 134.85f, (byte) 27);
+						performSkillToTarget(231095, 231073, 21257);
+						Cast(4);
+						i++;
+						break;
+				}
+			}
+		}
 	}
 
 	@Override
 	public void onDie(Npc npc) {
-		Npc hyperion = getNpc(231073);
-		if (isInstanceDestroyed) {
-			return;
-		}
-		switch (npc.getObjectTemplate().getTemplateId()) {
-			case 231074:
-				sendMsg(1401795);
-				protection++;
-				removeProtection();
-				npc.getController().onDelete();
-				break;
-			case 231078:
-				sendMsg(1401795);
-				protection++;
-				removeProtection();
-				npc.getController().onDelete();
-				break;
-			case 231082:
-				sendMsg(1401795);
-				protection++;
-				removeProtection();
-				npc.getController().onDelete();
-				break;
-			case 231086:
-				sendMsg(1401795);
-				protection++;
-				removeProtection();
-				npc.getController().onDelete();
-				break;
-			case 231073:
-				spawn(730842, 124.669853f, 137.840668f, 113.942917f, (byte) 0);
-				cancelResonatorTask();
-				despawnNpc(231092);
-				despawnNpc(231093);
-				despawnNpc(231094);
-				despawnNpc(231095);
-				break;
-			case 231087:
-			case 231088:
-			case 231089:
-				isDeadGenerator1();
-				break;
+		Npc shield1 = instance.getNpc(231104);
+		Npc shield2 = instance.getNpc(284437);
+		final int npcId = npc.getNpcId();
+		switch (npcId) {
 			case 231075:
 			case 231076:
 			case 231077:
-				isDeadGenerator2();
-				break;
-			case 231083:
-			case 231084:
-			case 231085:
-				isDeadGenerator3();
+				Protectors1++;
+				if (Protectors1 >= 3) {
+					final Npc generator1 = getNpc(231074);
+					remove(generator1);
+				}
+				despawnNpc(npc);
 				break;
 			case 231079:
 			case 231080:
 			case 231081:
-				isDeadGenerator4();
+				Protectors2++;
+				if (Protectors2 >= 3) {
+					final Npc generator2 = getNpc(231078);
+					remove(generator2);
+				}
+				despawnNpc(npc);
 				break;
+			case 231083:
+			case 231084:
+			case 231085:
+				Protectors3++;
+				if (Protectors3 >= 3) {
+					final Npc generator3 = getNpc(231082);
+					remove(generator3);
+				}
+				despawnNpc(npc);
+				break;
+			case 231087:
+			case 231088:
+			case 231089:
+				Protectors4++;
+				if (Protectors4 >= 3) {
+					final Npc generator4 = getNpc(231086);
+					remove(generator4);
+				}
+				despawnNpc(npc);
+				break;
+			case 231074:
+			case 231078:
+			case 231082:
+			case 231086:
+				sendMessage(1401795);
+				ShieldGenerator++;
+				if (ShieldGenerator >= 4) {
+					final Npc hyperion = getNpc(231073);
+					despawnNpc(shield1);
+					sendMessage(1401796);
+					despawnNpc(shield2);
+					remove(hyperion);
+					startSp();
+					startCheck();
+					startCheckID();
+				}
+				despawnNpc(npc);
+				break;
+			case 231073:
+				spawn(730842, 143.37f, 135.30f, 112.17f, (byte) 55);
+				stopTask();
+				DestroyInst();
+				break;
+			case 231090:
+			case 231091:
 			case 231092:
-				if (!(hyperion.getAi2().getState() == (AIState.IDLE)) || !(hyperion.getAi2().getState() == (AIState.DIED))
-						|| !(hyperion.getAi2().getState() == (AIState.DESPAWNED))) {
-					resonatorSpawn(npc.getNpcId(), npc.getX(), npc.getY(), npc.getZ(), npc.getHeading());
-				}
-				break;
 			case 231093:
-				if (!(hyperion.getAi2().getState() == (AIState.IDLE)) || !(hyperion.getAi2().getState() == (AIState.DIED))
-						|| !(hyperion.getAi2().getState() == (AIState.DESPAWNED))) {
-					resonatorSpawn(npc.getNpcId(), npc.getX(), npc.getY(), npc.getZ(), npc.getHeading());
-				}
-				break;
 			case 231094:
-				if (!(hyperion.getAi2().getState() == (AIState.IDLE)) || !(hyperion.getAi2().getState() == (AIState.DIED))
-						|| !(hyperion.getAi2().getState() == (AIState.DESPAWNED))) {
-					resonatorSpawn(npc.getNpcId(), npc.getX(), npc.getY(), npc.getZ(), npc.getHeading());
-				}
-				break;
 			case 231095:
-				if (!(hyperion.getAi2().getState() == (AIState.IDLE)) || !(hyperion.getAi2().getState() == (AIState.DIED))
-						|| !(hyperion.getAi2().getState() == (AIState.DESPAWNED))) {
-					resonatorSpawn(npc.getNpcId(), npc.getX(), npc.getY(), npc.getZ(), npc.getHeading());
-				}
+			case 231096:
+			case 231097:
+			case 233298:
+			case 233299:
+			case 231102:
+			case 231103:
+				despawnNpc(npc);
 				break;
 		}
 	}
 
-	private void cancelResonatorTask() {
-		if (resonator != null && !resonator.isCancelled()) {
-			resonator.cancel(true);
+	private void CargeCast(int Nm) {
+		switch (Nm) {
+			case 1:
+				if (instance.getNpc(231092) != null) {
+					performSkillToTarget(231092, 231073, 21258);
+					buff++;
+					sendChargeMessage(buff);
+					CastBuffHyperion(1);
+				}
+				break;
+			case 2:
+				if (instance.getNpc(231093) != null) {
+					performSkillToTarget(231093, 231073, 21382);
+					buff++;
+					sendChargeMessage(buff);
+					CastBuffHyperion(2);
+				}
+				break;
+			case 3:
+				if (instance.getNpc(231094) != null) {
+					performSkillToTarget(231094, 231073, 21384);
+					buff++;
+					sendChargeMessage(buff);
+					CastBuffHyperion(3);
+				}
+				break;
+			case 4:
+				if (instance.getNpc(231095) != null) {
+					performSkillToTarget(231095, 231073, 21383);
+					buff++;
+					sendChargeMessage(buff);
+					CastBuffHyperion(4);
+				}
+				break;
+
 		}
 	}
 
-	private void cancelskillTask(int npcId) {
-		Future<?> task = skillTask.get(npcId);
-		if (task != null && !task.isCancelled()) {
-			task.cancel(true);
+	private void CastBuff(int Nm) {
+
+		switch (Nm) {
+			case 1:
+				if (instance.getNpc(231092) != null)
+					performSkillToTarget(231092, 231092, 21371);
+				break;
+			case 2:
+				if (instance.getNpc(231093) != null)
+					performSkillToTarget(231093, 231093, 21371);
+				break;
+			case 3:
+				if (instance.getNpc(231094) != null)
+					performSkillToTarget(231094, 231094, 21371);
+				break;
+			case 4:
+				if (instance.getNpc(231095) != null)
+					performSkillToTarget(231095, 231095, 21371);
+				break;
+
 		}
-		skillTask.remove(npcId);
 	}
 
-	private void startSkillTask(final Npc npc, final int skillId, final int messageId) {
-		Future<?> task = ThreadPoolManager.getInstance().schedule(new Runnable() {
+	private void sendChargeMessage(int Act) {
+
+		switch (Act) {
+			case 1:
+				sendMessage(1401791);
+				break;
+			case 2:
+				sendMessage(1401792);
+				break;
+			case 3:
+				sendMessage(1401793);
+				break;
+			case 4:
+				sendMessage(1401794);
+				break;
+		}
+
+	}
+
+	private void sendMessage(final int msg) {
+		instance.doOnAllPlayers(new Visitor<Player>() {
+
 			@Override
-			public void run() {
-				Npc hyperion = getNpc(231073);
-				if (hyperion == null) {
-					return;
-				}
-				if (hyperion.getLifeStats().isAlreadyDead()) {
-					return;
-				}
-				NpcShoutsService.getInstance().sendMsg(npc, messageId);
-				SkillEngine.getInstance().getSkill(npc, skillId, 1, hyperion).useNoAnimationSkill();
-				if (!skillCount.contains(npc.getNpcId())) {
-					skillCount.add(npc.getNpcId());
-				}
-				if (skillCount.size() == 4) {
-					stopInstance();
-				}
+			public void visit(Player player) {
+				PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(msg));
 			}
-		}, 32000);
-		skillTask.put(npc.getNpcId(), task);
+		});
 	}
 
-	private void stopInstance() {
-		NpcShoutsService.getInstance().sendMsg(instance, 1401794, 0, false, 25, 0);
-		ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				NpcShoutsService.getInstance().sendMsg(instance, 1401909, 0, false, 25, 0);
-				Npc hyperion = getNpc(231073);
-				for (Player p : instance.getPlayersInside()) {
-					p.getController().onAttack(hyperion, p.getLifeStats().getMaxHp() + 1, true);
-				}
-				cancelResonatorTask();
-				for (FastMap.Entry<Integer, Future<?>> e = skillTask.head(), end = skillTask.tail(); (e = e.getNext()) != end;) {
-					if (e.getValue() != null && !e.getValue().isCancelled()) {
-						e.getValue().cancel(true);
-					}
-					despawnNpc(e.getKey());
-
-				}
-				skillTask.clear();
-				spawn(730842, 129.46301f, 137.99736f, 112.17429f, (byte) 54);
-				despawnNpc(231073);
-			}
-		}, 5000);
+	private void performSkillToTarget(int npcId, int targetId, int skillId) {
+		final Npc npc = instance.getNpc(npcId);
+		final Npc target = instance.getNpc(targetId);
+		SkillEngine.getInstance().getSkill(npc, skillId, 60, target).useSkill();
 	}
 
-	private void spawnResonators() {
-		resonator = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				startSkillTask((Npc) spawn(231092, 108.55013f, 138.96948f, 132.60164f, (byte) 0), 21258, 1401791);
-				resonator = ThreadPoolManager.getInstance().schedule(new Runnable() {
-					@Override
-					public void run() {
-						startSkillTask((Npc) spawn(231093, 126.5471f, 154.47961f, 131.47116f, (byte) 90), 21382, 1401792);
-						resonator = ThreadPoolManager.getInstance().schedule(new Runnable() {
-							@Override
-							public void run() {
-								startSkillTask((Npc) spawn(231094, 146.72455f, 139.12267f, 132.68515f, (byte) 60), 21384, 1401793);
-								resonator = ThreadPoolManager.getInstance().schedule(new Runnable() {
-									@Override
-									public void run() {
-										startSkillTask((Npc) spawn(231095, 129.41306f, 121.34766f, 131.47116f, (byte) 30), 21416, 1401794);
-									}
-								}, 40 * 1000);
-							}
-						}, 40 * 1000);
-					}
-				}, 40 * 1000);
-			}
-		}, 40 * 1000);
-	}
-
-	private void resonatorSpawn(final int npcId, final float x, final float y, final float z, final float h) {
-		cancelskillTask(npcId);
-		ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				spawn(npcId, x, y, z, (byte) h);
-			}
-		}, 40 * 1000);
-	}
-
-	private boolean isDeadGenerator1() {
-		Npc Generator1 = getNpc(231087);
-		Npc Generator2 = getNpc(231088);
-		Npc Generator3 = getNpc(231089);
-		if (isDead(Generator1) && isDead(Generator2) && isDead(Generator3)) {
-			Npc idegenerator1 = getNpc(231074);
-			if (idegenerator1 != null) {
-				idegenerator1.getEffectController().removeEffect(21371);
-			}
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isDeadGenerator2() {
-		Npc Generator4 = getNpc(231075);
-		Npc Generator5 = getNpc(231076);
-		Npc Generator6 = getNpc(231077);
-		if (isDead(Generator4) && isDead(Generator5) && isDead(Generator6)) {
-			Npc idegenerator2 = getNpc(231078);
-			if (idegenerator2 != null) {
-				idegenerator2.getEffectController().removeEffect(21371);
-			}
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isDeadGenerator3() {
-		Npc Generator7 = getNpc(231083);
-		Npc Generator8 = getNpc(231084);
-		Npc Generator9 = getNpc(231085);
-		if (isDead(Generator7) && isDead(Generator8) && isDead(Generator9)) {
-			Npc idegenerator3 = getNpc(231082);
-			if (idegenerator3 != null) {
-				idegenerator3.getEffectController().removeEffect(21371);
-			}
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isDeadGenerator4() {
-		Npc Generator10 = getNpc(231079);
-		Npc Generator11 = getNpc(231080);
-		Npc Generator12 = getNpc(231081);
-		if (isDead(Generator10) && isDead(Generator11) && isDead(Generator12)) {
-			Npc idegenerator4 = getNpc(231086);
-			if (idegenerator4 != null) {
-				idegenerator4.getEffectController().removeEffect(21371);
-			}
-			return true;
-		}
-		return false;
-	}
-
-	private void removeProtection() {
-		if (protection != 4) {
-			return;
-		}
-		Npc hyperion = instance.getNpc(231073);
-		if (hyperion != null) {
-			sendMsg(1401796);
-			despawnNpc(284437);
-			hyperion.getEffectController().removeEffect(21254);
-			getRandomTarget(hyperion);
-			spawnResonators();
-			NpcShoutsService.getInstance().sendMsg(instance, 1401790, 0, false, 25, 0);
-		}
-	}
-
-	private void getRandomTarget(Npc hyperion) {
-		List<Player> players = new ArrayList<Player>();
-		for (Player player : instance.getPlayersInside()) {
-			if (!PlayerActions.isAlreadyDead(player) && MathUtil.isIn3dRange(player, hyperion, 16)) {
-				players.add(player);
-			}
-		}
-		if (players.isEmpty()) {
-			return;
-		}
-		SkillEngine.getInstance().getSkill(hyperion, 21241, 1, players.get(Rnd.get(0, players.size() - 1))).useNoAnimationSkill();
-	}
-
-	private void despawnNpc(int npcId) {
-		Npc npc = getNpc(npcId);
+	private void despawnNpc(Npc npc) {
 		if (npc != null) {
 			npc.getController().onDelete();
 		}
 	}
 
-	private boolean isDead(Npc npc) {
-		return (npc == null || npc.getLifeStats().isAlreadyDead());
+	private void remove(Npc npc) {
+		npc.getEffectController().removeEffect(21371);
+	}
+
+	private void stopTask() {
+		if (spIda != null) {
+			spIda.cancel(false);
+		}
+		if (Cast != null) {
+			Cast.cancel(false);
+		}
+		if (CastBuff1 != null) {
+			CastBuff1.cancel(false);
+		}
+		if (CastBuff2 != null) {
+			CastBuff2.cancel(false);
+		}
+		if (CastBuff3 != null) {
+			CastBuff3.cancel(false);
+		}
+		if (CastBuff4 != null) {
+			CastBuff4.cancel(false);
+		}
+		if (CheckBuff != null) {
+			CheckBuff.cancel(false);
+		}
+		if (Leave != null) {
+			Leave.cancel(false);
+		}
+		if (CheckID != null) {
+			CheckID.cancel(false);
+		}
 	}
 
 	@Override
 	public void onInstanceDestroy() {
-		isInstanceDestroyed = true;
-	}
-
-    @Override
-    public boolean onDie(final Player player, Creature lastAttacker) {
-        PacketSendUtility.broadcastPacket(player, new SM_EMOTION(player, EmotionType.DIE, 0, player.equals(lastAttacker) ? 0 : lastAttacker.getObjectId()), true);
-
-		PacketSendUtility.sendPacket(player, new SM_DIE(player.haveSelfRezEffect(), player.haveSelfRezItem(), 0, 8));
-		return true;
+		ShieldGenerator = 0;
+		Protectors1 = 0;
+		Protectors2 = 0;
+		Protectors3 = 0;
+		Protectors4 = 0;
+		stopTask();
+		if (Destroy != null) {
+			Destroy.cancel(false);
+		}
 	}
 }

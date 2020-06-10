@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.world.zone;
 
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public final class ZoneName {
 	}
 
 	public static final ZoneName createOrGet(String name) {
-		name = name.toUpperCase();
+		name = name.toUpperCase(Locale.forLanguageTag("en"));
 		if (zoneNames.containsKey(name)) {
 			return zoneNames.get(name);
 		}
@@ -61,7 +63,7 @@ public final class ZoneName {
 	}
 
 	public static final int getId(String name) {
-		name = name.toUpperCase();
+		name = name.toUpperCase(Locale.forLanguageTag("en"));
 		if (zoneNames.containsKey(name)) {
 			return zoneNames.get(name).id();
 		}
@@ -69,7 +71,7 @@ public final class ZoneName {
 	}
 
 	public static final ZoneName get(String name) {
-		name = name.toUpperCase();
+		name = name.toUpperCase(Locale.forLanguageTag("en"));
 		if (zoneNames.containsKey(name)) {
 			return zoneNames.get(name);
 		}

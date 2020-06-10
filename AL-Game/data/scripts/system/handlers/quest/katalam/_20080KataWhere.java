@@ -95,7 +95,7 @@ public class _20080KataWhere extends QuestHandler {
 						}
 					}
 					case SET_SUCCEED: {
-						return defaultCloseDialog(env, 3, 3, true, false);
+						return defaultCloseDialog(env, 2, 3, true, false);
 					}
 					default:
 						break;

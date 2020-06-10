@@ -17,6 +17,9 @@
 
 package com.aionemu.gameserver.ai2;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.aionemu.commons.callbacks.metadata.ObjectCallback;
 import com.aionemu.gameserver.ai2.event.AIEventLog;
 import com.aionemu.gameserver.ai2.event.AIEventType;
@@ -43,9 +46,6 @@ import com.aionemu.gameserver.spawnengine.SpawnEngine;
 import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.world.WorldPosition;
 import com.google.common.base.Preconditions;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author ATracer
@@ -534,6 +534,10 @@ public abstract class AbstractAI implements AI2 {
 		return spawn(owner.getWorldId(), npcId, x, y, z, heading, 0, getPosition().getInstanceId());
 	}
 
+
+	protected VisibleObject spawn(int npcId, float x, float y, float z, byte heading, String walkerId, int walkerIdx) {
+		return spawn(owner.getWorldId(), npcId, x, y, z, heading, walkerId, walkerIdx, getPosition().getInstanceId());
+	}
 	/**
 	 * Spawn object with staticId in the same world and instance as AI's owner
 	 */
@@ -547,6 +551,10 @@ public abstract class AbstractAI implements AI2 {
 		return SpawnEngine.spawnObject(template, instanceId);
 	}
 
+	protected VisibleObject spawn(int worldId, int npcId, float x, float y, float z, byte heading, String walkerId, int walkerIdx, int instanceId) {
+		SpawnTemplate template = SpawnEngine.addNewSingleTimeSpawn(worldId, npcId, x, y, z, heading, walkerId, walkerIdx);
+		return SpawnEngine.spawnObject(template, instanceId);
+	}
 	@Override
 	public int modifyDamage(int damage) {
 		return damage;

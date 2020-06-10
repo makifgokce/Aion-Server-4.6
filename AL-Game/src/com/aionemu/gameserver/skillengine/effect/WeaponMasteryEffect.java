@@ -36,7 +36,7 @@ import com.aionemu.gameserver.skillengine.model.Effect;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "WeaponMasteryEffect")
-public class WeaponMasteryEffect extends BufEffect {
+public class WeaponMasteryEffect extends BuffEffect {
 
 	@XmlAttribute(name = "weapon")
 	private WeaponType weaponType;

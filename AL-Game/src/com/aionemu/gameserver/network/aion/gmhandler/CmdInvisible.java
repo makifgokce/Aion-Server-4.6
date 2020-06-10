@@ -17,11 +17,16 @@
 
 package com.aionemu.gameserver.network.aion.gmhandler;
 
+import com.aionemu.gameserver.controllers.attack.AttackUtil;
+import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.state.CreatureVisualState;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_NPC_INFO;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_STATE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.skillengine.effect.AbnormalState;
 import com.aionemu.gameserver.utils.PacketSendUtility;
+import com.aionemu.gameserver.utils.ThreadPoolManager;
 
 /**
  * @author Antraxx
@@ -34,9 +39,31 @@ public class CmdInvisible extends AbstractGMHandler {
 	}
 
 	private void run() {
+		final Summon summon = admin.getSummon();
 		admin.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
 		admin.setVisualState(CreatureVisualState.HIDE20);
+		if (summon != null && summon.isSpawned()) {
+			summon.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
+			summon.setVisualState(CreatureVisualState.HIDE20);
+			PacketSendUtility.broadcastPacketAndReceive(admin, new SM_NPC_INFO(summon, admin));
+			AttackUtil.cancelCastOn(summon);
+			summon.getEffectController().sendEffectIconsTo(admin);
+		}
+
+		AttackUtil.cancelCastOn(admin);
+
 		PacketSendUtility.broadcastPacket(admin, new SM_PLAYER_STATE(admin), true);
-		PacketSendUtility.sendMessage(admin, "You are invisible.");
+		ThreadPoolManager.getInstance().schedule(new Runnable() {
+			@Override
+			public void run() {
+				// do on all who targetting on 'effected' (set target null,
+				// cancel attack skill, cancel npc pursuit)
+				AttackUtil.removeTargetFrom(admin, true);
+				if (summon != null){
+					AttackUtil.removeTargetFrom(summon, true);
+				}
+			}
+		}, 500);
+		PacketSendUtility.sendPacket(admin, SM_SYSTEM_MESSAGE.STR_SKILL_EFFECT_INVISIBLE_BEGIN);
 	}
 }

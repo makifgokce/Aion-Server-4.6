@@ -65,7 +65,8 @@ public class ItemActions {
         @XmlElement(name = "tuning", type = TuningAction.class),
         @XmlElement(name = "megaphone", type = MegaphoneAction.class),
         @XmlElement(name = "pack", type = PackAction.class),
-        @XmlElement(name = "authorize", type=AuthorizeAction.class)})
+        @XmlElement(name = "authorize", type=AuthorizeAction.class),
+		@XmlElement(name = "f2p", type = F2pAction.class)})
     protected List<AbstractItemAction> itemActions;
 
     /**

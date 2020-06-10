@@ -17,14 +17,15 @@
 
 package com.aionemu.gameserver.taskmanager.fromdb.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.ShutdownHook;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.utils.PacketSendUtility;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.knownlist.Visitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Divinity, nrg
@@ -60,8 +61,7 @@ public class RestartHandler extends TaskFromDBHandler {
 		World.getInstance().doOnAllPlayers(new Visitor<Player>() {
 			@Override
 			public void visit(Player player) {
-				PacketSendUtility.sendBrightYellowMessageOnCenter(player, "Automatic Task: The server will restart in " + warnCountDown
-						+ " seconds ! Please find a safe place and disconnect your character.");
+				player.getClientConnection().sendPacket(SM_SYSTEM_MESSAGE.STR_SERVER_SHUTDOWN(String.valueOf(warnCountDown)));
 			}
 		});
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generiert am/um 30.04.2016 12:03 aus PS-Drop-Datei: Poeta_4.9_loot_live408626911.xml -->
+<npc_drops xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="npc_drops.xsd">
+    <npc_drop npc_id="231073"> <!-- Hyperion -->
+        <drop_group name="KINAH" use_category="true" race="PC_ALL">
+            <drop item_id="182400001" chance="80" min_amount="150" max_amount="300" no_reduce="false" eachmember="false" name="Kinah" />
+        </drop_group>
+        <drop_group name="QUEST_ITEM" use_category="true" race="PC_ALL">
+            <drop item_id="186000257" chance="100" min_amount="1" max_amount="1" no_reduce="true" eachmember="true" name="Quest" />
+        </drop_group>
+        <drop_group name="CHEST" use_category="true" race="PC_ALL">
+            <drop item_id="188052387" chance="100" min_amount="1" max_amount="1" no_reduce="true" eachmember="true" name="Hyperion Equipment Chest" />
+        </drop_group>
+        <drop_group name="CHEST2" use_category="true" race="PC_ALL">
+            <drop item_id="188052501" chance="100" min_amount="1" max_amount="1" no_reduce="true" eachmember="true" name="Findings of the Katalamize Expedition Group" />
+        </drop_group>
+        <drop_group name="CHEST3" use_category="true" race="PC_ALL">
+            <drop item_id="188053295" chance="5" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Box of Feathers of the Lord" />
+            <drop item_id="188053083" chance="5" min_amount="1" max_amount="1" no_reduce="true" eachmember="true" name="Box of Upgrade Serum" />
+        </drop_group>
+    </npc_drop>
+</npc_drops>

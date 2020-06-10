@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.world.geo;
 
 import com.aionemu.gameserver.geoEngine.models.GeoMap;
@@ -24,7 +23,7 @@ import com.aionemu.gameserver.geoEngine.models.GeoMap;
  */
 public interface GeoData {
 
-	void loadGeoMaps();
+    void loadGeoMaps();
 
-	GeoMap getMap(int worldId);
+    GeoMap getMap(int worldId);
 }

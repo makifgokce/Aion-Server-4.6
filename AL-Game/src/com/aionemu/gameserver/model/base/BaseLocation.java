@@ -17,10 +17,10 @@
 
 package com.aionemu.gameserver.model.base;
 
+import java.sql.Timestamp;
+
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.templates.base.BaseTemplate;
-
-import java.sql.Timestamp;
 
 /**
  * @author Himiko

@@ -133,7 +133,7 @@ public class Rename extends AdminCommand {
 	}
 
 	public void sendPacket(Player admin, Player player, String rename, String recipient) {
-		Iterator<Friend> knownFriends = player.getFriendList().iterator();
+		Iterator<Friend> knownFriends = player.getCommonData().getFriendList().iterator();
 
 		while (knownFriends.hasNext()) {
 			Friend nextObject = knownFriends.next();

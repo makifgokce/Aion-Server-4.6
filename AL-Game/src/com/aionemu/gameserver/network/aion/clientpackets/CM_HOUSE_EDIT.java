@@ -34,6 +34,9 @@ import com.aionemu.gameserver.services.item.HouseObjectFactory;
 import com.aionemu.gameserver.services.item.ItemPacketService.ItemDeleteType;
 import com.aionemu.gameserver.utils.audit.AuditLogger;
 import com.aionemu.gameserver.utils.idfactory.IDFactory;
+
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +81,7 @@ public class CM_HOUSE_EDIT extends AionClientPacket {
         } else if (action == HousingAction.ENTER_DECORATION || action == HousingAction.EXIT_DECORATION) {
             //NOTHING TO READ
         } else {
-            log.error("Unknown housing action type? 0x" + Integer.toHexString(actionId).toUpperCase());
+            log.error("Unknown housing action type? 0x" + Integer.toHexString(actionId).toUpperCase(Locale.forLanguageTag("en")));
         }
     }
 

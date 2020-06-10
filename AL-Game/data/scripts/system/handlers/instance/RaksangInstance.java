@@ -17,25 +17,24 @@
 
 package instance;
 
+import java.util.Map;
+
 import com.aionemu.commons.network.util.ThreadPoolManager;
-import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.instance.handlers.GeneralInstanceHandler;
 import com.aionemu.gameserver.instance.handlers.InstanceID;
 import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.actions.NpcActions;
-import com.aionemu.gameserver.model.drop.DropItem;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.StaticDoor;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_DIE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
-import com.aionemu.gameserver.services.drop.DropRegistrationService;
 import com.aionemu.gameserver.skillengine.SkillEngine;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.WorldMapInstance;
-import java.util.Map;
-import java.util.Set;
+import com.aionemu.gameserver.world.zone.ZoneInstance;
+import com.aionemu.gameserver.world.zone.ZoneName;
 
 /**
  * @author xTz
@@ -179,32 +178,12 @@ public class RaksangInstance extends GeneralInstanceHandler {
 		PacketSendUtility.sendPacket(player, new SM_DIE(player.haveSelfRezEffect(), player.haveSelfRezItem(), 0, 8));
 		return true;
 	}
-
 	@Override
-	public void onDropRegistered(Npc npc) { // Ancient Balaur Scale
-		Set<DropItem> dropItems = DropRegistrationService.getInstance().getCurrentDropMap().get(npc.getObjectId());
-		int npcId = npc.getNpcId();
-		switch (npcId) {
-			case 217475: // Raksha
-			case 217647: // Raksha boilheart
-				int index = dropItems.size() + 1;
-				int var = Rnd.get(2);
-				switch (var) {
-					case 0:
-						for (Player player : instance.getPlayersInside()) {
-							if (player.isOnline()) {
-								dropItems.add(DropRegistrationService.getInstance().regDropItem(index++, player.getObjectId(), npcId, 182006427, 8));
-							}
-						}
-						break;
-					case 1:
-						for (Player player : instance.getPlayersInside()) {
-							if (player.isOnline()) {
-								dropItems.add(DropRegistrationService.getInstance().regDropItem(index++, player.getObjectId(), npcId, 182006427, 12));
-							}
-						}
-						break;
+		public void onEnterZone(Player player, ZoneInstance zone) {
+			if (zone.getAreaTemplate().getZoneName() == ZoneName.get("IDRAKSHA_SENSORYAREA_03_206197_3_300310000")) {
+				if (!doors.get(219).isOpen()){
+					doors.get(219).setOpen(true);
 				}
+			}
 		}
-	}
 }

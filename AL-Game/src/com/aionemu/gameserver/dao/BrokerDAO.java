@@ -20,6 +20,7 @@ package com.aionemu.gameserver.dao;
 import java.util.List;
 
 import com.aionemu.gameserver.model.gameobjects.BrokerItem;
+import com.aionemu.gameserver.model.gameobjects.Item;
 
 public abstract class BrokerDAO implements IDFactoryAwareDAO {
 
@@ -29,6 +30,7 @@ public abstract class BrokerDAO implements IDFactoryAwareDAO {
 
 	public abstract boolean preBuyCheck(int itemForCheck);
 
+	public abstract List<Item> getBrokerItems();
 	@Override
 	public final String getClassName() {
 		return BrokerDAO.class.getName();

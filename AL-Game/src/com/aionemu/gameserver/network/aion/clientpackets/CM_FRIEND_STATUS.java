@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.clientpackets;
 
 import org.slf4j.Logger;
@@ -61,7 +60,7 @@ public class CM_FRIEND_STATUS extends AionClientPacket {
 			log.warn("received unknown status id " + status);
 			statusEnum = Status.ONLINE;
 		}
-		activePlayer.getFriendList().setStatus(statusEnum, activePlayer.getCommonData());
+		activePlayer.getCommonData().getFriendList().setStatus(statusEnum, activePlayer.getCommonData());
 		PacketSendUtility.sendPacket(activePlayer, new SM_FRIEND_STATUS(status));
 	}
 }

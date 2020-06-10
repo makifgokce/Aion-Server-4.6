@@ -17,14 +17,15 @@
 
 package com.aionemu.gameserver.network.aion.iteminfo;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Set;
+
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.items.IdianStone;
 import com.aionemu.gameserver.model.items.ItemStone;
 import com.aionemu.gameserver.model.items.ManaStone;
 import com.aionemu.gameserver.model.templates.item.ArmorType;
-import java.nio.ByteBuffer;
-import java.util.Set;
-import org.slf4j.LoggerFactory;
 
 public class ManaStoneInfoBlobEntry extends ItemBlobEntry {
 
@@ -40,9 +41,9 @@ public void writeThisBlob(ByteBuffer buf) {
 			writeC(buf, item.getEnchantLevel());
 			writeD(buf, item.getItemSkinTemplate().getTemplateId());
 			writeC(buf, item.getOptionalSocket());
+			writeC(buf, item.getBonusEnchant());
 			writeC(buf, 0);
-			writeC(buf, 0);
-			
+
 			writeItemStones(buf);
         ItemStone god = item.getGodStone();
 			writeD(buf, god != null ? god.getItemId() : 0);
@@ -72,56 +73,71 @@ public void writeThisBlob(ByteBuffer buf) {
         }
             writeC(buf, item.getAuthorize());
             writeD(buf, 0);
-        if (item.getItemTemplate().getArmorType() == ArmorType.FEATHER) {
-            writeD(buf, 42);
-            writeD(buf, item.getAuthorize() * 150);
-            writeQ(buf, 0L);
-        if (item.getItemTemplate().getAwakenId() == 52) {
-            writeD(buf, 30);
-            writeD(buf, item.getAuthorize() * 4);
-        } else {
-            writeD(buf, 35);
-            writeD(buf, item.getAuthorize() * 20);
+            if (item.getItemTemplate().getArmorType() == ArmorType.FEATHER) {
+                writeD(buf, 42);
+                writeD(buf, item.getAuthorize() * 150);
+                writeQ(buf, 0L);
+	            if (item.getItemTemplate().getAwakenId() == 52) {
+	                writeD(buf, 30);
+	                writeD(buf, item.getAuthorize() * 4);
+	            } else {
+	                writeD(buf, 35);
+	                writeD(buf, item.getAuthorize() * 20);
+                }
+                writeQ(buf, 0L);
+                writeB(buf, new byte[16]);
+            } else {
+                writeB(buf, new byte[48]);
+                }
+
             }
-            writeQ(buf, 0L);
-            writeB(buf, new byte[16]);
-        } else {
-            writeB(buf, new byte[48]);
-            }
-        }
 
   private void writeItemStones(ByteBuffer buf) {
-    Item item = this.ownerItem;
-    if (item.hasManaStones()) {
-      Set<ManaStone> manaStone = item.getItemStones();
-      int count = item.getItemTemplate().getSpecialSlots();
-      int temp = count;
-      for (ManaStone stone : manaStone) {
-        if (stone.isSpecial()) {
-          writeD(buf, stone.getItemId());
-          temp--;
-        }
-      }
-      if (temp > 0) {
-        writeB(buf, new byte[temp * 4]);
-      }
-      for (ManaStone stone : manaStone) {
-        if (!stone.isSpecial()) {
-          if (count > item.getSockets(false)) {
-           LoggerFactory.getLogger(ManaStoneInfoBlobEntry.class);
-          } else {
-            writeD(buf, stone.getItemId());
-            count++;
-          }
-        }
-      }
-      if (count < 12) {
-        writeB(buf, new byte[(12 - count) * 4]);
-      }
-    } else {
-      writeB(buf, new byte[48]);
-    }
-  }
+		  Item item = ownerItem;
+	      int count = 0;
+
+	      if (item.hasManaStones()) {
+	          Set<ManaStone> itemStones = item.getItemStones();
+	          ArrayList<ManaStone> basicStones = new ArrayList<>();
+	          ArrayList<ManaStone> ancientStones = new ArrayList<>();
+
+	          for (ManaStone itemStone : itemStones) {
+	              if (itemStone.isBasic()) {
+	                  basicStones.add(itemStone);
+	              } else {
+	                  ancientStones.add(itemStone);
+	              }
+	          }
+
+	          if (item.getItemTemplate().getSpecialSlots() > 0) {
+	              if (ancientStones.size() > 0) {
+	                  for (ManaStone ancientStone : ancientStones) {
+	                      if (count == 6) {
+	                          break;
+	                      }
+	                      writeD(buf, ancientStone.getItemId());
+	                      count++;
+	                  }
+	              }
+
+	              for (int i = count; i < item.getItemTemplate().getSpecialSlots(); i++) {
+	                  writeD(buf, 0);
+	                  count++;
+	              }
+	          }
+
+	          for (ManaStone basicStone : basicStones) {
+	              if (count == 6) {
+	                  break;
+	              }
+	              writeD(buf, basicStone.getItemId());
+	              count++;
+	          }
+	          skip(buf, (12 - count) * 4);
+	      } else {
+	          skip(buf, 48);
+	      }
+	  }
 
   @Override
 public int getSize() {

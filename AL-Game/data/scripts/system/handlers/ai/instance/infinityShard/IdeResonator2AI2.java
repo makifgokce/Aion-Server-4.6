@@ -19,8 +19,8 @@ package ai.instance.infinityShard;
 
 import java.util.concurrent.Future;
 
-import com.aionemu.gameserver.ai2.AIName;
 import com.aionemu.gameserver.ai2.AI2Actions;
+import com.aionemu.gameserver.ai2.AIName;
 import com.aionemu.gameserver.ai2.NpcAI2;
 import com.aionemu.gameserver.ai2.poll.AIAnswer;
 import com.aionemu.gameserver.ai2.poll.AIAnswers;
@@ -42,15 +42,19 @@ public class IdeResonator2AI2 extends NpcAI2 {
 		super.handleSpawned();
 		startpower();
 	}
-
 	private void startpower() {
-		skillTask = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				AI2Actions.targetCreature(IdeResonator2AI2.this, getPosition().getWorldMapInstance().getNpc(231073));
-				AI2Actions.useSkill(IdeResonator2AI2.this, 21383);
-			}
-		}, 3000, 5000);
+		if(!IdeResonator2AI2.this.getEffectController().hasAbnormalEffect(21371)) {
+			skillTask = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					AI2Actions.targetCreature(IdeResonator2AI2.this, getPosition().getWorldMapInstance().getNpc(231073));
+					AI2Actions.useSkill(IdeResonator2AI2.this, 21383);
+				}
+			}, 3000, 5000);
+		} else {
+			AI2Actions.targetCreature(IdeResonator2AI2.this, getPosition().getWorldMapInstance().getNpc(231073));
+			AI2Actions.useSkill(IdeResonator2AI2.this, 21384);
+		}
 	}
 
 	private void cancelskillTask() {

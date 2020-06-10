@@ -17,6 +17,16 @@
 
 package com.aionemu.gameserver.model.templates.npc;
 
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import com.aionemu.gameserver.ai2.AiNames;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.TribeClass;
@@ -26,9 +36,6 @@ import com.aionemu.gameserver.model.templates.BoundRadius;
 import com.aionemu.gameserver.model.templates.VisibleObjectTemplate;
 import com.aionemu.gameserver.model.templates.stats.KiskStatsTemplate;
 import com.aionemu.gameserver.model.templates.stats.NpcStatsTemplate;
-
-import javax.xml.bind.annotation.*;
-import java.util.List;
 
 /**
  * @author Luno
@@ -46,6 +53,8 @@ public class NpcTemplate extends VisibleObjectTemplate {
 	private int titleId;
 	@XmlAttribute(name = "name")
 	private String name;
+    @XmlAttribute(name = "name_desc")
+    private String name_desc;
 	@XmlAttribute(name = "height")
 	private float height = 1;
 	@XmlElement(name = "stats")
@@ -283,4 +292,8 @@ public class NpcTemplate extends VisibleObjectTemplate {
 	public Boolean getMistSpawnCondition() {
 		return onMist;
 	}
+
+    public String getNameDesc() {
+        return name_desc;
+    }
 }

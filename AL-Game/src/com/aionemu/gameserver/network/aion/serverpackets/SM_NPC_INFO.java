@@ -17,6 +17,10 @@
 
 package com.aionemu.gameserver.network.aion.serverpackets;
 
+import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.CreatureType;
 import com.aionemu.gameserver.model.gameobjects.Npc;
@@ -27,13 +31,11 @@ import com.aionemu.gameserver.model.items.NpcEquippedGear;
 import com.aionemu.gameserver.model.templates.BoundRadius;
 import com.aionemu.gameserver.model.templates.item.ItemTemplate;
 import com.aionemu.gameserver.model.templates.npc.NpcTemplate;
+import com.aionemu.gameserver.model.templates.npc.NpcTemplateType;
 import com.aionemu.gameserver.model.templates.spawns.SpawnTemplate;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 import com.aionemu.gameserver.services.TownService;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Map.Entry;
 
 /**
  * This packet is displaying visible npc/monsters.
@@ -96,6 +98,15 @@ public class SM_NPC_INFO extends AionServerPacket {
 		npcTypeId = CreatureType.ATTACKABLE.getId();
 		npcId = npc.getNpcId();
 		masterName = master;
+	}
+
+	public SM_NPC_INFO(Npc npc, int npcType) {
+		this._npc = npc;
+		npcTemplate = npc.getObjectTemplate();
+		npcTypeId = npcType;
+		npcId = npc.getNpcId();
+		creatorId = npc.getCreatorId();
+		masterName = npc.getMasterName();
 	}
 
 	/**
@@ -173,8 +184,12 @@ public class SM_NPC_INFO extends AionServerPacket {
 		writeH(npcTemplate.getAttackDelay());
 		writeH(npcTemplate.getAttackDelay());
 
-		writeC(_npc.isFlag() ? 0x13 : _npc.isNewSpawn() ? 0x01 : 0x00);
-
+		if (npcTemplate.getNpcTemplateType() == NpcTemplateType.FLAG) {
+			writeC(0x13);
+		}
+		else {
+			writeC(_npc.isNewSpawn() ? 0x01 : 0x00);
+		}
 		/**
 		 * Movement
 		 */
@@ -189,20 +204,18 @@ public class SM_NPC_INFO extends AionServerPacket {
 		} else {
 			writeH(spawn.getStaticId());
 		}
-		writeC(0);
-		writeC(0); // all unknown
-		writeC(0);
-		writeC(0);
-		writeC(0);
-		writeC(0);
-		writeC(0);
-		writeC(0);
+		writeQ(0);
 		writeC(_npc.getVisualState()); // visualState
 
 		/**
 		 * 1 : normal (kisk too) 2 : summon 32 : trap 64 : skill area 1024 : holy servant, noble energy
 		 */
-		writeH(_npc.isFlag() ? 0x13 : _npc.getNpcObjectType().getId());
+		if (npcTemplate.getNpcTemplateType() == NpcTemplateType.FLAG) {
+				writeH(0x13);
+		}
+		else {
+			writeH(_npc.getNpcObjectType().getId());
+		}
 		writeC(0x00); // unk
 		writeD(_npc.getTarget() == null ? 0 : _npc.getTarget().getObjectId());
 		writeD(TownService.getInstance().getTownIdByPosition(_npc));

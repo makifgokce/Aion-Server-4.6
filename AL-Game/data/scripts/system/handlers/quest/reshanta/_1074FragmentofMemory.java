@@ -18,10 +18,11 @@
 package quest.reshanta;
 
 import com.aionemu.gameserver.model.DialogAction;
+import com.aionemu.gameserver.model.TeleportAnimation;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.model.TeleportAnimation;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
@@ -105,8 +106,13 @@ public class _1074FragmentofMemory extends QuestHandler {
 				}
 					break;
 				case 700355: // Artefact of the Inception
-					useQuestObject(env, 3, 3, true, false);
-					return playQuestMovie(env, 271);
+					if(player.getInventory().decreaseByItemId(188020000, 1, QuestStatus.START)) {
+						useQuestObject(env, 3, 3, true, false);
+						return playQuestMovie(env, 271);
+					} else {
+						PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(true, 1111203, player.getObjectId(), 1));
+						return sendQuestEndDialog(env);
+					}
 				case 790001: { //Pernos
 					switch (env.getDialog()) {
 						case QUEST_SELECT:

@@ -17,11 +17,15 @@
 
 package com.aionemu.gameserver.skillengine.effect;
 
-import com.aionemu.gameserver.skillengine.model.Effect;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+
+import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.LOG;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.TYPE;
+import com.aionemu.gameserver.skillengine.model.Effect;
 
 /**
  * @author Sippolo
@@ -30,15 +34,26 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "MpAttackEffect")
 public class MpAttackEffect extends AbstractOverTimeEffect {
 
+	@XmlAttribute(name = "percent")
+	protected boolean percent;
+	@XmlAttribute(name = "value")
+	protected int value;
+
 	// TODO bosses are resistent to this?
 	@Override
 	public void onPeriodicAction(Effect effect) {
-		int maxMP = effect.getEffected().getLifeStats().getMaxMp();
+		Creature effected = effect.getEffected();
+		int maxMP = effected.getLifeStats().getMaxMp();
 		int newValue = value;
 		// Support for values in percentage
 		if (percent) {
-			newValue = (int) ((maxMP * value) / 100);
+			newValue = (maxMP * value) / 100;
 		}
-		effect.getEffected().getLifeStats().reduceMp(newValue);
+
+		if(newValue < 0) {
+			newValue = 0;
+		}
+		effect.setReserved2(newValue);
+		effected.getLifeStats().reduceMp(TYPE.HEAL_MP, newValue, 0, LOG.REGULAR);
 	}
 }

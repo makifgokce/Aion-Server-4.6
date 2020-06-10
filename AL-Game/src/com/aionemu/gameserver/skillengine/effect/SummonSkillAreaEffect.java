@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.skillengine.effect;
 
 import java.util.concurrent.Future;
@@ -63,12 +62,13 @@ public class SummonSkillAreaEffect extends SummonServantEffect {
 				useTime = 7;
 				break;
 		}
-
 		final Servant servant = spawnServant(effect, useTime, NpcObjectType.SKILLAREA, x, y, z);
+		final int finalSkillId = servant.getSkillList() != null ? servant.getSkillList().getRandomSkill().getSkillId() : 0;
 		Future<?> task = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
 			@Override
 			public void run() {
-				servant.getController().useSkill(skillId);
+				servant.getController().useSkill(finalSkillId);
 			}
 		}, 0, 3000);
 		servant.getController().addTask(TaskId.SKILL_USE, task);

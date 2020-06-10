@@ -194,14 +194,30 @@
             <xs:enumeration value="SLOW_RESISTANCE_PENETRATION"/>
             <!-- Effects Boosts and Deboosts -->
             <xs:enumeration value="HEAL_SKILL_BOOST"/>
-            <xs:enumeration value="HEAL_SKILL_DEBOOST" />
+            <xs:enumeration value="HEAL_SKILL_DEBOOST"/>
             <!-- Boost duration of Buff skills -->
             <xs:enumeration value="BOOST_DURATION_BUFF"/>
             <!-- Boost resist of Debuff skills -->
             <xs:enumeration value="BOOST_RESIST_DEBUFF"/>
             <!-- 3.5 -->
             <xs:enumeration value="ELEMENTAL_FIRE"/>
+
+            <!-- AP & Drop Boost -->
+            <xs:enumeration value="AP_BOOST"/>
+            <xs:enumeration value="DR_BOOST"/>
+            <!-- 4.8/4.9 -->
+            <xs:enumeration value="AP_REDUCE_RATE"/>
+            <xs:enumeration value="ENCHANT_BOOST"/>
+            <xs:enumeration value="AUTHORIZE_BOOST"/>
+            <xs:enumeration value="INDUN_DROP_BOOST"/>
+            <xs:enumeration value="DEATH_PENALTY_REDUCE"/>
+            <xs:enumeration value="ENCHANT_OPTION_BOOST"/>
+
             <!-- PvP and PvE -->
+	   <xs:enumeration value="PVP_PHYSICAL_ATTACK"/>
+            <xs:enumeration value="PVP_PHYSICAL_DEFEND"/>
+            <xs:enumeration value="PVP_MAGICAL_ATTACK"/>
+            <xs:enumeration value="PVP_MAGICAL_DEFEND"/>
             <xs:enumeration value="PVP_ATTACK_RATIO"/>
             <xs:enumeration value="PVP_ATTACK_RATIO_MAGICAL"/>
             <xs:enumeration value="PVP_ATTACK_RATIO_PHYSICAL"/>
@@ -226,11 +242,24 @@
             <xs:enumeration value="PVPATTACKRATIO_MAGICAL"/>
             <xs:enumeration value="MAGICAL_CRITICAL_REDUCE_RATE"/>
             <xs:enumeration value="PVPATTACKRATIO_PHYSICAL"/>
+            <xs:enumeration value="UNK_STAT"/>
+            <!-- 4.7 -->
+            <xs:enumeration value="PVP_DODGE"/>
+			<xs:enumeration value="PVP_EVASION"/>
+            <xs:enumeration value="PVP_BLOCK"/>
+            <xs:enumeration value="PVP_PARRY"/>
+            <xs:enumeration value="PVP_HIT_ACCURACY"/>
+			<xs:enumeration value="PVP_PHYSICAL_ACCURACY"/>
+            <xs:enumeration value="PVP_MAGICAL_RESIST"/>
+			<xs:enumeration value="PVP_MAGICAL_ACCURACY"/>
+            <xs:enumeration value="PVP_MAGICAL_HIT_ACCURACY"/>
+            <xs:enumeration value="BLOCK_PENETRATION"/>
+            <xs:enumeration value="ORDALIE_REWARD"/>
         </xs:restriction>
     </xs:simpleType>
-	
+
     <!-- conditions -->
-	
+
     <xs:complexType name="Conditions">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="mp" type="MpCondition" minOccurs="0" maxOccurs="1"/>
@@ -470,13 +499,12 @@
             <xs:enumeration value="DEFORM"/>
             <xs:enumeration value="CLOSEAERIAL"/>
             <xs:enumeration value="NOFLY"/>
-            <xs:enumeration value="RIDEROBOT"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="LeftHandSlot">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="SHIELD" />
-            <xs:enumeration value="DUAL" />
+            <xs:enumeration value="SHIELD"/>
+            <xs:enumeration value="DUAL"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

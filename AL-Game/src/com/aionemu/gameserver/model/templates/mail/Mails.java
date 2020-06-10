@@ -19,6 +19,7 @@ package com.aionemu.gameserver.model.templates.mail;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.bind.Unmarshaller;
@@ -41,7 +42,7 @@ public class Mails {
 
 	void afterUnmarshal(Unmarshaller u, Object parent) {
 		for (SysMail template : sysMailTemplates) {
-			String sysMailName = template.getName().toLowerCase();
+			String sysMailName = template.getName().toLowerCase(Locale.forLanguageTag("en"));
 			sysMailByName.put(sysMailName, template);
 		}
 		sysMailTemplates.clear();
@@ -49,7 +50,7 @@ public class Mails {
 	}
 
 	public MailTemplate getMailTemplate(String name, String eventName, Race playerRace) {
-		SysMail template = sysMailByName.get(name.toLowerCase());
+		SysMail template = sysMailByName.get(name.toLowerCase(Locale.forLanguageTag("en")));
 		if (template == null) {
 			return null;
 		}

@@ -14,21 +14,22 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.skillengine.effect;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_INFO;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_TRANSFORM;
 import com.aionemu.gameserver.skillengine.model.Effect;
 import com.aionemu.gameserver.skillengine.model.TransformType;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Sweetkr, kecimis
@@ -39,10 +40,16 @@ public abstract class TransformEffect extends EffectTemplate {
 
 	@XmlAttribute
 	protected int model;
+
 	@XmlAttribute
 	protected TransformType type = TransformType.NONE;
+
 	@XmlAttribute
 	protected int panelid;
+
+	@XmlAttribute
+	protected int itemId;
+
 	@XmlAttribute
 	protected AbnormalState state = AbnormalState.BUFF;
 
@@ -80,29 +87,54 @@ public abstract class TransformEffect extends EffectTemplate {
 			}
 			effected.getTransformModel().setModelId(newModel);
 			effected.getTransformModel().setTransformType(transformType);
-		} else if (effected instanceof Summon) {
+			effected.getTransformModel().setItemId(0);
+			if (model == 202635) { // Makes the effected unAttackable for all
+				PacketSendUtility.broadcastPacket(effected, new SM_PLAYER_INFO((Player) effected, false), 100);
+			}
+		}
+		else if (effected instanceof Summon) {
 			effected.getTransformModel().setModelId(0);
-		} else if (effected instanceof Npc) {
+		}
+		else if (effected instanceof Npc) {
 			effected.getTransformModel().setModelId(effected.getObjectTemplate().getTemplateId());
 		}
 		effected.getTransformModel().setPanelId(0);
-		PacketSendUtility.broadcastPacketAndReceive(effected, new SM_TRANSFORM(effected, 0, false));
+		PacketSendUtility.broadcastPacketAndReceive(effected, new SM_TRANSFORM(effected, 0, false, 0));
 
 		if (effected instanceof Player) {
 			((Player) effected).setTransformed(false);
+			((Player) effected).setTransformedModelId(0);
+			((Player) effected).setTransformedItemId(0);
+			((Player) effected).setTransformedPanelId(0);
 		}
 	}
 
 	@Override
-	public void startEffect(Effect effect) {
+	public void startEffect(Effect effect) { // , AbnormalState effectId
 		final Creature effected = effect.getEffected();
+
+		// if (effectId != null) {
+		// effect.setAbnormal(effectId.getId());
+		// effected.getEffectController().setAbnormal(effectId.getId());
+		// }
+
 		effected.getTransformModel().setModelId(model);
 		effected.getTransformModel().setPanelId(panelid);
+		effected.getTransformModel().setItemId(itemId);
 		effected.getTransformModel().setTransformType(effect.getTransformType());
-		PacketSendUtility.broadcastPacketAndReceive(effected, new SM_TRANSFORM(effected, panelid, true));
+		PacketSendUtility.broadcastPacketAndReceive(effected, new SM_TRANSFORM(effected, panelid, true, itemId, effect.getSkillId()));
+
+		if (model == 202635) { // Makes the effected Attackable for all
+			if (effected instanceof Player) {
+				PacketSendUtility.broadcastPacket(effected, new SM_PLAYER_INFO((Player) effected, true), 100);
+			}
+		}
 
 		if (effected instanceof Player) {
 			((Player) effected).setTransformed(true);
+			((Player) effected).setTransformedModelId(model);
+			((Player) effected).setTransformedItemId(itemId);
+			((Player) effected).setTransformedItemId(panelid);
 		}
 	}
 

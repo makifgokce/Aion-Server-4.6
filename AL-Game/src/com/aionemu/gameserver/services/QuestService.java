@@ -36,6 +36,7 @@ import com.aionemu.gameserver.configs.main.MembershipConfig;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.dataholders.QuestsData;
 import com.aionemu.gameserver.model.DescriptionId;
+import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.model.PlayerClass;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.TaskId;
@@ -54,6 +55,7 @@ import com.aionemu.gameserver.model.skill.PlayerSkillEntry;
 import com.aionemu.gameserver.model.team2.alliance.PlayerAlliance;
 import com.aionemu.gameserver.model.team2.common.legacy.LootRuleType;
 import com.aionemu.gameserver.model.team2.group.PlayerGroup;
+import com.aionemu.gameserver.model.templates.ExpandType;
 import com.aionemu.gameserver.model.templates.QuestTemplate;
 import com.aionemu.gameserver.model.templates.npc.NpcTemplate;
 import com.aionemu.gameserver.model.templates.quest.CollectItem;
@@ -78,7 +80,6 @@ import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.handlers.HandlerResult;
 import com.aionemu.gameserver.questEngine.handlers.models.WorkOrdersData;
 import com.aionemu.gameserver.questEngine.handlers.models.XMLQuest;
-import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
@@ -125,7 +126,7 @@ public final class QuestService {
 			return false; // prevent repeatable reward because of wrong quest
 							// handling
 		}
-		List<QuestItems> questItems = new ArrayList<QuestItems>();
+		List<QuestItems> questItems = new ArrayList<>();
 		if (!template.getExtendedRewards().isEmpty()) {
 			if (qs.getCompleteCount() == template.getMaxRepeatCount() - 1) { // This
 																				// is
@@ -154,7 +155,7 @@ public final class QuestService {
 	private static List<QuestItems> getRewardItems(QuestEnv env, QuestTemplate template, boolean extended, int reward) {
 		Player player = env.getPlayer();
 		int id = env.getQuestId();
-		List<QuestItems> questItems = new ArrayList<QuestItems>();
+		List<QuestItems> questItems = new ArrayList<>();
 		Rewards rewards;
 		if (extended) {
 			rewards = template.getExtendedRewards().get(0);
@@ -344,9 +345,17 @@ public final class QuestService {
 		}
 		if (rewards.getExtendInventory() != null) {
 			if (rewards.getExtendInventory() == 1) {
-				CubeExpandService.expand(player, false);
+				if(player.getNpcExpands() + player.getQuestExpands() + player.getItemExpands() + 1 < 12) {
+					CubeExpandService.expand(player, ExpandType.QUEST);
+				} else {
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_EXTEND_INVENTORY_CANT_EXTEND_MORE_BY_QUEST);
+				}
 			} else if (rewards.getExtendInventory() == 2) {
-				WarehouseService.expand(player);
+				if(player.getWarehouseNpcExpands() + player.getWarehouseQuestExpands() + player.getWarehouseItemExpands() + 1 < 11) {
+					WarehouseService.expand(player, ExpandType.QUEST);
+				} else {
+
+				}
 			}
 		}
 		if (rewards.getExtendStigma() != null) {
@@ -532,7 +541,7 @@ public final class QuestService {
 		}
 
 		if (template.getCombineSkill() != null) {
-			List<Integer> skills = new ArrayList<Integer>(); // skills to check
+			List<Integer> skills = new ArrayList<>(); // skills to check
 			if (template.getCombineSkill() == -1) // any skill
 			{
 				skills.add(30002);
@@ -698,7 +707,7 @@ public final class QuestService {
 
 		// Check required skills
 		if (template.getCombineSkill() != null) {
-			List<Integer> skills = new ArrayList<Integer>(); // skills to check
+			List<Integer> skills = new ArrayList<>(); // skills to check
 			if (template.getCombineSkill() == -1) // any skill
 			{
 				skills.add(30002);
@@ -913,7 +922,7 @@ public final class QuestService {
 				continue;
 			}
 			if (players != null && player.isInGroup2()) {
-				List<Player> pls = new ArrayList<Player>();
+				List<Player> pls = new ArrayList<>();
 				if (drop.isDropEachMemberGroup()) {
 					for (Player member : players) {
 						if (isQuestDrop(member, drop)) {
@@ -942,7 +951,7 @@ public final class QuestService {
 					pls.clear();
 				}
 			} else if (players != null && player.isInAlliance2()) {
-				List<Player> pls = new ArrayList<Player>();
+				List<Player> pls = new ArrayList<>();
 				if (drop.isDropEachMemberAlliance()) {
 					for (Player member : players) {
 						if (isQuestDrop(member, drop)) {
@@ -1173,7 +1182,7 @@ public final class QuestService {
 	}
 
 	public static List<Player> getEachDropMembersGroup(PlayerGroup group, int npcId, int questId) {
-		List<Player> players = new ArrayList<Player>();
+		List<Player> players = new ArrayList<>();
 		for (QuestDrop qd : getQuestDrop(npcId)) {
 			if (qd.isDropEachMemberGroup()) {
 				for (Player player : group.getMembers()) {
@@ -1189,7 +1198,7 @@ public final class QuestService {
 	}
 
 	public static List<Player> getEachDropMembersAlliance(PlayerAlliance alliance, int npcId, int questId) {
-		List<Player> players = new ArrayList<Player>();
+		List<Player> players = new ArrayList<>();
 		for (QuestDrop qd : getQuestDrop(npcId)) {
 			if (qd.isDropEachMemberGroup()) {
 				for (Player player : alliance.getMembers()) {

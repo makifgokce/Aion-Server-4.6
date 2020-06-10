@@ -17,18 +17,20 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.services.BrokerService;
+import com.aionemu.gameserver.utils.MathUtil;
 
 /**
  * @author kosyak
  */
 public class CM_BUY_BROKER_ITEM extends AionClientPacket {
 
-	@SuppressWarnings("unused")
-	private int brokerId;
+	private int npcObjId;
 	private int itemUniqueId;
 	private int itemCount;
 
@@ -38,7 +40,7 @@ public class CM_BUY_BROKER_ITEM extends AionClientPacket {
 
 	@Override
 	protected void readImpl() {
-		this.brokerId = readD();
+		this.npcObjId = readD();
 		this.itemUniqueId = readD();
 		this.itemCount = readH();
 	}
@@ -46,10 +48,12 @@ public class CM_BUY_BROKER_ITEM extends AionClientPacket {
 	@Override
 	protected void runImpl() {
 		Player player = getConnection().getActivePlayer();
-
+		VisibleObject obj = player.getKnownList().getObject(npcObjId);
 		if (itemCount < 1) {
 			return;
 		}
-		BrokerService.getInstance().buyBrokerItem(player, itemUniqueId);
+		if (obj != null && obj instanceof Npc && MathUtil.isInRange(player, obj, 6)) {
+			BrokerService.getInstance().buyBrokerItem(player, itemUniqueId);
+		}
 	}
 }

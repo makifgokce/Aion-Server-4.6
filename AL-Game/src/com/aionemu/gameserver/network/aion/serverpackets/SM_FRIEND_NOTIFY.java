@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
 import com.aionemu.gameserver.network.aion.AionConnection;
@@ -39,6 +38,10 @@ public class SM_FRIEND_NOTIFY extends AionServerPacket {
 	 * Buddy has deleted you
 	 */
 	public static final int DELETED = 2;
+	/**
+	 * %0 şu an çevrimiçi değil. Fakat arkadaşlık isteğin gönderildi.
+	 */
+	public static final int FRIEND_OFFLINE_ADDED = 11;
 	private final int code;
 	private final String name;
 

@@ -17,6 +17,8 @@
 
 package admincommands;
 
+import java.util.Locale;
+
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_TRANSFORM;
 import com.aionemu.gameserver.utils.PacketSendUtility;
@@ -46,7 +48,7 @@ public class Morph extends AdminCommand {
 			target = (Player) admin.getTarget();
 		}
 
-		if (!("cancel").startsWith(params[0].toLowerCase())) {
+		if (!("cancel").startsWith(params[0].toLowerCase(Locale.forLanguageTag("en")))) {
 			try {
 				param = Integer.parseInt(params[0]);
 

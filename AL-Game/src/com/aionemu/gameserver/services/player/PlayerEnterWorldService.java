@@ -24,17 +24,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javolution.util.FastList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.cache.HTMLCache;
 import com.aionemu.gameserver.configs.administration.AdminConfig;
-import com.aionemu.gameserver.configs.main.*;
-import com.aionemu.gameserver.dao.*;
-import com.aionemu.gameserver.model.ChatType;
+import com.aionemu.gameserver.configs.main.AutoGroupConfig;
+import com.aionemu.gameserver.configs.main.CraftConfig;
+import com.aionemu.gameserver.configs.main.EventsConfig;
+import com.aionemu.gameserver.configs.main.FastTrackConfig;
+import com.aionemu.gameserver.configs.main.GSConfig;
+import com.aionemu.gameserver.configs.main.HTMLConfig;
+import com.aionemu.gameserver.configs.main.PeriodicSaveConfig;
+import com.aionemu.gameserver.configs.main.SecurityConfig;
+import com.aionemu.gameserver.dao.AbyssRankDAO;
+import com.aionemu.gameserver.dao.InventoryDAO;
+import com.aionemu.gameserver.dao.ItemStoneListDAO;
+import com.aionemu.gameserver.dao.PlayerDAO;
+import com.aionemu.gameserver.dao.PlayerPasskeyDAO;
+import com.aionemu.gameserver.dao.PlayerPunishmentsDAO;
+import com.aionemu.gameserver.dao.PlayerQuestListDAO;
+import com.aionemu.gameserver.dao.PlayerSkillListDAO;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.TaskId;
 import com.aionemu.gameserver.model.account.Account;
@@ -44,6 +55,7 @@ import com.aionemu.gameserver.model.account.PlayerAccountData;
 import com.aionemu.gameserver.model.gameobjects.HouseObject;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
+import com.aionemu.gameserver.model.gameobjects.player.AbyssRank;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
 import com.aionemu.gameserver.model.gameobjects.player.emotion.Emotion;
@@ -59,11 +71,58 @@ import com.aionemu.gameserver.model.skill.PlayerSkillEntry;
 import com.aionemu.gameserver.model.team2.alliance.PlayerAllianceService;
 import com.aionemu.gameserver.model.team2.group.PlayerGroupService;
 import com.aionemu.gameserver.network.aion.AionConnection;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ABYSS_RANK;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_AFTER_TIME_CHECK;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_BLOCK_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_CHANNEL_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_CHARACTER_SELECT;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_CUBE_UPDATE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ENTER_WORLD_CHECK;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_FAST_TRACK;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_FRIEND_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_GAME_TIME;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INSTANCE_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INVENTORY_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_COOLDOWN;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_MACRO_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_MOTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_SPAWN;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_STATE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PRICES;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_QUEST_COMPLETED_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_QUEST_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_QUIT_RESPONSE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_RECIPE_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SKILL_COOLDOWN;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SKILL_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_STATS_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TITLE_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_UI_SETTINGS;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
-import com.aionemu.gameserver.services.*;
+import com.aionemu.gameserver.services.AccessLevelEnum;
+import com.aionemu.gameserver.services.AutoGroupService;
+import com.aionemu.gameserver.services.BrokerService;
+import com.aionemu.gameserver.services.ClassChangeService;
+import com.aionemu.gameserver.services.DisputeLandService;
+import com.aionemu.gameserver.services.EventService;
+import com.aionemu.gameserver.services.F2pService;
+import com.aionemu.gameserver.services.FastTrackService;
+import com.aionemu.gameserver.services.HTMLService;
+import com.aionemu.gameserver.services.HousingService;
+import com.aionemu.gameserver.services.KiskService;
+import com.aionemu.gameserver.services.LegionService;
+import com.aionemu.gameserver.services.PetitionService;
+import com.aionemu.gameserver.services.PunishmentService;
 import com.aionemu.gameserver.services.PunishmentService.PunishmentType;
+import com.aionemu.gameserver.services.SerialKillerService;
+import com.aionemu.gameserver.services.SiegeService;
+import com.aionemu.gameserver.services.SkillLearnService;
+import com.aionemu.gameserver.services.StigmaService;
+import com.aionemu.gameserver.services.SurveyService;
+import com.aionemu.gameserver.services.VortexService;
 import com.aionemu.gameserver.services.abyss.AbyssSkillService;
 import com.aionemu.gameserver.services.craft.RelinquishCraftStatus;
 import com.aionemu.gameserver.services.instance.InstanceService;
@@ -77,10 +136,11 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.utils.audit.AuditLogger;
 import com.aionemu.gameserver.utils.collections.ListSplitter;
-import com.aionemu.gameserver.utils.i18n.CustomMessageId;
-import com.aionemu.gameserver.utils.i18n.LanguageHandler;
 import com.aionemu.gameserver.utils.rates.Rates;
+import com.aionemu.gameserver.utils.stats.AbyssRankEnum;
 import com.aionemu.gameserver.world.World;
+
+import javolution.util.FastList;
 
 /**
  * @author ATracer
@@ -113,35 +173,7 @@ import com.aionemu.gameserver.world.World;
 public final class PlayerEnterWorldService {
 
 	private static final Logger log = LoggerFactory.getLogger("GAMECONNECTION_LOG");
-	private static final String serverName = "Welcome to " + GSConfig.SERVER_NAME + "!";
-	private static final String serverIntro = "Please remember: Accountsharing is not permitted";
-	private static final String serverInfo;
-	private static final String alInfo;
-	private static final Set<Integer> pendingEnterWorld = new HashSet<Integer>();
-
-	static {
-		String infoBuffer = LanguageHandler.translate(CustomMessageId.HOMEPAGE) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.TEAMSPEAK) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO1) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO2) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO3) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO4) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO5) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO6) + "\n";
-		infoBuffer = infoBuffer + LanguageHandler.translate(CustomMessageId.INFO7);
-
-		String alBuffer = "=============================\n";
-		alBuffer = alBuffer + "Aion Lightning Core,developed by Aion German.\n";
-		alBuffer = alBuffer + "Copyright 2015 Core 4.6.2 EU\n";
-		alBuffer = alBuffer + "=============================\n";
-		alBuffer = alBuffer + LanguageHandler.translate(CustomMessageId.ENDMESSAGE) + GSConfig.SERVER_NAME + " .";
-
-		serverInfo = infoBuffer;
-		alInfo = alBuffer;
-
-		infoBuffer = null;
-		alBuffer = null;
-	}
+	private static final Set<Integer> pendingEnterWorld = new HashSet<>();
 
 	/**
 	 * @param objectId
@@ -169,7 +201,7 @@ public final class PlayerEnterWorldService {
 		}
 		// passkey check
 		if (SecurityConfig.PASSKEY_ENABLE && !client.getAccount().getCharacterPasskey().isPass()) {
-			showPasskey(objectId, client);
+			showPasskey(client.getAccount().getId(), client);
 		} else {
 			validateAndEnterWorld(objectId, client);
 		}
@@ -216,6 +248,7 @@ public final class PlayerEnterWorldService {
 					Player player = World.getInstance().findPlayer(objectId);
 					if (player != null) {
 						AuditLogger.info(player, "Duplicate player in world");
+						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_KICK_ANOTHER_USER_TRY_LOGIN);
 						client.close(new SM_QUIT_RESPONSE(), false);
 						return;
 					}
@@ -249,6 +282,7 @@ public final class PlayerEnterWorldService {
 			player.setClientConnection(client);
 
 			log.info("[MAC_AUDIT] Player " + player.getName() + " (account " + account.getName() + ") has entered world with " + client.getMacAddress() + " MAC.");
+            log.info("[HDD_AUDIT] Player " + player.getName() + " (account " + account.getName() + ") has entered world with " + client.getHddSerial() + " HDD.");
 			World.getInstance().storeObject(player);
 
 			StigmaService.onPlayerLogin(player);
@@ -306,9 +340,10 @@ public final class PlayerEnterWorldService {
 				if (((System.currentTimeMillis() / 1000) - lastOnline) > 300) {
 					player.getCommonData().setDp(0);
 				}
+				pcd.setResponseRate(player.getF2p() != null ? 60 : 40);
 			}
 			InstanceService.onPlayerLogin(player);
-            client.sendPacket(new SM_FAST_TRACK(1, 1, true));
+            client.sendPacket(new SM_FAST_TRACK(player.getCommonData().getServerId(), 1, true));
 			if (!player.getSkillList().isSkillPresent(3512)) {
 				player.getSkillList().addSkill(player, 3512, 129);
 			}
@@ -351,9 +386,9 @@ public final class PlayerEnterWorldService {
                 FastTrackService.getInstance().checkAuthorizationRequest(player);
             }
 
-			byte[] uiSettings = player.getPlayerSettings().getUiSettings();
-			byte[] shortcuts = player.getPlayerSettings().getShortcuts();
-			byte[] houseBuddies = player.getPlayerSettings().getHouseBuddies();
+			byte[] uiSettings = player.getCommonData().getPlayerSettings().getUiSettings();
+			byte[] shortcuts = player.getCommonData().getPlayerSettings().getShortcuts();
+			byte[] houseBuddies = player.getCommonData().getPlayerSettings().getHouseBuddies();
 
 			if (uiSettings != null) {
 				client.sendPacket(new SM_UI_SETTINGS(uiSettings, 0));
@@ -400,22 +435,24 @@ public final class PlayerEnterWorldService {
 			SiegeService.getInstance().onPlayerLogin(player);
 
 			client.sendPacket(new SM_PRICES());
+			if(!player.getCommonData().getFriendList().getIsFriendListSent()) {
+				client.sendPacket(new SM_FRIEND_LIST());
+				player.getCommonData().getFriendList().setIsFriendListSent(true);
+				client.sendPacket(new SM_BLOCK_LIST());
+			}
 			DisputeLandService.getInstance().onLogin(player);
 			client.sendPacket(new SM_ABYSS_RANK(player.getAbyssRank()));
-            client.sendPacket(new SM_PACKAGE_INFO_NOTIFY(0));
-
-			// Intro message
-			PacketSendUtility.sendWhiteMessage(player, serverName);
-			PacketSendUtility.sendYellowMessage(player, serverIntro);
-			PacketSendUtility.sendBrightYellowMessage(player, serverInfo);
-			PacketSendUtility.sendWhiteMessage(player, alInfo);
-			if (player.isMarried()) {
-				PacketSendUtility.sendYellowMessage(player, "You are Married !");
-			}
+            //client.sendPacket(new SM_PACKAGE_INFO_NOTIFY(0));
 
 			player.setRates(Rates.getRatesFor(client.getAccount().getMembership()));
-			if (CustomConfig.PREMIUM_NOTIFY) {
-				showPremiumAccountInfo(client, account);
+
+			//Gm skill delete
+			if (player.getAccessLevel() == 0) {
+				for (int al : AccessLevelEnum.getAlType(AccessLevelEnum.AccessLevel10.getLevel()).getSkills()) {
+					if (player.getSkillList().isSkillPresent(al)) {
+						SkillLearnService.removeSkill(player, al);
+					}
+				}
 			}
 
 			if (player.isGM()) {
@@ -426,60 +463,43 @@ public final class PlayerEnterWorldService {
 					PacketSendUtility.sendMessage(player, "=============================");
 					if (AdminConfig.INVULNERABLE_GM_CONNECTION) {
 						player.setInvul(true);
-						PacketSendUtility.sendMessage(player, ">> Connection in Invulnerable mode <<");
+						PacketSendUtility.sendMessage(player, ">> Invulnerable Mode : ON <<");
 					}
 					if (AdminConfig.INVISIBLE_GM_CONNECTION) {
 						player.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
 						player.setVisualState(CreatureVisualState.HIDE20);
 						PacketSendUtility.broadcastPacket(player, new SM_PLAYER_STATE(player), true);
-						PacketSendUtility.sendMessage(player, ">> Connection in Invisible mode <<");
+						PacketSendUtility.sendMessage(player, ">> Invisible Mode : ON <<");
 					}
 					if (AdminConfig.ENEMITY_MODE_GM_CONNECTION.equalsIgnoreCase("Neutral")) {
 						player.setAdminNeutral(3);
 						player.setAdminEnmity(0);
-						PacketSendUtility.sendMessage(player, ">> Connection in Neutral mode <<");
+						PacketSendUtility.sendMessage(player, ">> Neutral Mode : ALL <<");
 					}
 					if (AdminConfig.ENEMITY_MODE_GM_CONNECTION.equalsIgnoreCase("Enemy")) {
 						player.setAdminNeutral(0);
 						player.setAdminEnmity(3);
-						PacketSendUtility.sendMessage(player, ">> Connection in Enemy mode <<");
+						PacketSendUtility.sendMessage(player, ">> Neutral Mode : ENEMY <<");
 					}
 					if (AdminConfig.VISION_GM_CONNECTION) {
 						player.setSeeState(CreatureSeeState.SEARCH10);
 						PacketSendUtility.broadcastPacket(player, new SM_PLAYER_STATE(player), true);
-						PacketSendUtility.sendMessage(player, ">> Connection in Vision mode <<");
+						PacketSendUtility.sendMessage(player, ">> Vision Mode : ON <<");
 					}
 					if (AdminConfig.WHISPER_GM_CONNECTION) {
 						player.setUnWispable();
-						PacketSendUtility.sendMessage(player, ">> Accepting Whisper : OFF <<");
+						PacketSendUtility.sendMessage(player, ">> Whisper : OFF <<");
 					}
 					PacketSendUtility.sendMessage(player, "=============================");
 				}
-			}
 
-			// Special skill for gm
-			if (player.getAccessLevel() >= AdminConfig.COMMAND_SPECIAL_SKILL) {
-				FastList<Integer> gmSkill = FastList.newInstance();
-				gmSkill.add(174);
-				gmSkill.add(175);
-				gmSkill.add(1904);
-				gmSkill.add(1911);
-				gmSkill.add(3224);
-				gmSkill.add(3226);
-				gmSkill.add(3227);
-				gmSkill.add(3232);
-				gmSkill.add(3233);
-				gmSkill.add(3234);
-				gmSkill.add(3235);
-				gmSkill.add(3236);
-				gmSkill.add(3237);
-				gmSkill.add(3238);
-				gmSkill.add(3239);
-				gmSkill.add(3240);
-				gmSkill.add(3241);
-				for (FastList.Node<Integer> n = gmSkill.head(), end = gmSkill.tail(); (n = n.getNext()) != end;) {
-					PlayerSkillEntry skill = new PlayerSkillEntry(n.getValue(), true, 1, PersistentState.NOACTION);
-					player.getSkillList().addStigmaSkill(player, skill.getSkillId(), skill.getSkillLevel());
+				// Special skill for gm
+				if (player.getAccessLevel() >= AdminConfig.COMMAND_SPECIAL_SKILL) {
+					for (int al : AccessLevelEnum.getAlType(player.getAccessLevel()).getSkills()) {
+						if(!player.getSkillList().isSkillPresent(al)) {
+							player.getSkillList().addGMSkill(player, al, 1);
+						}
+					}
 				}
 			}
 
@@ -490,6 +510,9 @@ public final class PlayerEnterWorldService {
 			if (player.isInPrison()) {
 				PunishmentService.updatePrisonStatus(player);
 			}
+
+			F2pService.getInstance().onEnterWorld(player);
+
 
 			if (player.isNotGatherable()) {
 				PunishmentService.updateGatherableStatus(player);
@@ -509,7 +532,6 @@ public final class PlayerEnterWorldService {
 				AutoGroupService.getInstance().onPlayerLogin(player);
 			}
 			ClassChangeService.showClassChangeDialog(player);
-
 			// Homeward Bound Skill fix
 			if (player.getActiveHouse() != null) {
 				if (player.getSkillList().getSkillEntry(2670) != null || player.getSkillList().getSkillEntry(2671) != null) {
@@ -522,7 +544,7 @@ public final class PlayerEnterWorldService {
 					}
 				}
 			}
-
+			gpAnnounce(player);
 			/**
 			 * Trigger restore services on login.
 			 */
@@ -537,28 +559,27 @@ public final class PlayerEnterWorldService {
 			if (HTMLConfig.ENABLE_GUIDES) {
 				HTMLService.onPlayerLogin(player);
 			}
-
+			
 			for (StorageType st : StorageType.values()) {
-				if (st == StorageType.LEGION_WAREHOUSE) {
+				if (st == StorageType.LEGION_WAREHOUSE)
 					continue;
-				}
 				IStorage storage = player.getStorage(st.getId());
 				if (storage != null) {
 					for (Item item : storage.getItemsWithKinah()) {
-						if (item.getExpireTime() > 0) {
+						if (item.getExpireTime() > 0)
 							ExpireTimerTask.getInstance().addTask(item, player);
-						}
 					}
 				}
 			}
 
 			for (Item item : player.getEquipment().getEquippedItems()) {
-				if (item.getExpireTime() > 0) {
+				if (item.getExpireTime() > 0)
 					ExpireTimerTask.getInstance().addTask(item, player);
-				}
 			}
-
-			player.getEquipment().checkRankLimitItems(); // Remove items after offline changed rank
+			
+			if(!player.isGM()) {
+				player.getEquipment().checkRankLimitItems(); // Remove items after offline changed rank
+			}
 
 			for (Motion motion : player.getMotions().getMotions().values()) {
 				if (motion.getExpireTime() != 0) {
@@ -603,7 +624,6 @@ public final class PlayerEnterWorldService {
 			}
 
 			PlayerTransferService.getInstance().onEnterWorld(player);
-			player.setPartnerId(DAOManager.getDAO(WeddingDAO.class).loadPartnerId(player));
 		} else {
 			log.info("[DEBUG] enter world" + objectId + ", Player: " + player);
 		}
@@ -616,14 +636,18 @@ public final class PlayerEnterWorldService {
 	// TODO! this method code is really odd [Nemesiss]
 	private static void sendItemInfos(AionConnection client, Player player) {
 		// Cubesize limit set in inventory.
-		int questExpands = player.getQuestExpands();
 		int npcExpands = player.getNpcExpands();
-		player.getInventory().setLimit(StorageType.CUBE.getLimit() + (questExpands + npcExpands) * 12);
-		player.getWarehouse().setLimit(StorageType.REGULAR_WAREHOUSE.getLimit() + player.getWarehouseSize() * 8);
+		int questExpands = player.getQuestExpands();
+		int itemExpands = player.getItemExpands();
+		player.getInventory().setLimit(StorageType.CUBE.getLimit() + (questExpands + npcExpands + itemExpands) * 12);
+		int wNpcExpands = player.getWarehouseNpcExpands();
+		int wQuestExpands = player.getWarehouseQuestExpands();
+		int wItemExpands = player.getWarehouseItemExpands();
+		player.getWarehouse().setLimit(StorageType.REGULAR_WAREHOUSE.getLimit() + (wNpcExpands + wQuestExpands + wItemExpands) * 8);
 
 		// items
 		Storage inventory = player.getInventory();
-		List<Item> allItems = new ArrayList<Item>();
+		List<Item> allItems = new ArrayList<>();
 		if (inventory.getKinah() == 0) {
 			inventory.increaseKinah(0); // create an empty object with value 0
 		}
@@ -632,13 +656,13 @@ public final class PlayerEnterWorldService {
 		allItems.addAll(inventory.getItems());
 
         boolean isFirst = true;
-		ListSplitter<Item> splitter = new ListSplitter<Item>(allItems, 10);
+		ListSplitter<Item> splitter = new ListSplitter<>(allItems, 10);
 		while (!splitter.isLast()) {
-            client.sendPacket(new SM_INVENTORY_INFO(isFirst, splitter.getNext(), npcExpands, questExpands, player));
+            client.sendPacket(new SM_INVENTORY_INFO(isFirst, splitter.getNext(), npcExpands, questExpands, itemExpands, player));
             isFirst = false;
 		}
 
-        client.sendPacket(new SM_INVENTORY_INFO(false, new ArrayList<Item>(0), npcExpands, questExpands, player));
+        client.sendPacket(new SM_INVENTORY_INFO(false, new ArrayList<Item>(0), npcExpands, questExpands, itemExpands, player));
 		client.sendPacket(new SM_STATS_INFO(player));
 		client.sendPacket(SM_CUBE_UPDATE.stigmaSlots(player.getCommonData().getAdvancedStigmaSlotSize()));
 	}
@@ -651,28 +675,23 @@ public final class PlayerEnterWorldService {
 	 * @param player
 	 */
 	private static void playerLoggedIn(Player player) {
-		log.info("Player logged in: " + player.getName() + " Account: " + player.getClientConnection().getAccount().getName());
+		log.info("[Login] Player: " + player.getName() + " Hesap: " + player.getClientConnection().getAccount().getName());
 		player.getCommonData().setOnline(true);
 		DAOManager.getDAO(PlayerDAO.class).onlinePlayer(player, true);
-		player.onLoggedIn();
+		player.getCommonData().onLoggedIn();
 		player.setOnlineTime();
 	}
-
-	private static void showPremiumAccountInfo(AionConnection client, Account account) {
-		byte membership = account.getMembership();
-		if (membership > 0) {
-			String accountType = "";
-			switch (account.getMembership()) {
-				case 1:
-					accountType = "Premium";
-					break;
-				case 2:
-					accountType = "VIP";
-					break;
-			}
-			client.sendPacket(new SM_MESSAGE(0, null, "Your account is " + accountType, ChatType.GOLDEN_YELLOW));
-		}
-	}
+	/**
+	*	Glory Point Announce
+	*/
+	private static void gpAnnounce (Player player) {
+        AbyssRank abyssRank = player.getAbyssRank();
+        if (abyssRank.getRank().getId() >= AbyssRankEnum.STAR1_OFFICER.getId()) {
+            int gp = player.getAbyssRank().getRank().getDailyReduceGp();
+            PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GLORY_POINT_LOSE_COMMON);
+            PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_GLORY_POINT_LOSE_PERSONAL(player.getName(), gp));
+        }
+    }
 }
 
 class GeneralUpdateTask implements Runnable {

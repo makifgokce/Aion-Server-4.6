@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npc_drops>
+    <npc_drop npc_id="218327">
+		<drop_group name="ACCESSORY_RARE" use_category="true">
+			<drop item_id="121001076" chance="1.0" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Turquoise Necklace of the Forgotten"/>
+		</drop_group>
+	</npc_drop>
+</npc_drops>

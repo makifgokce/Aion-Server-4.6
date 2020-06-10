@@ -19,9 +19,9 @@ package admincommands;
 
 import com.aionemu.gameserver.controllers.attack.AggroInfo;
 import com.aionemu.gameserver.dataholders.DataManager;
-import com.aionemu.gameserver.model.gameobjects.CreatureType;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.CreatureType;
 import com.aionemu.gameserver.model.gameobjects.Gatherable;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
@@ -64,8 +64,8 @@ public class Info extends AdminCommand {
 					+ "%" + "\nPvP defend: " + player.getGameStats().getStat(StatEnum.PVP_DEFEND_RATIO, 0).getCurrent() * 0.1f + "%" + "\nCast Time Boost: +"
 					+ (player.getGameStats().getStat(StatEnum.BOOST_CASTING_TIME, 1000).getCurrent() * 0.1f - 100) + "%" + "\nAttack Speed: "
 					+ player.getGameStats().getAttackSpeed().getCurrent() * 0.001f + "\nMovement Speed: " + player.getGameStats().getMovementSpeedFloat()
-                    + "\n[Life Stats]\nHP: "+ player.getLifeStats().getCurrentHp() + "/" + player.getGameStats().getMaxHp().getCurrent() + "\nMP: "
-                    + player.getLifeStats().getCurrentMp() + "/" + player.getGameStats().getMaxMp().getCurrent()
+                    + "\n[Life Stats]\nHP: "+ player.getLifeStats().getCurrentHp() + "/" + player.getGameStats().getMaxHp().getCurrent() + " %" + player.getLifeStats().getHpPercentage() + "\nMP: "
+                    + player.getLifeStats().getCurrentMp() + "/" + player.getGameStats().getMaxMp().getCurrent() + " %" + player.getLifeStats().getMpPercentage()
 					+ "\n----------Main Hand------------\nAttack: " + player.getGameStats().getMainHandPAttack().getCurrent() + "\nAccuracy: "
 					+ player.getGameStats().getMainHandPAccuracy().getCurrent() + "\nCritical: " + player.getGameStats().getMainHandPCritical().getCurrent()
 					+ "\n------------Off Hand------------\nAttack: " + player.getGameStats().getOffHandPAttack().getCurrent() + "\nAccuracy: "
@@ -110,8 +110,8 @@ public class Info extends AdminCommand {
 			PacketSendUtility.sendMessage(admin,
 					"[Relations to target]" + "\nisEnemy: " + admin.isEnemy(npc) + "\ncanAttack: " + RestrictionsManager.canAttack(admin, target)
 							+ "\n[Relations to you]" + "\nisEnemy: " + npc.isEnemy(admin) + "\nisAggressive: " + TribeRelationService.isAggressive(npc, admin));
-			PacketSendUtility.sendMessage(admin, "[Life stats]" + "\nHP: " + npc.getLifeStats().getCurrentHp() + " / " + npc.getLifeStats().getMaxHp()
-					+ "\nMP: " + npc.getLifeStats().getCurrentMp() + " / " + npc.getLifeStats().getMaxMp() + "\nXP: "
+			PacketSendUtility.sendMessage(admin, "[Life stats]" + "\nHP: " + npc.getLifeStats().getCurrentHp() + " / " + npc.getLifeStats().getMaxHp() + " %" + npc.getLifeStats().getHpPercentage()
+					+ "\nMP: " + npc.getLifeStats().getCurrentMp() + " / " + npc.getLifeStats().getMaxMp() + " %" + npc.getLifeStats().getMpPercentage() + "\nXP: "
 					+ npc.getObjectTemplate().getStatsTemplate().getMaxXp());
 			PacketSendUtility.sendMessage(admin, "[Sense range]" + "\nRadius: " + npc.getObjectTemplate().getAggroRange() + "\nSide: "
 					+ npc.getObjectTemplate().getBoundRadius().getSide() + " / Front: " + npc.getObjectTemplate().getBoundRadius().getFront()

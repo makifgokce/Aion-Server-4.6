@@ -18,6 +18,7 @@
 package quest.heiron;
 
 import com.aionemu.gameserver.model.DialogAction;
+import com.aionemu.gameserver.model.TeleportAnimation;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
@@ -70,11 +71,12 @@ public class _1063BrigadierIndratu extends QuestHandler {
 						}
 					}
 					case SETPRO1: {
-						TeleportService2.teleportTo(player, 210040000, 1881.2819f, 2589.232f, 139.9159f, (byte) 67);
+						TeleportService2.teleportTo(player, 210040000, 1881.2819f, 2589.232f, 139.9159f, (byte) 67, TeleportAnimation.BEAM_ANIMATION);
 						changeQuestStep(env, 0, 1, false); // 1
 						return closeDialogWindow(env);
 					}
 					case SET_SUCCEED: {
+						TeleportService2.teleportTo(player, 110010000, 1875.1628f, 1511.0737f, 812.6755f, (byte) 0, TeleportAnimation.BEAM_ANIMATION);
 						return defaultCloseDialog(env, 2, 2, true, false); // reward
 					}
 					default:

@@ -100,6 +100,12 @@ public class ReloadSpawn extends AdminCommand {
 				worldId = 600020000;
 			} else if (destination.equalsIgnoreCase("Tiamaranta")) {
 				worldId = 600030000;
+			} else if (destination.equalsIgnoreCase("Nkatalam")) {
+				worldId = 600050000;
+			} else if (destination.equalsIgnoreCase("Skatalam")) {
+				worldId = 600060000;
+			} else if (destination.equalsIgnoreCase("KatalamUg")) {
+				worldId = 600070000;
 			} else if (destination.equalsIgnoreCase("Oriel")) {
 				worldId = 700010000;
 			} else if (destination.equalsIgnoreCase("Pernon")) {
@@ -136,6 +142,9 @@ public class ReloadSpawn extends AdminCommand {
 			reloadMap(120080000, player, "Marchutan Priory");
 			reloadMap(600020000, player, "Sarpan");
 			reloadMap(600030000, player, "Tiamaranta");
+			reloadMap(600050000, player, "Nkatalam");
+			reloadMap(600060000, player, "Skatalam");
+			reloadMap(600070000, player, "KatalamUg");
 			reloadMap(700010000, player, "Oriel");
 			reloadMap(710010000, player, "Pernon");
 		} else {

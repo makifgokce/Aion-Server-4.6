@@ -18,13 +18,14 @@
 package admincommands;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.utils.ChatUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
 import com.aionemu.gameserver.world.World;
-import com.aionemu.gameserver.world.WorldMapType;
 
 /**
  * @author Antraxx
@@ -44,11 +45,11 @@ public class PlayerList extends AdminCommand {
 
 		// get all currently connected players
 		Collection<Player> players = World.getInstance().getAllPlayers();
-		PacketSendUtility.sendMessage(player, "Currently connected players:");
+		PacketSendUtility.sendMessage(player, "Online players:");
 
 		for (Player p : players) {
 			if (params.length > 0) {
-				String cmd = params[0].toLowerCase().trim();
+				String cmd = params[0].toLowerCase(Locale.forLanguageTag("en")).trim();
 				if (("ely").startsWith(cmd)) {
 					if (p.getCommonData().getRace() == Race.ASMODIANS) {
 						continue;
@@ -70,9 +71,9 @@ public class PlayerList extends AdminCommand {
 					}
 				}
 			}
-
+			String chatLink = ChatUtil.position(p.getName(), p.getRace().getRaceId(), p.getPosition());
 			PacketSendUtility.sendMessage(player, "Char: " + p.getName() + " (" + p.getAcountName() + ") " + " - " + p.getCommonData().getRace().name() + "/"
-					+ p.getCommonData().getPlayerClass().name() + " - Location: " + WorldMapType.getWorld(p.getWorldId()).name());
+					+ p.getCommonData().getPlayerClass().name() + " - Location: " + chatLink);
 		}
 	}
 

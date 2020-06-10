@@ -22,17 +22,21 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.player.QuestStateList;
 import com.aionemu.gameserver.model.gameobjects.player.RequestResponseHandler;
 import com.aionemu.gameserver.model.items.storage.StorageType;
+import com.aionemu.gameserver.model.templates.ExpandType;
 import com.aionemu.gameserver.model.templates.WarehouseExpandTemplate;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_QUESTION_WINDOW;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_WAREHOUSE_INFO;
+import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
@@ -58,33 +62,35 @@ public class WarehouseService {
 			return;
 		}
 
-		if (npcCanExpandLevel(expandTemplate, player.getWarehouseSize() + 1) && validateNewSize(player.getWarehouseSize() + 1)) {
-			if (validateNewSize(player.getWarehouseSize() + 1)) {
-				/**
-				 * Check if our player can pay the warehouse expand price
-				 */
-				final int price = getPriceByLevel(expandTemplate, player.getWarehouseSize() + 1);
-				RequestResponseHandler responseHandler = new RequestResponseHandler(npc) {
-					@Override
-					public void acceptRequest(Creature requester, Player responder) {
-						if (player.getInventory().getKinah() < price) {
-							PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300831));
-							return;
-						}
-						expand(responder);
-						player.getInventory().decreaseKinah(price);
+		if (npcCanExpandLevel(expandTemplate, player.getWarehouseNpcExpands() + 1) && canExpand(player)) {
+			if (player.getWarehouseNpcExpands() >= CustomConfig.NPC_CUBE_EXPANDS_SIZE_LIMIT) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_EXTEND_CHAR_WAREHOUSE_CANT_EXTEND_MORE);
+				return;
+			}
+			/**
+			* Check if our player can pay the warehouse expand price
+			*/
+			final int price = getPriceByLevel(expandTemplate, player.getWarehouseNpcExpands() + 1);
+			RequestResponseHandler responseHandler = new RequestResponseHandler(npc) {
+				@Override
+				public void acceptRequest(Creature requester, Player responder) {
+					if (player.getInventory().getKinah() < price) {
+						PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300831));
+						return;
 					}
-
-					@Override
-					public void denyRequest(Creature requester, Player responder) {
-						// nothing to do
-					}
-				};
-
-				boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_WAREHOUSE_EXPAND_WARNING, responseHandler);
-				if (result) {
-					PacketSendUtility.sendPacket(player, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_WAREHOUSE_EXPAND_WARNING, 0, 0, String.valueOf(price)));
+					expand(responder, ExpandType.NPC);
+					player.getInventory().decreaseKinah(price);
 				}
+
+				@Override
+				public void denyRequest(Creature requester, Player responder) {
+					// nothing to do
+				}
+			};
+
+			boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_WAREHOUSE_EXPAND_WARNING, responseHandler);
+			if (result) {
+				PacketSendUtility.sendPacket(player, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_WAREHOUSE_EXPAND_WARNING, 0, 0, String.valueOf(price)));
 			}
 		} else {
 			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300432));
@@ -94,14 +100,22 @@ public class WarehouseService {
 	/**
 	 * @param player
 	 */
-	public static void expand(Player player) {
+	public static void expand(Player player, ExpandType type) {
 		if (!canExpand(player)) {
 			return;
 		}
-		PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300433, "8")); // 8
-																					// Slots
-																					// added
-		player.setWarehouseSize(player.getWarehouseSize() + 1);
+		PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300433, "8")); // 8  Slots  added
+		switch(type) {
+			case NPC:
+				player.setWarehouseNpcExpands(player.getWarehouseNpcExpands() + 1);
+				break;
+			case QUEST:
+				player.setWarehouseQuestExpands(player.getWarehouseQuestExpands() + 1);
+				break;
+			case ITEM:
+				player.setWarehouseItemExpands(player.getWarehouseItemExpands() + 1);
+				break;
+		}
 
 		sendWarehouseInfo(player, false);
 	}
@@ -122,7 +136,7 @@ public class WarehouseService {
 	 * @return
 	 */
 	public static boolean canExpand(Player player) {
-		return validateNewSize(player.getWarehouseSize() + 1);
+		return validateNewSize(player.getWarehouseNpcExpands() + player.getWarehouseItemExpands() + player.getWarehouseQuestExpands() + 1);
 	}
 
 	/**
@@ -157,7 +171,7 @@ public class WarehouseService {
 	public static void sendWarehouseInfo(Player player, boolean sendAccountWh) {
 		List<Item> items = player.getStorage(StorageType.REGULAR_WAREHOUSE.getId()).getItems();
 
-		int whSize = player.getWarehouseSize();
+		int whSize = player.getWarehouseNpcExpands();
 		int itemsSize = items.size();
 
 		/**
@@ -188,5 +202,25 @@ public class WarehouseService {
 		}
 
 		PacketSendUtility.sendPacket(player, new SM_WAREHOUSE_INFO(null, StorageType.ACCOUNT_WAREHOUSE.getId(), 0, false, player));
+	}
+
+	private static int getCompletedCubeQuests(Player player) {
+		int result = 0;
+		QuestStateList qs = player.getQuestStateList();
+		int[] questIds = { 1987, 2985};
+		for (int q : questIds) {
+			if (qs.getQuestState(q) != null && qs.getQuestState(q).getStatus().equals(QuestStatus.COMPLETE)) {
+				result++;
+			}
+		}
+		return result > 1 ? 1 : result;
+	}
+	public static boolean canExpandByTicket(Player player, int level) {
+		if (!canExpand(player)) {
+			return false;
+		}
+		int ticketExpands = player.getQuestExpands() - getCompletedCubeQuests(player);
+
+		return ticketExpands < level;
 	}
 }

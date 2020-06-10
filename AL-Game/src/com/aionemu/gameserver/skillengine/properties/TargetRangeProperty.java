@@ -29,11 +29,11 @@ import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.Trap;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.templates.zone.ZoneType;
 import com.aionemu.gameserver.skillengine.model.Skill;
 import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PositionUtil;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
-import com.aionemu.gameserver.model.templates.zone.ZoneType;
 
 /**
  * @author ATracer
@@ -167,6 +167,9 @@ public class TargetRangeProperty {
 							if (!player.isOnline()) {
 								continue;
 							}
+							if (effector.getController().isDueling(player)) {
+								break;
+							}
 							if (MathUtil.isIn3dRange(effector, player, effectiveRange + 1)) {
 								effectedList.add(player);
 								partyCount++;
@@ -176,6 +179,9 @@ public class TargetRangeProperty {
 						effectedList.clear();
 						for (Player member : effector.getPlayerGroup2().getMembers()) {
 							if (partyCount >= maxcount) {
+								break;
+							}
+							if (effector.getController().isDueling(member)) {
 								break;
 							}
 							// TODO: here value +4 till better move controller

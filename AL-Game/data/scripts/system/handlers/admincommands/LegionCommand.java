@@ -18,6 +18,7 @@
 package admincommands;
 
 import java.util.List;
+import java.util.Locale;
 
 import javolution.util.FastList;
 
@@ -321,7 +322,7 @@ public class LegionCommand extends AdminCommand {
 		if (name.contains("_")) {
 			name = name.replaceAll("_", " ");
 		}
-		Legion legion = service.getLegion(name.toLowerCase());
+		Legion legion = service.getLegion(name.toLowerCase(Locale.forLanguageTag("en")));
 		if (legion == null) {
 			PacketSendUtility.sendMessage(player, "legion " + name + " not exists.");
 			return null;

@@ -19,7 +19,7 @@
  * Credits goes to all Open Source Core Developer Groups listed below
  * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
  * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
- * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * Everybody knows that this Emulator Core was developed by Aion Lightning
  * @-Aion-Unique-
  * @-Aion-Lightning
  * @Aion-Engine
@@ -29,6 +29,24 @@
  */
 package com.aionemu.gameserver.geoEngine;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.ShortBuffer;
+import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.configs.main.GeoDataConfig;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.geoEngine.bounding.BoundingVolume;
@@ -36,24 +54,18 @@ import com.aionemu.gameserver.geoEngine.collision.CollisionIntention;
 import com.aionemu.gameserver.geoEngine.math.Matrix3f;
 import com.aionemu.gameserver.geoEngine.math.Vector3f;
 import com.aionemu.gameserver.geoEngine.models.GeoMap;
-import com.aionemu.gameserver.geoEngine.scene.*;
+import com.aionemu.gameserver.geoEngine.scene.Geometry;
+import com.aionemu.gameserver.geoEngine.scene.Mesh;
+import com.aionemu.gameserver.geoEngine.scene.Node;
+import com.aionemu.gameserver.geoEngine.scene.Spatial;
+import com.aionemu.gameserver.geoEngine.scene.VertexBuffer;
 import com.aionemu.gameserver.geoEngine.scene.mesh.DoorGeometry;
 import com.aionemu.gameserver.model.templates.materials.MaterialTemplate;
 import com.aionemu.gameserver.world.zone.ZoneName;
 import com.aionemu.gameserver.world.zone.ZoneService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import sun.misc.Cleaner;
 import sun.nio.ch.DirectBuffer;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.*;
-import java.nio.channels.FileChannel;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Mr. Poke
@@ -71,7 +83,7 @@ public class GeoWorldLoader {
 
     @SuppressWarnings("resource")
     public static Map<String, Spatial> loadMeshs(String fileName) throws IOException {
-        Map<String, Spatial> geoms = new HashMap<String, Spatial>();
+        Map<String, Spatial> geoms = new HashMap<>();
         File geoFile = new File(fileName);
         FileChannel roChannel = null;
         MappedByteBuffer geo = null;
@@ -91,7 +103,7 @@ public class GeoWorldLoader {
             for (int c = 0; c < modelCount; c++) {
                 Mesh m = new Mesh();
 
-                int vectorCount = ((int) geo.getShort()) * 3;
+                int vectorCount = (geo.getInt()) * 3;
                 ByteBuffer floatBuffer = MappedByteBuffer.allocateDirect(vectorCount * 4);
                 FloatBuffer vertices = floatBuffer.asFloatBuffer();
                 for (int x = 0; x < vectorCount; x++) {
@@ -157,7 +169,9 @@ public class GeoWorldLoader {
         geo = roChannel.map(FileChannel.MapMode.READ_ONLY, 0, (int) roChannel.size()).load();
         geo.order(ByteOrder.LITTLE_ENDIAN);
         if (geo.get() == 0) {
+            // no terrain
             map.setTerrainData(new short[]{geo.getShort()});
+            /*int cutoutSize =*/ geo.getInt();
         } else {
             int size = geo.getInt();
             short[] terrainData = new short[size];
@@ -165,6 +179,16 @@ public class GeoWorldLoader {
                 terrainData[i] = geo.getShort();
             }
             map.setTerrainData(terrainData);
+
+            // read list of terrain indexes to remove.
+            int cutoutSize = geo.getInt();
+            if (cutoutSize > 0) {
+                int[] cutoutData = new int[cutoutSize];
+                for (int i = 0; i < cutoutSize; i++) {
+                    cutoutData[i] = geo.getInt();
+                }
+                map.setTerrainCutouts(cutoutData);
+            }
         }
 
         while (geo.hasRemaining()) {
@@ -178,9 +202,10 @@ public class GeoWorldLoader {
                 matrix[i] = geo.getFloat();
             }
             float scale = geo.getFloat();
+            geo.get(); // TODO : use the data: EventType eventType = EventType.fromByte(geo.get());
             Matrix3f matrix3f = new Matrix3f();
             matrix3f.set(matrix);
-            Spatial node = models.get(name.toLowerCase().intern());
+            Spatial node = models.get(name.toLowerCase(Locale.forLanguageTag("en")).intern());
             try {
                 if (node != null) {
                     Spatial nodeClone = node;
@@ -234,7 +259,7 @@ public class GeoWorldLoader {
             int regionId = getVectorHash(bv.getCenter().x, bv.getCenter().y, bv.getCenter().z);
             int index = node.getName().lastIndexOf('\\');
             int dotIndex = node.getName().lastIndexOf('.');
-            String zoneName = node.getName().substring(index + 1, dotIndex).toUpperCase();
+            String zoneName = node.getName().substring(index + 1, dotIndex).toUpperCase(Locale.forLanguageTag("en"));
             if (childNumber > 0) {
                 zoneName += "_CHILD" + childNumber;
             }
@@ -257,7 +282,7 @@ public class GeoWorldLoader {
         BoundingVolume bv = node.getWorldBound();
         int regionId = getVectorHash(bv.getCenter().x, bv.getCenter().y, bv.getCenter().z);
         int index = node.getName().lastIndexOf('\\');
-        String doorName = worldId + "_" + "DOOR" + "_" + regionId + "_" + node.getName().substring(index + 1).toUpperCase();
+        String doorName = worldId + "_" + "DOOR" + "_" + regionId + "_" + node.getName().substring(index + 1).toUpperCase(Locale.forLanguageTag("en"));
         node.setName(doorName);
     }
 

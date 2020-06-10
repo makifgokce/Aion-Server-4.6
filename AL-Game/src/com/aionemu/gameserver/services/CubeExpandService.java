@@ -25,14 +25,13 @@ import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.model.gameobjects.player.QuestStateList;
 import com.aionemu.gameserver.model.gameobjects.player.RequestResponseHandler;
 import com.aionemu.gameserver.model.items.storage.StorageType;
 import com.aionemu.gameserver.model.templates.CubeExpandTemplate;
+import com.aionemu.gameserver.model.templates.ExpandType;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_CUBE_UPDATE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_QUESTION_WINDOW;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
-import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
@@ -80,7 +79,7 @@ public class CubeExpandService {
 						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_WAREHOUSE_EXPAND_NOT_ENOUGH_MONEY);
 						return;
 					}
-					expand(responder, true);
+					expand(responder, ExpandType.NPC);
 					player.getInventory().decreaseKinah(price);
 				}
 
@@ -104,26 +103,38 @@ public class CubeExpandService {
 	 * @param player
 	 * @param isNpcExpand
 	 */
-	public static void expand(Player player, boolean isNpcExpand) {
+	public static void expand(Player player, ExpandType type) {
 		if (!canExpand(player)) {
 			return;
 		}
 		PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300431, "9")); // 9 Slots added
-		if (isNpcExpand) {
-			player.setNpcExpands(player.getNpcExpands() + 1);
-		} else {
-			player.setQuestExpands(player.getQuestExpands() + 1);
+		switch (type) {
+			case NPC:
+				player.setNpcExpands(player.getNpcExpands() + 1);
+				break;
+			case QUEST:
+				player.setQuestExpands(player.getQuestExpands() + 1);
+				break;
+			case ITEM:
+				player.setItemExpands(player.getItemExpands() + 1);
+				break;
 		}
 		PacketSendUtility.sendPacket(player, SM_CUBE_UPDATE.cubeSize(StorageType.CUBE, player));
 	}
 
 	public static boolean canExpandByTicket(Player player, int ticketLevel) {
 		if (!canExpand(player)) {
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_EXTEND_INVENTORY_CANT_EXTEND_MORE);
 			return false;
 		}
-		int ticketExpands = player.getQuestExpands() - getCompletedCubeQuests(player);
-
-		return ticketExpands < ticketLevel;
+		int cubeLevel = player.getNpcExpands() + player.getQuestExpands() + player.getItemExpands();
+		ticketLevel *= 3;
+		if(cubeLevel < ticketLevel) {
+			return true;
+		}else {
+			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_EXTEND_INVENTORY_CANT_EXTEND_MORE);
+			return false;
+		}
 	}
 
 	/**
@@ -131,7 +142,7 @@ public class CubeExpandService {
 	 * @return
 	 */
 	public static boolean canExpand(Player player) {
-		return validateNewSize(player.getNpcExpands() + player.getQuestExpands() + 1);
+		return validateNewSize(player.getNpcExpands() + player.getQuestExpands() + player.getItemExpands() + 1);
 	}
 
 	/**
@@ -155,18 +166,6 @@ public class CubeExpandService {
 	private static boolean npcCanExpandLevel(CubeExpandTemplate clist, int level) {
 		// check if level exists in template
 		return clist.contains(level);
-	}
-
-	private static int getCompletedCubeQuests(Player player) {
-		int result = 0;
-		QuestStateList qs = player.getQuestStateList();
-		int[] questIds = { 1800, 1947, 2833, 2937, 1797 };
-		for (int q : questIds) {
-			if (qs.getQuestState(q) != null && qs.getQuestState(q).getStatus().equals(QuestStatus.COMPLETE)) {
-				result++;
-			}
-		}
-		return result > 2 ? 2 : result;
 	}
 
 	/**

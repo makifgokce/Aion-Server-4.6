@@ -8,6 +8,7 @@ import com.aionemu.gameserver.model.templates.spawns.SpawnTemplate;
 import com.aionemu.gameserver.services.item.ItemService;
 import com.aionemu.gameserver.spawnengine.SpawnEngine;
 import com.aionemu.gameserver.utils.PacketSendUtility;
+
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
@@ -37,7 +38,7 @@ public final class CmdWish extends AbstractGMHandler {
             int worldId = admin.getWorldId();
 
             for(NpcTemplate nTemp : npcTemp.valueCollection()){
-                if(nTemp.getName().equalsIgnoreCase(npcName)){
+                if(nTemp.getNameDesc().equalsIgnoreCase(npcName)){
                     SpawnTemplate spawn = SpawnEngine.addNewSpawn(worldId, nTemp.getTemplateId(), x, y, z, heading, 0);
                     VisibleObject visibleObject = SpawnEngine.spawnObject(spawn, admin.getInstanceId());
                     String objectName = visibleObject.getObjectTemplate().getName();

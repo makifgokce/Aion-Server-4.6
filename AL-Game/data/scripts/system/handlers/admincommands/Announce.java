@@ -18,6 +18,7 @@
 package admincommands;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.utils.PacketSendUtility;
@@ -39,9 +40,9 @@ public class Announce extends AdminCommand {
 	public void execute(Player player, String... params) {
 		String message;
 
-		if (("anonymous").startsWith(params[0].toLowerCase())) {
+		if (("anonymous").startsWith(params[0].toLowerCase(Locale.forLanguageTag("en")))) {
 			message = "Announce: ";
-		} else if (("name").startsWith(params[0].toLowerCase())) {
+		} else if (("name").startsWith(params[0].toLowerCase(Locale.forLanguageTag("en")))) {
 			message = player.getName() + " : ";
 		} else {
 			PacketSendUtility.sendMessage(player, "Syntax: //announce <anonymous|name> <message>");

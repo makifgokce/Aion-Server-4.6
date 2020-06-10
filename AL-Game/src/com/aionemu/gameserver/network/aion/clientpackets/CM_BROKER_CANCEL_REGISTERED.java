@@ -17,18 +17,20 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.services.BrokerService;
+import com.aionemu.gameserver.utils.MathUtil;
 
 /**
  * @author kosyachok
  */
 public class CM_BROKER_CANCEL_REGISTERED extends AionClientPacket {
 
-	@SuppressWarnings("unused")
-	private int npcId;
+	private int npcObjId;
 	private int brokerItemId;
 
 	public CM_BROKER_CANCEL_REGISTERED(int opcode, State state, State... restStates) {
@@ -37,13 +39,17 @@ public class CM_BROKER_CANCEL_REGISTERED extends AionClientPacket {
 
 	@Override
 	protected void readImpl() {
-		npcId = readD();
+		npcObjId = readD();
 		brokerItemId = readD();
 	}
 
 	@Override
 	protected void runImpl() {
 		Player player = getConnection().getActivePlayer();
-		BrokerService.getInstance().cancelRegisteredItem(player, brokerItemId);
+		VisibleObject obj = player.getKnownList().getObject(npcObjId);
+
+		if (obj != null && obj instanceof Npc && MathUtil.isInRange(player, obj, 6)) {
+			BrokerService.getInstance().cancelRegisteredItem(player, brokerItemId);
+		}
 	}
 }

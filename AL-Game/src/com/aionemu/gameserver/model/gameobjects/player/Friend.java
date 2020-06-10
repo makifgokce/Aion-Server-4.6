@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.model.gameobjects.player;
 
 import org.slf4j.Logger;
@@ -32,6 +31,8 @@ public class Friend {
 	private static final Logger log = LoggerFactory.getLogger(Friend.class);
 	private PlayerCommonData pcd;
 
+	private String friendNote = "";
+
 	public Friend(PlayerCommonData pcd) {
 		this.pcd = pcd;
 	}
@@ -46,7 +47,7 @@ public class Friend {
 		if (pcd.getPlayer() == null || !pcd.isOnline()) {
 			return FriendList.Status.OFFLINE;
 		}
-		return pcd.getPlayer().getFriendList().getStatus();
+		return pcd.getFriendList().getStatus();
 	}
 
 	public void setPCD(PlayerCommonData pcd) {
@@ -68,6 +69,14 @@ public class Friend {
 
 	public String getNote() {
 		return pcd.getNote();
+	}
+
+	public String getFriendNote() {
+		return friendNote;
+	}
+
+	public void setNote(String note) {
+		friendNote = note;
 	}
 
 	public PlayerClass getPlayerClass() {
@@ -95,10 +104,7 @@ public class Friend {
 			return 0;
 		}
 
-		return (int) (pcd.getLastOnline().getTime() / 1000); // Convert to int,
-																// unix time
-																// format (ms ->
-																// seconds)
+		return (int) (pcd.getLastOnline().getTime() / 1000); // Convert to int, unix time format (ms -> seconds)
 	}
 
 	public int getOid() {

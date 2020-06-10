@@ -2503,4 +2503,29 @@
 		<routestep step="10" x="2498.1025" y="1861.132" z="325.16284"/>
 		<routestep step="11" x="2490.063" y="1861.4701" z="326.65063"/>
 	</walker_template>
+	<walker_template route_id="74THGARRISONBALAUR" pool="1">
+		<routestep step="1" x="978.1" y="2689.9" z="171.25"/>
+		<routestep step="2" x="960.9" y="2691.2" z="172.62"/>
+		<routestep step="3" x="978.1" y="2689.9" z="171.25"/>
+		<routestep step="4" x="989.8" y="2684.9" z="171.25"/>
+	</walker_template>
+	<!-- 76th Garrison -->
+	<walker_template route_id="76THGARRISONBALAUR" pool="1">
+		<routestep step="1" x="1730.4204" y="871.85004" z="187.25" />
+		<routestep step="2" x="1733.3925" y="860.9041" z="187.875" />
+		<routestep step="3" x="1727.9309" y="842.0199" z="189.87932" />
+		<routestep step="4" x="1733.3925" y="860.9041" z="187.875" />
+		<routestep step="5" x="1730.4204" y="871.85004" z="187.25" />
+		<routestep step="6" x="1729.2336" y="890.6811" z="186.52118" />
+	</walker_template>
+	<walker_template route_id="76THGARRISONSUB" pool="1">
+		<routestep step="1" x="1596.2692" y="843.77167" z="145.47147" />
+		<routestep step="2" x="1591.7966" y="862.174" z="147.61046" />
+		<routestep step="3" x="1580.3491" y="879.83704" z="147.15701" />
+		<routestep step="4" x="1573.2635" y="901.26685" z="145.59164" />
+		<routestep step="5" x="1580.3491" y="879.83704" z="147.15701" />
+		<routestep step="6" x="1591.7966" y="862.174" z="147.61046" />
+		<routestep step="7" x="1596.2692" y="843.77167" z="145.47147" />
+		<routestep step="8" x="1594.2" y="827.2239" z="143.08899" />
+	</walker_template>
 </npc_walker>

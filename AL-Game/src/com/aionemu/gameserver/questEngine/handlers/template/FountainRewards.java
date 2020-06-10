@@ -40,7 +40,7 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 public class FountainRewards extends QuestHandler {
 
 	private final int questId;
-	private final Set<Integer> startNpcs = new HashSet<Integer>();
+	private final Set<Integer> startNpcs = new HashSet<>();
 
 	public FountainRewards(int questId, List<Integer> startNpcIds) {
 		super(questId);
@@ -70,22 +70,18 @@ public class FountainRewards extends QuestHandler {
 			if (startNpcs.contains(targetId)) { // Coin Fountain
 				switch (dialog) {
 					case USE_OBJECT: {
-						if (!QuestService.inventoryItemCheck(env, true)) {
-							return true;
+						if (targetId == 730241 || targetId == 730242) { // hotfix
+																		// for
+																		// inggison
+																		// and
+																		// gelkmaros
+							return sendQuestDialog(env, 1011);
 						} else {
-							if (targetId == 730241 || targetId == 730242) { // hotfix
-																			// for
-																			// inggison
-																			// and
-																			// gelkmaros
-								return sendQuestDialog(env, 1011);
-							} else {
-								return sendQuestSelectionDialog(env);
-							}
+							return sendQuestSelectionDialog(env);
 						}
 					}
 					case SETPRO1: {
-						if (QuestService.collectItemCheck(env, false)) {
+						if (QuestService.inventoryItemCheck(env, true)) {
 							if (!player.getInventory().isFullSpecialCube()) {
 								if (QuestService.startQuest(env)) {
 									changeQuestStep(env, 0, 0, true);
@@ -96,6 +92,14 @@ public class FountainRewards extends QuestHandler {
 								return sendQuestSelectionDialog(env);
 							}
 						} else {
+							switch(questId) {
+								case 12061:
+								case 22061:
+								case 41188:
+									PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(true, 1111384, player.getObjectId(), 1));
+									default:
+										break;
+							}
 							return sendQuestSelectionDialog(env);
 						}
 					}

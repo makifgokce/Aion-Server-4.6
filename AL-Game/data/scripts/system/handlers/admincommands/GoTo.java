@@ -42,7 +42,7 @@ public class GoTo extends AdminCommand {
 	@Override
 	public void execute(Player player, String... params) {
 		if (params == null || params.length < 1) {
-			PacketSendUtility.sendMessage(player, "syntax //goto <location>");
+			PacketSendUtility.sendMessage(player, "//goto <location>");
 			return;
 		}
 
@@ -58,7 +58,7 @@ public class GoTo extends AdminCommand {
 		 */
 		// Sanctum
 		if (destination.equalsIgnoreCase("Sanctum")) {
-			goTo(player, WorldMapType.SANCTUM.getId(), 1322, 1511, 568);
+			goTo(player, WorldMapType.SANCTUM.getId(), 1476, 1595, 572);
 		} // Kaisinel
 		else if (destination.equalsIgnoreCase("Kaisinel")) {
 			goTo(player, WorldMapType.KAISINEL.getId(), 2155, 1567, 1205);
@@ -497,7 +497,7 @@ public class GoTo extends AdminCommand {
 			goTo(player, 600020000, 2877, 2286, 567);
 		} else if (destination.equalsIgnoreCase("Protectrice")) {
 			goTo(player, 300330000, 250, 246, 124);
-		} else if (destination.equalsIgnoreCase("Tiamaranta")) {
+		} else if (destination.equalsIgnoreCase("Tiamaranta") || destination.equalsIgnoreCase("tia")) {
 			goTo(player, 600030000, 71, 1732, 295);
 		} else if (destination.equalsIgnoreCase("Arbre gurrik")) {
 			goTo(player, 600030000, 742, 2362, 108);
@@ -532,7 +532,7 @@ public class GoTo extends AdminCommand {
 		} else if (destination.equalsIgnoreCase("Rentus") || destination.equalsIgnoreCase("Rentus Base")) {
 			goTo(player, 300280000, 579, 606, 153);
 		} else if (destination.equalsIgnoreCase("Raksang")) {
-			goTo(player, 300310000, 665, 735, 1188);
+			goTo(player, 300310000, 849, 949, 1207);
 		} else if (destination.equalsIgnoreCase("Muada") || destination.equalsIgnoreCase("Muada's Trencher")) {
 			goTo(player, 300380000, 492, 553, 106);
 		} else if (destination.equalsIgnoreCase("Satra")) {
@@ -555,9 +555,9 @@ public class GoTo extends AdminCommand {
 		}/**
 		 * 3.5 Instance
 		 */
-		else if (destination.equalsIgnoreCase("Antre tiamat") || destination.equalsIgnoreCase("tiamat2")) {
+		else if (destination.equalsIgnoreCase("Tiamat Hideout") || destination.equalsIgnoreCase("tiamat2")) {
 			goTo(player, 300520000, 505, 520, 240);
-		} else if (destination.equalsIgnoreCase("Forto tiamat") || destination.equalsIgnoreCase("tiamat1")) {
+		} else if (destination.equalsIgnoreCase("Tiamat Fortress") || destination.equalsIgnoreCase("tiamat1")) {
 			goTo(player, 300510000, 1581, 1068, 492);
 		} else if (destination.equalsIgnoreCase("Unstable Abyssal Splinter") || destination.equalsIgnoreCase("Core2")) {
 			goTo(player, 300600000, 704, 153, 453);
@@ -568,10 +568,10 @@ public class GoTo extends AdminCommand {
 		}/**
 		 * 3.7 Instances
 		 */
-		else if (destination.equalsIgnoreCase("hexway")) {
+		else if (destination.equalsIgnoreCase("Corridor of Betrayal")) {
 			goTo(player, 300700000, 682, 607, 320);
 		} else if (destination.equalsIgnoreCase("shugotomb")) {
-			goTo(player, 300560000, 178, 234, 543);
+			goTo(player, 300560000, 163, 215, 537);
 		} else if (destination.equalsIgnoreCase("unity") || destination.equalsIgnoreCase("Unity Training Grounds")) {
 			goTo(player, 301100000, 500, 371, 211);
 		}/**
@@ -581,7 +581,7 @@ public class GoTo extends AdminCommand {
 			goTo(player, 600050000, 2019, 1752, 308);
 		} else if (destination.equalsIgnoreCase("Bassen") || destination.equalsIgnoreCase("6011")) {
 			goTo(player, 600060000, 1472, 740, 67);
-		} else if (destination.equalsIgnoreCase("Pradeth") || destination.equalsIgnoreCase("6021")) {
+		} else if (destination.equalsIgnoreCase("Prades") || destination.equalsIgnoreCase("6021")) {
 			goTo(player, 600060000, 2586, 2634, 277);
 		}/**
 		 * 4.0 Maps
@@ -594,27 +594,27 @@ public class GoTo extends AdminCommand {
 			goTo(player, 600050000, 2787, 2577, 259);
 		} else if (destination.equalsIgnoreCase("mairinerk")) {
 			goTo(player, 600050000, 2870, 291, 296);
-		} else if (destination.equalsIgnoreCase("forest shadow")) {
+		} else if (destination.equalsIgnoreCase("shadow forest")) {
 			goTo(player, 600050000, 1696, 83, 112);
 		} else if (destination.equalsIgnoreCase("portis")) {
 			goTo(player, 600050000, 1943, 2937, 293);
-		} else if (destination.equalsIgnoreCase("porte nord eremion")) {
+		} else if (destination.equalsIgnoreCase("patrol")) {
 			goTo(player, 600050000, 2914, 1873, 396);
-		} else if (destination.equalsIgnoreCase("danaria")) {
+		} else if (destination.equalsIgnoreCase("katalam") || destination.equalsIgnoreCase("Southern Part of Katalam")) {
 			goTo(player, 600060000, 2545, 1699, 141);
-		} else if (destination.equalsIgnoreCase("danaria nord ely")) {
+		} else if (destination.equalsIgnoreCase("patrol2")) {
 			goTo(player, 600060000, 63, 1927, 519);
 		} else if (destination.equalsIgnoreCase("pepe")) {
 			goTo(player, 600060000, 1018, 2798, 300);
 		} else if (destination.equalsIgnoreCase("kaberinrinerk")) {
 			goTo(player, 600060000, 91, 2883, 469);
-		} else if (destination.equalsIgnoreCase("danaria nord asmo")) {
+		} else if (destination.equalsIgnoreCase("cleanup squad")) {
 			goTo(player, 600060000, 58, 1587, 520);
 		} else if (destination.equalsIgnoreCase("phon")) {
 			goTo(player, 600060000, 816, 275, 465);
 		} else if (destination.equalsIgnoreCase("wallinerk")) {
 			goTo(player, 600060000, 146, 345, 625);
-		} else if (destination.equalsIgnoreCase("idian")) {
+		} else if (destination.equalsIgnoreCase("ug") || destination.equalsIgnoreCase("Katalam Underground")) {
 			goTo(player, 600070000, 701, 693, 514);
 		} else if (destination.equalsIgnoreCase("iu")) {
 			goTo(player, 600080000, 1510, 1511, 565);
@@ -662,64 +662,79 @@ public class GoTo extends AdminCommand {
 		}/**
 		 * 4.3 Instances
 		 */
-		else if (destination.equalsIgnoreCase("mystic") || destination.equalsIgnoreCase("Danuar Mysticarium")) {
+		else if (destination.equalsIgnoreCase("sillusdungeon") || destination.equalsIgnoreCase("Hall of Knowledge")) {
 			goTo(player, 300480000, 179, 122, 231);
-		} else if (destination.equalsIgnoreCase("idgel") || destination.equalsIgnoreCase("Idgel Research Center")) {
+		} else if (destination.equalsIgnoreCase("pradesdungeon1") || destination.equalsIgnoreCase("Idgel Research Laboratory")) {
 			goTo(player, 300530000, 571, 472, 102);
-		} else if (destination.equalsIgnoreCase("eternal") || destination.equalsIgnoreCase("Eternal Bastion")) {
-			goTo(player, 300540000, 763, 268, 233);
-		} else if (destination.equalsIgnoreCase("cube") || destination.equalsIgnoreCase("Void Cube")) {
+		} else if (destination.equalsIgnoreCase("swb") || destination.equalsIgnoreCase("Steel Wall Bastion")) {
+			goTo(player, 300540000, 744, 293, 233);
+		} else if (destination.equalsIgnoreCase("bassendungeon") || destination.equalsIgnoreCase("Void Room")) {
 			goTo(player, 300580000, 181, 261, 310);
-		} else if (destination.equalsIgnoreCase("ophidan") || destination.equalsIgnoreCase("Ophidan Bridge")) {
-			goTo(player, 300590000, 760, 561, 572);
-		} else if (destination.equalsIgnoreCase("infinity") || destination.equalsIgnoreCase("Infinity Shard")) {
+		} else if (destination.equalsIgnoreCase("jormungand") || destination.equalsIgnoreCase("Jormungand Bridge")) {
+			goTo(player, 300590000, 760, 561, 573);
+		} else if (destination.equalsIgnoreCase("katalamize") || destination.equalsIgnoreCase("Katalamize")) {
 			goTo(player, 300800000, 118, 115, 131);
-		} else if (destination.equalsIgnoreCase("runadium") || destination.equalsIgnoreCase("Runadium")) {
+		} else if (destination.equalsIgnoreCase("rune katalamize") || destination.equalsIgnoreCase("Rune Katalamize")) {
 			goTo(player, 300900000, 150, 144, 124);
 		} else if (destination.equalsIgnoreCase("solo") || destination.equalsIgnoreCase("Solo Q")) {
 			goTo(player, 301000000, 210, 509, 153);
-		} else if (destination.equalsIgnoreCase("steelsolo1") || destination.equalsIgnoreCase("Steel Rose Solo 1st Deck")) {
+		} else if (destination.equalsIgnoreCase("steelsolo1") || destination.equalsIgnoreCase("Landing Stage of the Steel Rose Solo")) {
 			goTo(player, 301010000, 283, 452, 902);
-		} else if (destination.equalsIgnoreCase("steelsolo2") || destination.equalsIgnoreCase("Steel Rose Solo 2nd Deck")) {
+		} else if (destination.equalsIgnoreCase("steelsolo2") || destination.equalsIgnoreCase("Cabin of the Steel Rose Solo")) {
 			goTo(player, 301020000, 236, 506, 948);
-		} else if (destination.equalsIgnoreCase("steel1") || destination.equalsIgnoreCase("Steel Rose 1st Deck")) {
+		} else if (destination.equalsIgnoreCase("steel1") || destination.equalsIgnoreCase("Landing Stage of the Steel Rose")) {
 			goTo(player, 301030000, 283, 452, 902);
-		} else if (destination.equalsIgnoreCase("steel2") || destination.equalsIgnoreCase("Steel Rose 2nd Deck")) {
+		} else if (destination.equalsIgnoreCase("steel2") || destination.equalsIgnoreCase("Cabin of the Steel Rose")) {
 			goTo(player, 301040000, 236, 506, 948);
-		} else if (destination.equalsIgnoreCase("steel3") || destination.equalsIgnoreCase("Steel Rose 3rd Deck")) {
+		} else if (destination.equalsIgnoreCase("steel3") || destination.equalsIgnoreCase("Deck of the Steel Rose")) {
 			goTo(player, 301050000, 713, 462, 1015);
-		} else if (destination.equalsIgnoreCase("reliquary") || destination.equalsIgnoreCase("Danuar Reliquary")) {
+		} else if (destination.equalsIgnoreCase("runadium") || destination.equalsIgnoreCase("Runadium")) {
 			goTo(player, 301110000, 256, 257, 241);
-		} else if (destination.equalsIgnoreCase("kamar") || destination.equalsIgnoreCase("Kamar Battlefield")) {
+		} else if (destination.equalsIgnoreCase("Kamar Battlefield")) {
 			goTo(player, 301120000, 1374, 1455, 600);
-		} else if (destination.equalsIgnoreCase("sauro") || destination.equalsIgnoreCase("Sauro Supply Base")) {
+		} else if (destination.equalsIgnoreCase("sauro") || destination.equalsIgnoreCase("Sauro War Depot")) {
 			goTo(player, 301130000, 641, 176, 195);
-		} else if (destination.equalsIgnoreCase("danuar") || destination.equalsIgnoreCase("Danuar Sanctuary")) {
-			goTo(player, 301140000, 388, 1184, 55);
-		} else if (destination.equalsIgnoreCase("circus") || destination.equalsIgnoreCase("Nightmare Circus")) {
+		} else if (destination.equalsIgnoreCase("rune tribe") || destination.equalsIgnoreCase("Refuge of the Rune Tribe")) {
+			goTo(player, 301140000, 388, 1186, 55);
+		} else if (destination.equalsIgnoreCase("rukibuki") || destination.equalsIgnoreCase("Rukibuki Circus")) {
 			goTo(player, 301160000, 464, 567, 201);
-		} else if (destination.equalsIgnoreCase("idgel2") || destination.equalsIgnoreCase("Idgel Research Center (Legion)")) {
+		} else if (destination.equalsIgnoreCase("pradesdungeon2") || destination.equalsIgnoreCase("Idgel Research Laboratory Legion")) {
 			goTo(player, 301170000, 571, 472, 102);
-		} else if (destination.equalsIgnoreCase("cube2") || destination.equalsIgnoreCase("Void Cube (Legion)")) {
+		} else if (destination.equalsIgnoreCase("bassendungeon2") || destination.equalsIgnoreCase("Void Room Legion")) {
 			goTo(player, 301180000, 181, 261, 310);
-		} else if (destination.equalsIgnoreCase("mystic2") || destination.equalsIgnoreCase("Danuar Mysticarium (Legion)")) {
+		} else if (destination.equalsIgnoreCase("sillusdungeon2") || destination.equalsIgnoreCase("Hall of Knowledge Legion")) {
 			goTo(player, 301190000, 179, 122, 231);
 		}/**
+		 * Bosses
+		 */
+		else if (destination.equalsIgnoreCase("serusia") || destination.equalsIgnoreCase("Queen Serusia")){
+			goTo(player, 600070000, 527, 597, 557);
+		} else if (destination.equalsIgnoreCase("penemon") || destination.equalsIgnoreCase("Penemon the Executor")){
+			goTo(player, 600070000, 394, 893, 560);
+		} else if (destination.equalsIgnoreCase("promion") || destination.equalsIgnoreCase("Resurrected Promion")){
+			goTo(player, 600070000, 726, 1096, 518);
+		} else if (destination.equalsIgnoreCase("slavir") || destination.equalsIgnoreCase("Millenium Slavir")){
+			goTo(player, 600070000, 854, 1042, 546);
+		} else if (destination.equalsIgnoreCase("kamar") || destination.equalsIgnoreCase("Roaring Kamar")){
+			goTo(player, 600070000, 1278, 1332, 540);
+		} else if (destination.equalsIgnoreCase("grigol") || destination.equalsIgnoreCase("Slayer Grigol")){
+			goTo(player, 600070000, 1141, 305, 560);
+		} else if (destination.equalsIgnoreCase("lata") || destination.equalsIgnoreCase("Commander Lata")){
+			goTo(player, 600070000, 1262, 767, 564);
+		} else if (destination.equalsIgnoreCase("sunayaka") || destination.equalsIgnoreCase("Governor Sunayaka")){
+			goTo(player, 600040000, 783, 751, 1217);
+		}
+		/**
 		 * 4.5 Instances
 		 */
-		else if (destination.equalsIgnoreCase("ophidanwar") || destination.equalsIgnoreCase("Engulfed Ophidan Bridge")) {
+		else if (destination.equalsIgnoreCase("jormungandpvp") || destination.equalsIgnoreCase("Jormungand Marching Route")) {
 			goTo(player, 301210000, 773, 553, 576);
-		} else if (destination.equalsIgnoreCase("ironwall") || destination.equalsIgnoreCase("Iron Wall Warfront")) {
+		} else if (destination.equalsIgnoreCase("swbpvp") || destination.equalsIgnoreCase("Steel Wall Bastion Pvp")) {
 			goTo(player, 301220000, 449, 449, 270);
-		} else if (destination.equalsIgnoreCase("Illuminary") || destination.equalsIgnoreCase("Illuminary obelisk")) {
+		} else if (destination.equalsIgnoreCase("rst") || destination.equalsIgnoreCase("Rune Shield Tower")) {
 			goTo(player, 301230000, 321, 323, 405);
-		}/**
-		 * 4.7 Instances
-		 */
-		else if (destination.equalsIgnoreCase("runatorium")) {
-			goTo(player, 301310000, 528, 109, 176);
 		} else {
-			PacketSendUtility.sendMessage(player, "Could not find the specified destination !");
+			PacketSendUtility.sendMessage(player, "Boyle bir komut bulunamadi !");
 		}
 	}
 
@@ -746,6 +761,6 @@ public class GoTo extends AdminCommand {
 
 	@Override
 	public void onFail(Player player, String message) {
-		PacketSendUtility.sendMessage(player, "Syntax : //goto <location>");
+		PacketSendUtility.sendMessage(player, "//goto <location>");
 	}
 }

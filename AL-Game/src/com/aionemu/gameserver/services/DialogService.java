@@ -23,12 +23,13 @@ import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.TeleportAnimation;
+import com.aionemu.gameserver.model.actions.PlayerMode;
 import com.aionemu.gameserver.model.autogroup.AutoGroupType;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.AbyssRank;
-import com.aionemu.gameserver.model.gameobjects.player.PlayerHouseOwnerFlags;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.player.PlayerHouseOwnerFlags;
 import com.aionemu.gameserver.model.gameobjects.player.RequestResponseHandler;
 import com.aionemu.gameserver.model.team.legion.Legion;
 import com.aionemu.gameserver.model.team.legion.LegionWarehouse;
@@ -64,7 +65,6 @@ import com.aionemu.gameserver.services.trade.PricesService;
 import com.aionemu.gameserver.skillengine.model.SkillTargetSlot;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.stats.AbyssRankEnum;
-import org.joda.time.DateTime;
 
 /**
  * @author VladimirZ
@@ -108,11 +108,18 @@ public class DialogService {
 						PacketSendUtility.sendMessage(player, "Buy list is missing!!");
 						break;
 					}
-                    int sellPriceRate = tradeListTemplate.getSellPriceRate();
-                    int buyPriceRate = tradeListTemplate.getBuyPriceRate();
-                    PacketSendUtility.sendPacket(player, new SM_TRADELIST(player, npc, tradeListTemplate, PricesService.getVendorBuyModifier()
-                            * sellPriceRate / 100, PricesService.getVendorSellModifier(player.getRace())
-                            * buyPriceRate / 100));
+                    if (player.isInPlayerMode(PlayerMode.RIDE)) {
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CANT_SELL_WHILE_IN_RIDE);
+					return;
+					}
+					if (player.getInventory().isFull()) {
+						// You cannot trade as you are overburdened with items
+						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_EXCHANGE_TOO_HEAVY_TO_TRADE);
+						return;
+					}
+
+					int tradeModifier = tradeListTemplate.getSellPriceRate();
+					PacketSendUtility.sendPacket(player, new SM_TRADELIST(player, npc, tradeListTemplate, PricesService.getVendorBuyModifier() * tradeModifier / 100));
 					break;
 				}
 				case OPEN_STIGMA_WINDOW: { // stigma
@@ -152,53 +159,50 @@ public class DialogService {
 					break;
 				}
 				case RECOVERY: { // soul healing (2.5)
-					DateTime now = DateTime.now();
-					final long expLost = player.getCommonData().getExpRecoverable();
-					if (expLost == 0) {
-						player.getEffectController().removeAbnormalEffectsByTargetSlot(SkillTargetSlot.SPEC2);
-						player.getCommonData().setDeathCount(0);
-					}
-					final double factor = (expLost < 1000000 ? 0.25 - (0.00000015 * expLost) : 0.1);
-					final int price;
-
-					int day = now.getDayOfWeek();
-					if (day == 6 || day == 7) {
-						price = 1;
-					} else {
-						price = (int) (expLost * factor);
-					}
-
-					RequestResponseHandler responseHandler = new RequestResponseHandler(npc) {
-						@Override
-						public void acceptRequest(Creature requester, Player responder) {
-							if (player.getInventory().getKinah() >= price) {
-								PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GET_EXP2(expLost));
-								PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SUCCESS_RECOVER_EXPERIENCE);
-								player.getCommonData().resetRecoverableExp();
-								player.getInventory().decreaseKinah(price);
-								player.getEffectController().removeAbnormalEffectsByTargetSlot(SkillTargetSlot.SPEC2);
-								player.getCommonData().setDeathCount(0);
-							} else {
-								PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_NOT_ENOUGH_KINAH(price));
-							}
-						}
-
-						@Override
-						public void denyRequest(Creature requester, Player responder) {
-							// no message
-						}
-					};
-					if (player.getCommonData().getExpRecoverable() > 0) {
-						boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_ASK_RECOVER_EXPERIENCE, responseHandler);
-						if (result) {
-							PacketSendUtility.sendPacket(player,
-									new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_ASK_RECOVER_EXPERIENCE, 0, 0, String.valueOf(price)));
-						}
-					} else {
-						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_DONOT_HAVE_RECOVER_EXPERIENCE);
-					}
-					break;
+					// Soul Healing
+				if (player.getCommonData().getDeathCount() < 1){
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_DONOT_HAVE_RECOVER_EXPERIENCE);
+					return;
 				}
+				final long expLost = player.getCommonData().getExpRecoverable();
+				final double factor = (expLost < 1000000 ? 0.25 - (0.00000015 * expLost) : 0.1);
+				final int price = (int) (expLost * factor);
+				RequestResponseHandler responseHandler = new RequestResponseHandler(npc) {
+
+					@Override
+					public void acceptRequest(Creature requester, Player responder) {
+						if (player.getInventory().getKinah() >= price) {
+							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GET_EXP2(expLost));
+							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SUCCESS_RECOVER_EXPERIENCE);
+							player.getCommonData().resetRecoverableExp();
+							player.getInventory().decreaseKinah(price);
+							player.getEffectController().removeAbnormalEffectsByTargetSlot(SkillTargetSlot.SPEC2);
+							player.getCommonData().setDeathCount(0);
+						}
+						else {
+							PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_NOT_ENOUGH_KINAH(price));
+						}
+					}
+
+					@Override
+					public void denyRequest(Creature requester, Player responder) {
+					}
+				};
+
+				if (player.getCommonData().getExpRecoverable() > 0) {
+					boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_ASK_RECOVER_EXPERIENCE, responseHandler);
+					if (result) {
+						PacketSendUtility.sendPacket(player, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_ASK_RECOVER_EXPERIENCE, 0, 0, String.valueOf(price)));
+					}
+				}
+				else {
+					boolean result = player.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_ASK_RECOVER_EXPERIENCE, responseHandler);
+					if (result) {
+						PacketSendUtility.sendPacket(player, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_ASK_RECOVER_EXPERIENCE, 0, 0, String.valueOf(1)));
+					}
+				}
+				break;
+			}
 				case ENTER_PVP: { // (2.5)
 					switch (npc.getNpcId()) {
 						case 204089: // pvp arena in pandaemonium.
@@ -440,18 +444,37 @@ public class DialogService {
 					break;
 				}
 				case TRADE_IN: {
+					// News Mod Buy/Exchange 2.7
 					TradeListTemplate tradeListTemplate = DataManager.TRADE_LIST_DATA.getTradeInListTemplate(npc.getNpcId());
 					if (tradeListTemplate == null) {
 						PacketSendUtility.sendMessage(player, "Buy list is missing!!");
 						break;
 					}
+					if (player.isInPlayerMode(PlayerMode.RIDE)) {
+						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CANT_SELL_WHILE_IN_RIDE);
+						return;
+					}
+
 					PacketSendUtility.sendPacket(player, new SM_TRADE_IN_LIST(npc, tradeListTemplate, 100));
+
 					break;
 				}
-				case SELL:
+				case SELL:{
+					// Sell Item's
+					if (player.isInPlayerMode(PlayerMode.RIDE)) {
+						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CANT_SELL_WHILE_IN_RIDE);
+						return;
+					}
+					PacketSendUtility.sendPacket(player, new SM_SELL_ITEM(targetObjectId, PricesService.getVendorSellModifier(player.getRace())));
+					break;
+				}
 				case TRADE_SELL_LIST: {
 					TradeListTemplate tradeListTemplate = DataManager.TRADE_LIST_DATA.getPurchaseTemplate(npc.getNpcId());
-					PacketSendUtility.sendPacket(player, new SM_SELL_ITEM(targetObjectId, tradeListTemplate, 100));
+						if (player.isInPlayerMode(PlayerMode.RIDE)) {
+						PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_CANT_SELL_WHILE_IN_RIDE);
+						return;
+						}
+					PacketSendUtility.sendPacket(player, new SM_SELL_ITEM(targetObjectId, tradeListTemplate));
 					break;
 				}
 				case GIVEUP_CRAFT_EXPERT: { // relinquish Expert Status
@@ -495,15 +518,31 @@ public class DialogService {
 				case TELEPORT_SIMPLE:
 					switch (npc.getNpcId()) {
 						case 802437:
+							if (player.getAbyssRank().getRank().getId() < AbyssRankEnum.GENERAL.getId()) {
+								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(targetObjectId, 27));
+								return;
+							}
 							TeleportService2.teleportTo(player, 110070000, 503.50354F, 416.99362F, 126.78963F, (byte) 30);
 							break;
 						case 802438:
+							if (player.getAbyssRank().getRank().getId() < AbyssRankEnum.GENERAL.getId()) {
+								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(targetObjectId, 27));
+								return;
+							}
 							TeleportService2.teleportTo(player, 110070000, 503.60794F, 410.61899F, 126.78963F, (byte) 90);
 							break;
 						case 802439:
+							if (player.getAbyssRank().getRank().getId() < AbyssRankEnum.GENERAL.getId()) {
+								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(targetObjectId, 27));
+								return;
+							}
 							TeleportService2.teleportTo(player, 120080000, 386.42404F, 250.28336F, 93.129425F, (byte) 60);
 							break;
 						case 802440:
+							if (player.getAbyssRank().getRank().getId() < AbyssRankEnum.GENERAL.getId()) {
+								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(targetObjectId, 27));
+								return;
+							}
 							TeleportService2.teleportTo(player, 120080000, 392.75845F, 250.5977F, 93.129425F, (byte) 120);
 							break;
 					}

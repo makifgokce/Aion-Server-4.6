@@ -30,6 +30,9 @@ import com.aionemu.gameserver.services.siegeservice.BalaurAssaultService;
 import com.aionemu.gameserver.services.siegeservice.Siege;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
+
+import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -165,7 +168,7 @@ public class SiegeCommand extends AdminCommand {
 		// check if params2 is siege race
 		SiegeRace sr = null;
 		try {
-			sr = SiegeRace.valueOf(params[2].toUpperCase());
+			sr = SiegeRace.valueOf(params[2].toUpperCase(Locale.forLanguageTag("en")));
 		} catch (IllegalArgumentException e) {
 			// ignore
 		}

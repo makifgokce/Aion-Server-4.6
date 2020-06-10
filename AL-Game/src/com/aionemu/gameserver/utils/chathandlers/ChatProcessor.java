@@ -33,7 +33,6 @@ import com.aionemu.commons.scripting.classlistener.ScheduledTaskClassListener;
 import com.aionemu.commons.scripting.scriptmanager.ScriptManager;
 import com.aionemu.commons.utils.PropertiesUtils;
 import com.aionemu.gameserver.GameServerError;
-import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.model.GameEngine;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
@@ -87,8 +86,7 @@ public class ChatProcessor implements GameEngine {
 		acl.addClassListener(new ChatCommandsLoader(processor));
 		scriptManager.setGlobalClassListener(acl);
 
-		final File[] files = new File[] { new File("./data/scripts/system/adminhandlers.xml"), new File("./data/scripts/system/playerhandlers.xml"),
-				new File("./data/scripts/system/weddinghandlers.xml") };
+		final File[] files = new File[] { new File("./data/scripts/system/adminhandlers.xml")};
 		final CountDownLatch loadLatch = new CountDownLatch(files.length);
 
 		for (int i = 0; i < files.length; i++) {
@@ -169,14 +167,10 @@ public class ChatProcessor implements GameEngine {
 	public boolean handleChatCommand(Player player, String text) {
 		if (text.split(" ").length == 0)
 			return false;
-		if ((text.startsWith("//") && getCommand(text.substring(2)) instanceof AdminCommand)
-				|| (text.startsWith("..") && getCommand(text.substring(2)) instanceof WeddingCommand)) {
+		if ((text.startsWith("//") && getCommand(text.substring(2)) instanceof AdminCommand)) {
 			return (getCommand(text.substring(2))).process(player, text.substring(2));
-		} else if (text.startsWith(".")
-				&& (getCommand(text.substring(1)) instanceof PlayerCommand || (CustomConfig.ENABLE_ADMIN_DOT_COMMANDS && getCommand(text.substring(1)) instanceof AdminCommand))) {
-			return (getCommand(text.substring(1))).process(player, text.substring(1));
-		} else
-			return false;
+		}
+		return false;
 	}
 
 	private ChatCommand getCommand(String text) {

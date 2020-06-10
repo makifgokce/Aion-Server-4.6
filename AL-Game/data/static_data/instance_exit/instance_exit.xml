@@ -169,9 +169,9 @@
     <!-- Ophidan Bridge -->
     <instance_exit instance_id="300590000" exit_world="600070000" race="ELYOS" x="670.1918" y="644.75397" z="514.8737" h="41"/>
     <instance_exit instance_id="300590000" exit_world="600070000" race="ASMODIANS" x="728.5588" y="890.47754" z="514.7932" h="6"/>
-    <!-- Infinity Shard -->
-    <instance_exit instance_id="300800000" exit_world="600070000" race="ELYOS" x="693.44" y="846.04" z="514.9"/>
-    <instance_exit instance_id="300800000" exit_world="600070000" race="ASMODIANS" x="702.66" y="693.99" z="514.9"/>
+    <!-- Katalamize -->
+    <instance_exit instance_id="300800000" exit_world="600070000" race="ELYOS" x="1285.832" y="766.9573" z="563.5" h="55" />
+    <instance_exit instance_id="300800000" exit_world="600070000" race="ASMODIANS" x="1285.832" y="766.9573" z="563.5" h="55" />
     <!-- Danuar Reliquary -->
     <instance_exit instance_id="301110000" exit_world="600070000" race="ELYOS" x="693.44" y="846.04" z="514.9"/>
     <instance_exit instance_id="301110000" exit_world="600070000" race="ASMODIANS" x="702.66" y="693.99" z="514.9"/>

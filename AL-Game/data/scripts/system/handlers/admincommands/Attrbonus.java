@@ -30,8 +30,6 @@ import com.aionemu.gameserver.model.stats.container.StatEnum;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
-import com.aionemu.gameserver.utils.i18n.CustomMessageId;
-import com.aionemu.gameserver.utils.i18n.LanguageHandler;
 
 /**
  * @author xXMashUpXx
@@ -56,7 +54,7 @@ public class Attrbonus extends AdminCommand implements StatOwner {
 	@Override
 	public void execute(Player admin, String... params) {
 		if (params == null || params.length < 1) {
-			PacketSendUtility.sendMessage(admin, LanguageHandler.translate(CustomMessageId.COMMAND_ATTRBONUS_MESSAGE1));
+			PacketSendUtility.sendMessage(admin, "Syntax //attrbonus <modifier> <value>");
 			return;
 		}
 
@@ -64,7 +62,7 @@ public class Attrbonus extends AdminCommand implements StatOwner {
 		try {
 			parameter = Integer.parseInt(params[1]);
 		} catch (NumberFormatException e) {
-			PacketSendUtility.sendMessage(admin, LanguageHandler.translate(CustomMessageId.COMMAND_ATTRBONUS_MESSAGE2));
+			PacketSendUtility.sendMessage(admin, "Parameter should number");
 			return;
 		}
 
@@ -1027,6 +1025,6 @@ public class Attrbonus extends AdminCommand implements StatOwner {
 
 	@Override
 	public void onFail(Player player, String message) {
-		PacketSendUtility.sendMessage(player, LanguageHandler.translate(CustomMessageId.COMMAND_ATTRBONUS_MESSAGE1));
+		PacketSendUtility.sendMessage(player, "Syntax //attrbonus <modifier> <value>");
 	}
 }

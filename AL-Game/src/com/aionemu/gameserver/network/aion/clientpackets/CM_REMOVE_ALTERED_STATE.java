@@ -17,6 +17,9 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
@@ -26,8 +29,8 @@ import com.aionemu.gameserver.network.aion.AionConnection.State;
  */
 public class CM_REMOVE_ALTERED_STATE extends AionClientPacket {
 
-	private int skillid;
-
+	private int skillid, unk;
+    private static final Logger log = LoggerFactory.getLogger(CM_REMOVE_ALTERED_STATE.class);
 	/**
 	 * @param opcode
 	 */
@@ -43,7 +46,7 @@ public class CM_REMOVE_ALTERED_STATE extends AionClientPacket {
 	@Override
 	protected void readImpl() {
 		skillid = readH();
-
+		unk = readC();
 	}
 
 	/*
@@ -55,5 +58,9 @@ public class CM_REMOVE_ALTERED_STATE extends AionClientPacket {
 	protected void runImpl() {
 		Player player = getConnection().getActivePlayer();
 		player.getEffectController().removeEffect(skillid);
+		if(unk != 0) {
+			log.warn("[CM_REMOVE_ALTERED_STATE] unk != 0 unk = " + unk + " skillId = " + skillid);
+		}
+
 	}
 }

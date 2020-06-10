@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.model.items;
 
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
@@ -35,7 +34,7 @@ public class ItemStone implements StatOwner {
 		MANASTONE,
 		GODSTONE,
 		FUSIONSTONE,
-		IDIANSTONE
+		IDIANSTONE;
 	}
 
 	/**
@@ -96,7 +95,8 @@ public class ItemStone implements StatOwner {
 			case DELETED:
 				if (this.persistentState == PersistentState.NEW) {
 					this.persistentState = PersistentState.NOACTION;
-				} else {
+				}
+				else {
 					this.persistentState = PersistentState.DELETED;
 				}
 				break;
@@ -106,7 +106,6 @@ public class ItemStone implements StatOwner {
 				}
 			default:
 				this.persistentState = persistentState;
-				break;
 		}
 	}
 }

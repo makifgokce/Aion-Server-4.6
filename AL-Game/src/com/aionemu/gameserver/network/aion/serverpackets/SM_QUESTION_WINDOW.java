@@ -251,6 +251,25 @@ public class SM_QUESTION_WINDOW extends AionServerPacket {
 	 * %0 declined your trade offer. TODO: make it a simple box, not a question.
 	 */
 	public static final int STR_EXCHANGE_HE_REJECTED_EXCHANGE = 1300354;
+	/**
+	*	Satın almayı onayladığında Abis rütben düşer. Ticarete devam etmek istiyor musun?
+	*/
+	public static final int STR_TRADE_WARNING_ABYSS_RANKDOWN = 900981;
+	/**
+	*	Bunu satın aldığında, bir sonraki sezon için Abis rütben düşürülebilir. Ticarete devam etmek istiyor musun?
+	*/
+	public static final int STR_TRADE_WARNING_ABYSS_USER_RANKDOWN = 901470;
+	
+	// DIVERS
+	public static final int STR_MSGBOX_BUY_RANKITEM_WITH_RANKDOWN_CONFIRM = 904006;
+	public static final int STR_MSGBOX_AKS_ENTER_PK_SERVER = 902812;
+	public static final int STR_MSGBOX_DISASSEMBLEBOX_NOTICE = 904307;
+	public static final int STR_MSGBOX_FORCE_INVITE_PARTY = 901256;
+	public static final int STR_ENCHANT_ITEM_DO_YOU_WANT_ENCHANT_ITEM = 95001;
+	public static final int STR_GIVE_ITEM_OPTION_DO_YOU_WANT_GIVE_OPTION_WITH_WARNING = 95003;
+	public static final int STR_MSGBOX_CANT_REOBTAIN_QUEST_OVER_MAX_LEVEL = 903065;
+	
+	
 	private int code;
 	private int senderId;
 	private int range;

@@ -14,15 +14,17 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.skillengine.effect;
-
-import com.aionemu.gameserver.skillengine.model.Effect;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+
+import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.LOG;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.TYPE;
+import com.aionemu.gameserver.skillengine.model.Effect;
 
 /**
  * @author Sippolo
@@ -31,17 +33,30 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "MpAttackInstantEffect")
 public class MpAttackInstantEffect extends EffectTemplate {
 
-	@XmlAttribute
+	@XmlAttribute(name = "percent")
 	protected boolean percent;
 
 	@Override
-	public void applyEffect(Effect effect) {
-		int maxMP = effect.getEffected().getLifeStats().getMaxMp();
-		int newValue = value;
-		// Support for values in percentage
-		if (percent) {
-			newValue = ((maxMP * value) / 100);
+	public void calculate(Effect effect) {
+		if (!super.calculate(effect, null, null)) {
+			return;
 		}
-		effect.getEffected().getLifeStats().reduceMp(newValue);
+		Creature effected = effect.getEffected();
+
+		int maxMP = effected.getLifeStats().getMaxMp();
+		int newValue = (percent) ? (int) ((maxMP * value) / 100) : value;
+		if(newValue < 0) {
+			newValue = 0;
+		}
+		effect.setReserved2(newValue);
+		effect.setReservedInt(position, newValue);
+	}
+
+	@Override
+	public void applyEffect(Effect effect) {
+		Creature effected = effect.getEffected();
+		int newValue = effect.getReservedInt(position);
+
+		effected.getLifeStats().reduceMp(TYPE.HEAL_MP, newValue, 0, LOG.REGULAR);
 	}
 }

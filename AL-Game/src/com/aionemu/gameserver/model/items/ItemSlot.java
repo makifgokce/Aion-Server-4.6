@@ -60,6 +60,7 @@ public enum ItemSlot {
     LEFT_HAND(SUB_HAND.slotIdMask | SUB_OFF_HAND.slotIdMask, true),
     //TORSO_GLOVE_FOOT_SHOULDER_LEG(0, true), // TODO
 
+
     // STIGMA slots
     STIGMA1(1L << 30),
     STIGMA2(1L << 31),
@@ -75,7 +76,12 @@ public enum ItemSlot {
     ADV_STIGMA5(1L << 51),
     ADV_STIGMA6(1L << 52),
     ADVANCED_STIGMAS(ADV_STIGMA1.slotIdMask | ADV_STIGMA2.slotIdMask | ADV_STIGMA3.slotIdMask | ADV_STIGMA4.slotIdMask | ADV_STIGMA5.slotIdMask | ADV_STIGMA6.slotIdMask, true),
-    ALL_STIGMA(REGULAR_STIGMAS.slotIdMask | ADVANCED_STIGMAS.slotIdMask, true);
+    ALL_STIGMA(REGULAR_STIGMAS.slotIdMask | ADVANCED_STIGMAS.slotIdMask, true),
+
+	VIEW_DISPLAY(MAIN_HAND.slotIdMask | SUB_HAND.slotIdMask | HELMET.slotIdMask | TORSO.slotIdMask | GLOVES.slotIdMask
+			| BOOTS.slotIdMask | EARRINGS_LEFT.slotIdMask | EARRINGS_RIGHT.slotIdMask | RING_LEFT.slotIdMask | RING_RIGHT.slotIdMask
+			| NECKLACE.slotIdMask | SHOULDER.slotIdMask | PANTS.slotIdMask | WINGS.slotIdMask | WAIST.slotIdMask | FEATHERS.slotIdMask, true);
+
     private long slotIdMask;
     private boolean combo;
 
@@ -112,7 +118,7 @@ public enum ItemSlot {
     }
 
     public static ItemSlot[] getSlotsFor(long slot) {
-        List<ItemSlot> slots = new ArrayList<ItemSlot>();
+        List<ItemSlot> slots = new ArrayList<>();
         for (ItemSlot itemSlot : values()) {
             if (slot != 0 && !itemSlot.isCombo() && (slot & itemSlot.slotIdMask) == itemSlot.slotIdMask) {
                 slots.add(itemSlot);
@@ -128,4 +134,7 @@ public enum ItemSlot {
         }
         throw new IllegalArgumentException("Invalid provided slotIdMask " + slot);
     }
+    public static boolean isDisplaySlot(long slot) {
+		return (VIEW_DISPLAY.slotIdMask & slot) == slot;
+	}
 }

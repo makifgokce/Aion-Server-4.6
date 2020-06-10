@@ -78,7 +78,7 @@ public class AuraEffect extends EffectTemplate {
 		} else {
 			applyAuraTo(effector, effect);
 		}
-		PacketSendUtility.broadcastPacket(effector, new SM_MANTRA_EFFECT(effector, skillId));
+		PacketSendUtility.broadcastPacket(effector, new SM_MANTRA_EFFECT(effector.getObjectId(), skillId));
 	}
 
 	/**

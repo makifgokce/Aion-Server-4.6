@@ -64,6 +64,7 @@
     <xs:include schemaLocation="instance_bonusattr/instance_bonusattr.xsd"/>
     <xs:include schemaLocation="housing/housing_objects.xsd"/>
     <xs:include schemaLocation="ride/ride.xsd"/>
+	<xs:include schemaLocation="world_buff/world_buffs.xsd"/>
     <xs:include schemaLocation="robot/robot.xsd"/>
     <xs:include schemaLocation="instance_exit/instance_exit.xsd"/>
     <xs:include schemaLocation="portals/portal_loc.xsd"/>
@@ -151,6 +152,7 @@
                 <xs:element ref="instance_bonusattrs" minOccurs="0"/>
                 <xs:element ref="housing_objects" minOccurs="0"/>
                 <xs:element ref="rides" minOccurs="0"/>
+                <xs:element ref="world_buffs" minOccurs="0"/>
                 <xs:element ref="robots" minOccurs="0"/>
                 <xs:element ref="instance_exits" minOccurs="0"/>
                 <xs:element ref="portal_locs" minOccurs="0"/>

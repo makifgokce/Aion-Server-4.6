@@ -18,8 +18,8 @@
 package quest.verteron;
 
 import com.aionemu.gameserver.model.DialogAction;
-import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.TeleportAnimation;
+import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
@@ -73,7 +73,7 @@ public class _1020SealingTheAbyssGate extends QuestHandler {
 						TeleportService2.teleportTo(player, 210030000, 2683.2085f, 1068.8977f, 199.375f, (byte) 119, TeleportAnimation.BEAM_ANIMATION);
 						changeQuestStep(env, 0, 1, false);
 						return closeDialogWindow(env);
-					} else if (env.getDialogId() == DialogAction.SELECT_ACTION_1013.id()) {						
+					} else if (env.getDialogId() == DialogAction.SELECT_ACTION_1013.id()) {
 						playQuestMovie(env, 29);
 						return sendQuestDialog(env, 1013);
 					}
@@ -157,7 +157,8 @@ public class _1020SealingTheAbyssGate extends QuestHandler {
 
 	@Override
 	public boolean onZoneMissionEndEvent(QuestEnv env) {
-		return defaultOnZoneMissionEndEvent(env);
+		int[] quests = { 1130, 1011, 1012, 1013, 1014, 1015, 1021, 1016, 1018, 1017, 1019, 1022, 1023 };
+		return defaultOnZoneMissionEndEvent(env, quests);
 	}
 
 	@Override
@@ -166,7 +167,7 @@ public class _1020SealingTheAbyssGate extends QuestHandler {
 		return defaultOnLvlUpEvent(env, verteronQuests, true);
 	}
 
-	private void destroy(final int var, final QuestEnv env) { 
+	private void destroy(final int var, final QuestEnv env) {
 		final int targetObjectId = env.getVisibleObject().getObjectId();
 
 		final Player player = env.getPlayer();
@@ -176,7 +177,7 @@ public class _1020SealingTheAbyssGate extends QuestHandler {
 				if (player.getTarget().getObjectId() != targetObjectId) {
 					return;
 				}
-				QuestState qs = player.getQuestStateList().getQuestState(questId);
+
 				switch (var) {
 					case -2:
 						changeQuestStep(env, 2, 3, true);

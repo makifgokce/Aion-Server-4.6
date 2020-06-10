@@ -20,6 +20,7 @@ package com.aionemu.gameserver.network.aion.serverpackets;
 import com.aionemu.gameserver.controllers.RVController;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
+
 import javolution.util.FastMap;
 
 /**
@@ -119,12 +120,14 @@ public class SM_RIFT_ANNOUNCE extends AionServerPacket {
 				writeD(rift.getUsedEntries());
 				writeD(rift.getRemainTime());
 				writeC(rift.isVortex() ? 1 : 0);
-				writeC(0); // unk
+				writeC(rift.isMaster() ? 1 : 0);
 				break;
 			case 4:
 				writeH(0x05);
 				writeC(actionId);
 				writeD(objectId);
+				writeC(rift.isVortex() ? 1 : 0);
+				writeC(rift.isMaster() ? 1 : 0);
 				break;
 			case 5:
 				writeH(0x05); // 0x05

@@ -10,11 +10,23 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.network;
 
 import org.slf4j.Logger;
@@ -22,36 +34,31 @@ import org.slf4j.LoggerFactory;
 
 import com.aionemu.gameserver.configs.administration.DeveloperConfig;
 
-/**
- * @author Alcapwnd
- */
+
 public class PacketLoggerService {
 
     private static final Logger log = LoggerFactory.getLogger(PacketLoggerService.class);
-
-    public void logPacketCM(String name) {
-        if (!DeveloperConfig.SHOW_PACKETS) {
-            return;
-        }
-
-        log.info("[SHOW PACKETS CLIENT] " + name);
+    
+    public void logPacketCM(String name) 
+    {
+		if (DeveloperConfig.SHOW_PACKETS) {
+			log.info("[PACKET CLIENT] " + name);
+		}
+    }    
+    
+    public void logPacketSM(String name)
+    {    	
+		if (DeveloperConfig.SHOW_PACKETS) {
+			log.info("[PACKET SERVER] " + name);
+		}	
     }
-
-    public void logPacketSM(String name) {
-        if (!DeveloperConfig.SHOW_PACKETS) {
-            return;
-        }
-
-        log.info("[SHOW PACKETS SERVER] " + name);
-    }
-
+    
     @SuppressWarnings("synthetic-access")
     private static class SingletonHolder {
-
         protected static final PacketLoggerService instance = new PacketLoggerService();
     }
 
     public static final PacketLoggerService getInstance() {
         return SingletonHolder.instance;
-    }
+    }    
 }

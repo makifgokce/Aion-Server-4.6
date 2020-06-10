@@ -22,6 +22,7 @@ import com.aionemu.gameserver.world.exceptions.DuplicateAionObjectException;
 import javolution.util.FastMap;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -53,7 +54,7 @@ public class LegionContainer implements Iterable<Legion> {
 		if (legionsById.put(legion.getLegionId(), legion) != null) {
 			throw new DuplicateAionObjectException();
 		}
-		if (legionsByName.put(legion.getLegionName().toLowerCase(), legion) != null) {
+		if (legionsByName.put(legion.getLegionName().toLowerCase(Locale.forLanguageTag("en")), legion) != null) {
 			throw new DuplicateAionObjectException();
 		}
 	}
@@ -65,7 +66,7 @@ public class LegionContainer implements Iterable<Legion> {
 	 */
 	public void remove(Legion legion) {
 		legionsById.remove(legion.getLegionId());
-		legionsByName.remove(legion.getLegionName().toLowerCase());
+		legionsByName.remove(legion.getLegionName().toLowerCase(Locale.forLanguageTag("en")));
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class LegionContainer implements Iterable<Legion> {
 	 *         logged.
 	 */
 	public Legion get(String name) {
-		return legionsByName.get(name.toLowerCase());
+		return legionsByName.get(name.toLowerCase(Locale.forLanguageTag("en")));
 	}
 
 	/**
@@ -109,7 +110,7 @@ public class LegionContainer implements Iterable<Legion> {
 	 * @return true or false
 	 */
 	public boolean contains(String name) {
-		return legionsByName.containsKey(name.toLowerCase());
+		return legionsByName.containsKey(name.toLowerCase(Locale.forLanguageTag("en")));
 	}
 
 	/**

@@ -14,9 +14,9 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
+import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 
@@ -25,17 +25,17 @@ import com.aionemu.gameserver.network.aion.AionServerPacket;
  */
 public class SM_RIDE_ROBOT extends AionServerPacket {
 
-	private int player;
-	private int robotId;
+	private Player player;
+	private int robotInfo;
 
-	public SM_RIDE_ROBOT(int player, int robotId) {
+	public SM_RIDE_ROBOT(Player player, int robotInfo) {
 		this.player = player;
-		this.robotId = robotId;
+		this.robotInfo = robotInfo;
 	}
 
 	@Override
 	protected void writeImpl(AionConnection con) {
-		writeD(player);
-		writeD(robotId);
+		writeD(player.getObjectId());
+		writeD(robotInfo);
 	}
 }

@@ -26,5 +26,5 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "APBoostEffect")
-public class APBoostEffect extends BufEffect {
+public class APBoostEffect extends BuffEffect {
 }

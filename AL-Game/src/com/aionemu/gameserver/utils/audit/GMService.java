@@ -17,19 +17,17 @@
 
 package com.aionemu.gameserver.utils.audit;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.aionemu.gameserver.configs.administration.AdminConfig;
 import com.aionemu.gameserver.model.ChatType;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_MESSAGE;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-import com.aionemu.gameserver.utils.i18n.CustomMessageId;
-import com.aionemu.gameserver.utils.i18n.LanguageHandler;
 import com.aionemu.gameserver.world.World;
 
 import javolution.util.FastMap;
@@ -44,13 +42,13 @@ public class GMService {
 		return SingletonHolder.instance;
 	}
 
-	private Map<Integer, Player> gms = new FastMap<Integer, Player>();
+	private Map<Integer, Player> gms = new FastMap<>();
 	private boolean announceAny = false;
 	private List<Byte> announceList;
 
 	private GMService() {
 
-		announceList = new ArrayList<Byte>();
+		announceList = new ArrayList<>();
 		announceAny = AdminConfig.ANNOUNCE_LEVEL_LIST.equals("*");
 		if (!announceAny) {
 			try {
@@ -82,74 +80,21 @@ public class GMService {
 	public void onPlayerAvailable(Player player) {
 		if (player.isGM()) {
 			gms.put(player.getObjectId(), player);
-			String adminTag = "%s";
-			StringBuilder sb = new StringBuilder(adminTag);
-
-			if (AdminConfig.CUSTOMTAG_ENABLE) {
-				if (player.getAccessLevel() == 1) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS1.substring(0, AdminConfig.CUSTOMTAG_ACCESS1.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 2) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS2.substring(0, AdminConfig.CUSTOMTAG_ACCESS2.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 3) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS3.substring(0, AdminConfig.CUSTOMTAG_ACCESS3.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 4) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS4.substring(0, AdminConfig.CUSTOMTAG_ACCESS4.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 5) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS5.substring(0, AdminConfig.CUSTOMTAG_ACCESS5.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 6) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS6.substring(0, AdminConfig.CUSTOMTAG_ACCESS6.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 7) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS7.substring(0, AdminConfig.CUSTOMTAG_ACCESS7.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 8) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS8.substring(0, AdminConfig.CUSTOMTAG_ACCESS8.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 9) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS9.substring(0, AdminConfig.CUSTOMTAG_ACCESS9.length() - 3)).toString();
-				} else if (player.getAccessLevel() == 10) {
-					adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS10.substring(0, AdminConfig.CUSTOMTAG_ACCESS10.length() - 3)).toString();
-				}
-			}
 
 			Iterator<Player> iter = World.getInstance().getPlayersIterator();
 			while (iter.hasNext()) {
-				PacketSendUtility.sendBrightYellowMessageOnCenter(iter.next(),
-						"Information : " + String.format(adminTag, player.getName()) + LanguageHandler.translate(CustomMessageId.ANNOUNCE_GM_CONNECTION));
+				PacketSendUtility.sendBrightYellowMessageOnCenter(iter.next(), player.getName() + " Online!");
 			}
 		}
 	}
 
 	public void onPlayerUnavailable(Player player) {
 		gms.remove(player.getObjectId());
-		String adminTag = "%s";
-		StringBuilder sb = new StringBuilder(adminTag);
 
-		if (AdminConfig.CUSTOMTAG_ENABLE) {
-			if (player.getAccessLevel() == 1) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS1.substring(0, AdminConfig.CUSTOMTAG_ACCESS1.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 2) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS2.substring(0, AdminConfig.CUSTOMTAG_ACCESS2.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 3) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS3.substring(0, AdminConfig.CUSTOMTAG_ACCESS3.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 4) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS4.substring(0, AdminConfig.CUSTOMTAG_ACCESS4.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 5) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS5.substring(0, AdminConfig.CUSTOMTAG_ACCESS5.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 6) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS6.substring(0, AdminConfig.CUSTOMTAG_ACCESS6.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 7) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS7.substring(0, AdminConfig.CUSTOMTAG_ACCESS7.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 8) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS8.substring(0, AdminConfig.CUSTOMTAG_ACCESS8.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 9) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS9.substring(0, AdminConfig.CUSTOMTAG_ACCESS9.length() - 3)).toString();
-			} else if (player.getAccessLevel() == 10) {
-				adminTag = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS10.substring(0, AdminConfig.CUSTOMTAG_ACCESS10.length() - 3)).toString();
-			}
-		}
 
 		Iterator<Player> iter = World.getInstance().getPlayersIterator();
 		while (iter.hasNext()) {
-			PacketSendUtility.sendBrightYellowMessageOnCenter(iter.next(),
-					"Information : " + String.format(adminTag, player.getName()) + LanguageHandler.translate(CustomMessageId.ANNOUNCE_GM_DECONNECTION));
+			PacketSendUtility.sendBrightYellowMessageOnCenter(iter.next(), player.getName() + " Offline!");
 		}
 	}
 

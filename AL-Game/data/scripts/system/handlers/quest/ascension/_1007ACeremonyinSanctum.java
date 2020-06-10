@@ -281,6 +281,11 @@ public class _1007ACeremonyinSanctum extends QuestHandler {
 	}
 
 	@Override
+	public boolean onZoneMissionEndEvent(QuestEnv env) {
+		return defaultOnZoneMissionEndEvent(env, 1006);
+	}
+
+	@Override
 	public boolean onLvlUpEvent(QuestEnv env) {
 	CraftSkillUpdateService.getInstance().setMorphRecipe(env.getPlayer());
 		return defaultOnLvlUpEvent(env, 1006);

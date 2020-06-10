@@ -33,7 +33,9 @@ import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.items.storage.Storage;
 import com.aionemu.gameserver.model.siege.FortressLocation;
 import com.aionemu.gameserver.model.team2.alliance.PlayerAlliance;
+import com.aionemu.gameserver.model.team2.alliance.PlayerAllianceService;
 import com.aionemu.gameserver.model.team2.group.PlayerGroup;
+import com.aionemu.gameserver.model.team2.group.PlayerGroupService;
 import com.aionemu.gameserver.model.team2.league.League;
 import com.aionemu.gameserver.model.templates.InstanceCooltime;
 import com.aionemu.gameserver.model.templates.portal.*;
@@ -517,10 +519,38 @@ public class PortalService {
 		InstanceService.registerPlayerWithInstance(instance, player);
 		TeleportService2.teleportTo(player, loc.getWorldId(), instance.getInstanceId(), loc.getX(), loc.getY(), loc.getZ(), loc.getH(),
 				TeleportAnimation.BEAM_ANIMATION);
-		long useDelay = DataManager.INSTANCE_COOLTIME_DATA.getInstanceEntranceCooltime(player, instance.getMapId());
-		if (useDelay > 0 && !reenter) {
-			player.getPortalCooldownList().addPortalCooldown(loc.getWorldId(), useDelay);
+		if (!reenter) {
+
+			if (player.getPortalCooldownList().getPortalCooldownItem(loc.getWorldId()) == null) {
+				player.getPortalCooldownList().addPortalCooldown(loc.getWorldId(), 1, DataManager.INSTANCE_COOLTIME_DATA.getInstanceEntranceCooltime(player, loc.getWorldId()));
+			}
+			else {
+				player.getPortalCooldownList().addEntry(loc.getWorldId());
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_INSTANCE_DUNGEON_COUNT_USE);
+			}
 		}
+        switch (loc.getWorldId()) {
+            case 300190000:
+            case 300200000:
+            case 300230000:
+            case 300240000:
+            case 300320000:
+            case 300460000:
+            case 300480000:
+            case 300610000:
+            case 301270000:
+            case 301510000:
+            case 301630000:
+            case 301640000:
+            case 302100000:
+            case 302330000:
+            case 302400000: {
+                PlayerGroupService.removePlayer(player);
+                PlayerAllianceService.removePlayer(player);
+                PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1401718));
+                break;
+            }
+        }
 	}
 
 	private static void easyTransfer(Player player, PortalLoc loc) {

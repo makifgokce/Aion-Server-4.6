@@ -137,8 +137,15 @@ public class _1044TestingFlightSkills extends QuestHandler {
 	}
 
 	@Override
+	public boolean onZoneMissionEndEvent(QuestEnv env) {
+		int[] quests = { 1920, 1921, 1922 };
+		return defaultOnZoneMissionEndEvent(env, quests);
+	}
+
+	@Override
 	public boolean onLvlUpEvent(QuestEnv env) {
-		return defaultOnLvlUpEvent(env, 1922);
+		int[] quests = { 1920, 1921, 1922 };
+		return defaultOnLvlUpEvent(env, quests, true);
 	}
 
 	@Override

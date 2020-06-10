@@ -19,8 +19,6 @@ package com.aionemu.gameserver.services.transfers;
 
 import java.util.List;
 
-import javolution.util.FastList;
-
 import org.slf4j.Logger;
 
 import com.aionemu.commons.database.dao.DAOManager;
@@ -67,6 +65,8 @@ import com.aionemu.gameserver.utils.idfactory.IDFactory;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.WorldPosition;
 
+import javolution.util.FastList;
+
 /**
  * @author KID
  */
@@ -97,7 +97,7 @@ public class CMT_CHARACTER_INFORMATION extends AionClientPacket {
 		playerCommonData.setQuestExpands(readD());
 		playerCommonData.setNpcExpands(readD());
 		playerCommonData.setAdvancedStigmaSlotSize(readD());
-		playerCommonData.setWarehouseSize(readD());
+		playerCommonData.setWarehouseNpcExpands(readD());
 
 		PlayerAppearance playerAppearance = new PlayerAppearance();
 		playerAppearance.setSkinRGB(readD());
@@ -207,6 +207,7 @@ public class CMT_CHARACTER_INFORMATION extends AionClientPacket {
 
 			int colorExpires = readD();
 			int bonusNum = readD();
+			int bns_enchant = readD();
 			int randomNum = readD();
 			int packNum = readD();
 			boolean itemPacked = readD() == 1;
@@ -226,7 +227,7 @@ public class CMT_CHARACTER_INFORMATION extends AionClientPacket {
 				// bonus probably is lost, don't know [RR]
 				// dye expiration is lost
 				Item item = new Item(newId, itemId, itemCnt, itemColor, colorExpires, itemCreator, itemExpireTime, itemActivationCnt, itemEquipped,
-						itemSoulBound, equipSlot, location, enchant, skinId, fusionId, optSocket, optFusion, charge, bonusNum, randomNum, packNum, itemPacked,
+						itemSoulBound, equipSlot, location, enchant, skinId, fusionId, optSocket, optFusion, charge, bonusNum, bns_enchant, randomNum, packNum, itemPacked,
 						0);
 				if (manastones.size() > 0) {
 					for (int[] stone : manastones) {
@@ -288,6 +289,7 @@ public class CMT_CHARACTER_INFORMATION extends AionClientPacket {
 
 			int colorExpires = readD();
 			int bonusNum = readD();
+			int bns_enchant = readD();
 			int randomNum = readD();
 			int packNum = readD();
 			boolean itemPacked = readD() == 1;
@@ -307,7 +309,7 @@ public class CMT_CHARACTER_INFORMATION extends AionClientPacket {
 				// bonus probably is lost, don't know [RR]
 				// dye expiration is lost
 				Item item = new Item(newId, itemId, itemCnt, itemColor, colorExpires, itemCreator, itemExpireTime, itemActivationCnt, itemEquipped,
-						itemSoulBound, equipSlot, location, enchant, skinId, fusionId, optSocket, optFusion, charge, bonusNum, randomNum, packNum, itemPacked,
+						itemSoulBound, equipSlot, location, enchant, skinId, fusionId, optSocket, optFusion, charge, bonusNum, bns_enchant, randomNum, packNum, itemPacked,
 						0);
 				if (manastones.size() > 0) {
 					for (int[] stone : manastones) {
@@ -476,7 +478,7 @@ public class CMT_CHARACTER_INFORMATION extends AionClientPacket {
 
 		int uilen = readD(), shortlen = readD();
 		byte[] ui = readB(uilen), sc = readB(shortlen);
-		player.setPlayerSettings(new PlayerSettings(uilen > 0 ? ui : null, shortlen > 0 ? sc : null, null, readD(), readD()));
+		player.getCommonData().setPlayerSettings(new PlayerSettings(uilen > 0 ? ui : null, shortlen > 0 ? sc : null, null, readD(), readD()));
 		player.setAbyssRank(new AbyssRank(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0));
 		cnt = readD();
 		textLog.info("QuestStateList:" + cnt);

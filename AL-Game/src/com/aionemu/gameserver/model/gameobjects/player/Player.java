@@ -17,6 +17,15 @@
 
 package com.aionemu.gameserver.model.gameobjects.player;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.administration.AdminConfig;
 import com.aionemu.gameserver.configs.main.MembershipConfig;
@@ -32,18 +41,27 @@ import com.aionemu.gameserver.controllers.observer.ActionObserver;
 import com.aionemu.gameserver.dao.PlayerVarsDAO;
 import com.aionemu.gameserver.dao.PlayerWorldBanDAO;
 import com.aionemu.gameserver.dataholders.DataManager;
-import com.aionemu.gameserver.model.gameobjects.CreatureType;
 import com.aionemu.gameserver.model.Gender;
 import com.aionemu.gameserver.model.PlayerClass;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.TribeClass;
+import com.aionemu.gameserver.model.WorldBuff;
 import com.aionemu.gameserver.model.account.Account;
 import com.aionemu.gameserver.model.actions.PlayerActions;
 import com.aionemu.gameserver.model.actions.PlayerMode;
-import com.aionemu.gameserver.model.gameobjects.*;
+import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.CreatureType;
+import com.aionemu.gameserver.model.gameobjects.Item;
+import com.aionemu.gameserver.model.gameobjects.Kisk;
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.PersistentState;
+import com.aionemu.gameserver.model.gameobjects.Pet;
+import com.aionemu.gameserver.model.gameobjects.Summon;
+import com.aionemu.gameserver.model.gameobjects.SummonedObject;
+import com.aionemu.gameserver.model.gameobjects.Trap;
 import com.aionemu.gameserver.model.gameobjects.player.AbyssRank.AbyssRankUpdateType;
-import com.aionemu.gameserver.model.gameobjects.player.FriendList.Status;
 import com.aionemu.gameserver.model.gameobjects.player.emotion.EmotionList;
+import com.aionemu.gameserver.model.gameobjects.player.f2p.F2p;
 import com.aionemu.gameserver.model.gameobjects.player.motion.MotionList;
 import com.aionemu.gameserver.model.gameobjects.player.npcFaction.NpcFactions;
 import com.aionemu.gameserver.model.gameobjects.player.title.TitleList;
@@ -101,12 +119,9 @@ import com.aionemu.gameserver.utils.rates.RegularRates;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.WorldPosition;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
+
 import javolution.util.FastList;
 import javolution.util.FastMap;
-
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * This class is representing Player object, it contains all needed data.
@@ -126,8 +141,6 @@ public class Player extends Creature {
 	private LegionMember legionMember;
 	private MacroList macroList;
 	private PlayerSkillList skillList;
-	private FriendList friendList;
-	private BlockList blockList;
 	private PetList toyPetList;
 	private Mailbox mailbox;
 	private PrivateStore store;
@@ -146,7 +159,6 @@ public class Player extends Creature {
 	private Equipment equipment;
 	private HouseRegistry houseRegistry;
 	private PlayerStatsTemplate playerStatsTemplate;
-	private PlayerSettings playerSettings;
 	private com.aionemu.gameserver.model.team2.group.PlayerGroup playerGroup2;
 	private PlayerAllianceGroup playerAllianceGroup;
 	private final AbsoluteStatOwner absStatsHolder;
@@ -192,7 +204,7 @@ public class Player extends Creature {
 	private long nextSkillUse;
 	private long nextSummonSkillUse;
 	private ChainSkills chainSkills;
-	private Map<AttackStatus, Long> lastCounterSkill = new HashMap<AttackStatus, Long>();
+	private Map<AttackStatus, Long> lastCounterSkill = new HashMap<>();
 	private int dualEffectValue = 0;
 	private int wordBanTime = 0;
 	private boolean bannedFromWorld = false;
@@ -222,7 +234,6 @@ public class Player extends Creature {
 	private long flyStartTime;
 	private EmotionList emotions;
 	private MotionList motions;
-	private int partnerId;
 	private long flyReuseTime;
 	private boolean isMentor;
 	private long lastMsgTime = 0;
@@ -241,6 +252,7 @@ public class Player extends Creature {
 	byte housingStatus = HousingFlags.BUY_STUDIO_ALLOWED.getId();
 	private int battleReturnMap;
 	private float[] battleReturnCoords;
+	private FastList<WorldBuff> worldBuff;
 	// This variables are for the custom RP and GM system
 	private boolean isGmMode = false;
 	//This variables are for the battleground system
@@ -256,6 +268,7 @@ public class Player extends Creature {
 	public static final int CHAT_FIXED_ON_BOTH = CHAT_FIXED_ON_ELYOS | CHAT_FIXED_ON_ASMOS;
 	public int CHAT_FIX_WORLD_CHANNEL = CHAT_NOT_FIXED;
 	private int useAutoGroup = 0;
+	private boolean robot = false;
 	private int robotId = 0;
 	private float oldx;
 	private float oldy;
@@ -263,6 +276,11 @@ public class Player extends Creature {
 	public int FAST_TRACK_TYPE = 0; // 0 = nothing,1 = moved exact current,2 = already moved
 	private boolean isOnFastTrack = false;
 	private boolean isInLiveParty = false;
+	private F2p f2p;
+	private int transformModelId;
+	private int transformItemId;
+	private int transformPanelId;
+
 
 	/**
 	 * Used for JUnit tests
@@ -409,14 +427,6 @@ public class Player extends Creature {
 		this.toyPet = toyPet;
 	}
 
-	/**
-	 * Gets this players Friend List
-	 *
-	 * @return FriendList
-	 */
-	public FriendList getFriendList() {
-		return friendList;
-	}
 
 	/**
 	 * Is this player looking for a group
@@ -502,24 +512,6 @@ public class Player extends Creature {
 		this.captchaImage = captchaImage;
 	}
 
-	/**
-	 * Sets this players friend list. <br />
-	 * Remember to send the player the <tt>SM_FRIEND_LIST</tt> packet.
-	 *
-	 * @param list
-	 */
-	public void setFriendList(FriendList list) {
-		this.friendList = list;
-	}
-
-	public BlockList getBlockList() {
-		return blockList;
-	}
-
-	public void setBlockList(BlockList list) {
-		this.blockList = list;
-	}
-
 	public final PetList getPetList() {
 		return toyPetList;
 	}
@@ -549,7 +541,7 @@ public class Player extends Creature {
 
 	public void setQuestExpands(int questExpands) {
 		this.playerCommonData.setQuestExpands(questExpands);
-		getInventory().setLimit(getInventory().getLimit() + (questExpands + getNpcExpands()) * CUBE_SPACE);
+		getInventory().setLimit(getInventory().getLimit() + (questExpands + getNpcExpands() + getItemExpands()) * CUBE_SPACE);
 	}
 
 	public int getQuestExpands() {
@@ -558,11 +550,20 @@ public class Player extends Creature {
 
 	public void setNpcExpands(int npcExpands) {
 		this.playerCommonData.setNpcExpands(npcExpands);
-		getInventory().setLimit(getInventory().getLimit() + (npcExpands + getQuestExpands()) * CUBE_SPACE);
+		getInventory().setLimit(getInventory().getLimit() + (npcExpands + getQuestExpands() + getItemExpands()) * CUBE_SPACE);
 	}
 
 	public int getNpcExpands() {
 		return this.playerCommonData.getNpcExpands();
+	}
+
+	public void setItemExpands(int itemExpands) {
+		this.playerCommonData.setItemExpands(itemExpands);
+		getInventory().setLimit(getInventory().getLimit() + (itemExpands + getNpcExpands() + getQuestExpands()) * CUBE_SPACE);
+	}
+
+	public int getItemExpands() {
+		return this.playerCommonData.getItemExpands();
 	}
 
 	public PlayerClass getPlayerClass() {
@@ -681,31 +682,31 @@ public class Player extends Creature {
 	 * @return
 	 */
 	public IStorage getStorage(int storageType) {
-		if (storageType == StorageType.REGULAR_WAREHOUSE.getId()) {
-			return regularWarehouse;
-		}
+        if (storageType == StorageType.REGULAR_WAREHOUSE.getId()) {
+            return regularWarehouse;
+        }
 
-		if (storageType == StorageType.ACCOUNT_WAREHOUSE.getId()) {
-			return accountWarehouse;
-		}
+        if (storageType == StorageType.ACCOUNT_WAREHOUSE.getId()) {
+            return accountWarehouse;
+        }
 
-		if (storageType == StorageType.LEGION_WAREHOUSE.getId() && getLegion() != null) {
-			return new LegionStorageProxy(getLegion().getLegionWarehouse(), this);
-		}
+        if (storageType == StorageType.LEGION_WAREHOUSE.getId() && getLegion() != null) {
+            return new LegionStorageProxy(getLegion().getLegionWarehouse(), this);
+        }
 
-		if (storageType >= StorageType.PET_BAG_MIN && storageType <= StorageType.PET_BAG_MAX) {
-			return petBag[storageType - StorageType.PET_BAG_MIN];
-		}
+        if (storageType >= StorageType.PET_BAG_MIN && storageType <= StorageType.PET_BAG_MAX) {
+            return petBag[storageType - StorageType.PET_BAG_MIN];
+        }
 
-		if (storageType >= StorageType.HOUSE_WH_MIN && storageType <= StorageType.HOUSE_WH_MAX) {
-			return cabinets[storageType - StorageType.HOUSE_WH_MIN];
-		}
+        if (storageType >= StorageType.HOUSE_WH_MIN && storageType <= StorageType.HOUSE_WH_MAX) {
+            return cabinets[storageType - StorageType.HOUSE_WH_MIN];
+        }
 
-		if (storageType == StorageType.CUBE.getId()) {
-			return inventory;
-		}
-		return null;
-	}
+        if (storageType == StorageType.CUBE.getId()) {
+            return inventory;
+        }
+        return null;
+    }
 
 	/**
 	 * Items from UPDATE_REQUIRED storages and equipment
@@ -713,7 +714,7 @@ public class Player extends Creature {
 	 * @return
 	 */
 	public List<Item> getDirtyItemsToUpdate() {
-		List<Item> dirtyItems = new ArrayList<Item>();
+		List<Item> dirtyItems = new ArrayList<>();
 
 		IStorage cubeStorage = getStorage(StorageType.CUBE.getId());
 		if (cubeStorage.getPersistentState() == PersistentState.UPDATE_REQUIRED) {
@@ -809,21 +810,6 @@ public class Player extends Creature {
 		return inventory;
 	}
 
-	/**
-	 * @return the playerSettings
-	 */
-	public PlayerSettings getPlayerSettings() {
-		return playerSettings;
-	}
-
-	/**
-	 * @param playerSettings
-	 *            the playerSettings to set
-	 */
-	public void setPlayerSettings(PlayerSettings playerSettings) {
-		this.playerSettings = playerSettings;
-	}
-
 	public TitleList getTitleList() {
 		return titleList;
 	}
@@ -871,15 +857,6 @@ public class Player extends Creature {
 	@Override
 	public PlayerEffectController getEffectController() {
 		return (PlayerEffectController) super.getEffectController();
-	}
-
-	public void onLoggedIn() {
-		friendList.setStatus(Status.ONLINE, getCommonData());
-	}
-
-	public void onLoggedOut() {
-		requester.denyAll();
-		friendList.setStatus(FriendList.Status.OFFLINE, getCommonData());
 	}
 
 	/**
@@ -975,18 +952,38 @@ public class Player extends Creature {
 	/**
 	 * @return warehouse size
 	 */
-	public int getWarehouseSize() {
-		return this.playerCommonData.getWarehouseSize();
+	public int getWarehouseNpcExpands() {
+		return this.playerCommonData.getWarehouseNpcExpands();
 	}
 
 	/**
 	 * @param warehouseSize
 	 */
-	public void setWarehouseSize(int warehouseSize) {
-		this.playerCommonData.setWarehouseSize(warehouseSize);
-		getWarehouse().setLimit(getWarehouse().getLimit() + (warehouseSize * WAREHOUSE_SPACE));
+	public void setWarehouseNpcExpands(int warehouseSize) {
+		this.playerCommonData.setWarehouseNpcExpands(warehouseSize);
+		getWarehouse().setLimit(getWarehouse().getLimit() + ((warehouseSize + getWarehouseQuestExpands() + getWarehouseItemExpands()) * WAREHOUSE_SPACE));
 	}
 
+	public int getWarehouseQuestExpands() {
+		return this.playerCommonData.getWarehouseQuestExpands();
+	}
+	/**
+	 * @param WarehouseQuestExpands
+	 */
+	public void setWarehouseQuestExpands(int warehouseSize) {
+		this.playerCommonData.setWarehouseQuestExpands(warehouseSize);
+		getWarehouse().setLimit(getWarehouse().getLimit() + ((warehouseSize + getWarehouseNpcExpands() + getWarehouseItemExpands()) * WAREHOUSE_SPACE));
+	}
+	public int getWarehouseItemExpands() {
+		return this.playerCommonData.getWarehouseItemExpands();
+	}
+	/**
+	 * @param WarehouseItemExpands
+	 */
+	public void setWarehouseItemExpands(int warehouseSize) {
+		this.playerCommonData.setWarehouseItemExpands(warehouseSize);
+		getWarehouse().setLimit(getWarehouse().getLimit() + ((warehouseSize + getWarehouseNpcExpands() + getWarehouseQuestExpands()) * WAREHOUSE_SPACE));
+	}
 	/**
 	 * @return regularWarehouse
 	 */
@@ -1370,7 +1367,7 @@ public class Player extends Creature {
 			return false;
 		}
 
-		Long coolDown = itemCoolDowns.get(limits.getDelayId()).getReuseTime();
+		coolDown = itemCoolDowns.get(limits.getDelayId()).getReuseTime();
 		if (coolDown == null) {
 			return false;
 		}
@@ -1580,6 +1577,7 @@ public class Player extends Creature {
 		return playerAccount;
 	}
 
+
 	/**
 	 * Quest completion
 	 *
@@ -1785,6 +1783,50 @@ public class Player extends Creature {
 	public boolean havePermission(byte perm) {
 		return playerAccount.getMembership() >= perm;
 	}
+
+	public byte getMembership() {
+		if (playerAccount == null) {
+			return 0x00;
+		}
+		return playerAccount.getMembership();
+	}
+	/**
+	 * F2p
+	 */
+	public F2p getF2p() {
+		return f2p;
+	}
+
+	public void setF2p(F2p f2p) {
+		this.f2p = f2p;
+	}
+	/**
+	 * Transformation
+	 */
+	public int getTransformedModelId() {
+		return transformModelId;
+	}
+
+	public void setTransformedModelId(int id) {
+		transformModelId = id;
+	}
+
+	public int getTransformedItemId() {
+		return transformItemId;
+	}
+
+	public void setTransformedItemId(int id) {
+		transformItemId = id;
+	}
+
+	public int getTransformedPanelId() {
+		return transformPanelId;
+	}
+
+	public void setTransformedPanelId(int id) {
+		transformPanelId = id;
+	}
+
 
 	/**
 	 * @return Returns the emotions.
@@ -2081,13 +2123,9 @@ public class Player extends Creature {
 		return playerCommonData.getRace();
 	}
 
-	public Player findPartner() {
-		return World.getInstance().findPlayer(partnerId);
-
-	}
-
 	private PlayerVarsDAO daoVars = DAOManager.getDAO(PlayerVarsDAO.class);
 	private Map<String, Object> vars = FastMap.newInstance();
+	private Long coolDown;
 
 	public boolean hasVar(String key) {
 		return vars.containsKey(key);
@@ -2122,14 +2160,6 @@ public class Player extends Creature {
 
 	public void setVars(Map<String, Object> map) {
 		this.vars = map;
-	}
-
-	public boolean isMarried() {
-		return partnerId != 0;
-	}
-
-	public void setPartnerId(int partnerId) {
-		this.partnerId = partnerId;
 	}
 
 	@Override
@@ -2326,7 +2356,7 @@ public class Player extends Creature {
 
 	public void setRideObservers(ActionObserver observer) {
 		if (rideObservers == null) {
-			rideObservers = new ArrayList<ActionObserver>(3);
+			rideObservers = new ArrayList<>(3);
 		}
 
 		rideObservers.add(observer);
@@ -2375,126 +2405,125 @@ public class Player extends Creature {
 	public void addStatus(boolean addedStatus) {
 		this.addedStatus = addedStatus;
 	}
-
 	public boolean banFromWorld(String by, String reason, long duration) {
-		if (isBannedFromWorld()) {
-			return false;
-		} else {
-			bannedFromWorld = true;
-			bannedFromWorldDate = Calendar.getInstance().getTime();
-			bannedFromWorldDuring = duration;
-			bannedFromWorldBy = by;
-			bannedFromWorldReason = reason;
-			PlayerWorldBanDAO dao = DAOManager.getDAO(PlayerWorldBanDAO.class);
-			if (!dao.addWorldBan(getObjectId(), by, bannedFromWorldDuring, bannedFromWorldDate, bannedFromWorldReason)) {
-				return false;
-			}
+        if (isBannedFromWorld()) {
+            return false;
+        } else {
+            bannedFromWorld = true;
+            bannedFromWorldDate = Calendar.getInstance().getTime();
+            bannedFromWorldDuring = duration;
+            bannedFromWorldBy = by;
+            bannedFromWorldReason = reason;
+            PlayerWorldBanDAO dao = DAOManager.getDAO(PlayerWorldBanDAO.class);
+            if (!dao.addWorldBan(getObjectId(), by, bannedFromWorldDuring, bannedFromWorldDate, bannedFromWorldReason)) {
+                return false;
+            }
 
-			if (bannedFromWorldDuring > 0) {
-				scheduleUnbanFromWorld();
-			}
-		}
-		return true;
-	}
+            if (bannedFromWorldDuring > 0) {
+                scheduleUnbanFromWorld();
+            }
+        }
+        return true;
+    }
 
-	public static String getChanCommand(int chanId) {
-		switch (chanId) {
-			case CHAT_FIXED_ON_ASMOS:
-				return "." + "asmo";
-			case CHAT_FIXED_ON_ELYOS:
-				return "." + "ely";
-			case CHAT_FIXED_ON_WORLD:
-				return "." + "tg";
-			case CHAT_FIXED_ON_BOTH:
-				return "." + "2race";
-		}
-		return "";
-	}
+    public static String getChanCommand(int chanId) {
+        switch (chanId) {
+            case CHAT_FIXED_ON_ASMOS:
+                return "." + "asmo";
+            case CHAT_FIXED_ON_ELYOS:
+                return "." + "ely";
+            case CHAT_FIXED_ON_WORLD:
+                return "." + "tg";
+            case CHAT_FIXED_ON_BOTH:
+                return "." + "2race";
+        }
+        return "";
+    }
 
-	public boolean isBannedFromWorld() {
-		return bannedFromWorld;
-	}
+    public boolean isBannedFromWorld() {
+        return bannedFromWorld;
+    }
 
-	public boolean unbanFromWorld() {
-		bannedFromWorld = false;
-		PlayerWorldBanDAO dao = DAOManager.getDAO(PlayerWorldBanDAO.class);
-		cancelUnbanFromWorld();
-		dao.removeWorldBan(getObjectId());
-		return true;
-	}
+    public boolean unbanFromWorld() {
+        bannedFromWorld = false;
+        PlayerWorldBanDAO dao = DAOManager.getDAO(PlayerWorldBanDAO.class);
+        cancelUnbanFromWorld();
+        dao.removeWorldBan(getObjectId());
+        return true;
+    }
 
-	public void scheduleUnbanFromWorld() {
-		if (!isBannedFromWorld()) {
-			throw new RuntimeException("scheduling unban task when not banned from " + getChanCommand(CHAT_FIX_WORLD_CHANNEL));
-		}
-		cancelUnbanFromWorld();
-		final int playerObjId = getObjectId();
-		final String playerName = getName();
-		final String adminName = bannedFromWorldBy;
-		final long time = bannedFromWorldDuring;
-		if (time > 0) {
-			final Date endDate = new Date(bannedFromWorldDate.getTime() + bannedFromWorldDuring);
-			taskToUnbanFromWorld = ThreadPoolManager.getInstance().schedule(new Runnable() {
-				@Override
-				public void run() {
-					World world = World.getInstance();
-					Player player = world.findPlayer(playerName);
-					Player admin = world.findPlayer(adminName);
-					if (endDate.getTime() <= Calendar.getInstance().getTimeInMillis()) {
-						DAOManager.getDAO(PlayerWorldBanDAO.class).removeWorldBan(playerObjId);
-					}
-					if (player != null) {
-						player.bannedFromWorld = false;
-						PacketSendUtility.sendBrightYellowMessageOnCenter(player, "You're not anymore banned from chat channels");
-					}
-					if (admin != null) {
-						PacketSendUtility.sendBrightYellowMessageOnCenter(admin, "The player " + playerName + " is no more banned from chat channels");
-					}
-				}
-			}, time);
-		}
-	}
+    public void scheduleUnbanFromWorld() {
+        if (!isBannedFromWorld()) {
+            throw new RuntimeException("scheduling unban task when not banned from " + getChanCommand(CHAT_FIX_WORLD_CHANNEL));
+        }
+        cancelUnbanFromWorld();
+        final int playerObjId = getObjectId();
+        final String playerName = getName();
+        final String adminName = bannedFromWorldBy;
+        final long time = bannedFromWorldDuring;
+        if (time > 0) {
+            final Date endDate = new Date(bannedFromWorldDate.getTime() + bannedFromWorldDuring);
+            taskToUnbanFromWorld = ThreadPoolManager.getInstance().schedule(new Runnable() {
+                @Override
+                public void run() {
+                    World world = World.getInstance();
+                    Player player = world.findPlayer(playerName);
+                    Player admin = world.findPlayer(adminName);
+                    if (endDate.getTime() <= Calendar.getInstance().getTimeInMillis()) {
+                        DAOManager.getDAO(PlayerWorldBanDAO.class).removeWorldBan(playerObjId);
+                    }
+                    if (player != null) {
+                        player.bannedFromWorld = false;
+                        PacketSendUtility.sendBrightYellowMessageOnCenter(player, "You're not anymore banned from chat channels");
+                    }
+                    if (admin != null) {
+                        PacketSendUtility.sendBrightYellowMessageOnCenter(admin, "The player " + playerName + " is no more banned from chat channels");
+                    }
+                }
+            }, time);
+        }
+    }
 
-	private void cancelUnbanFromWorld() {
-		if (taskToUnbanFromWorld != null) {
-			taskToUnbanFromWorld.cancel(false);
-			taskToUnbanFromWorld = null;
-		}
-	}
+    private void cancelUnbanFromWorld() {
+        if (taskToUnbanFromWorld != null) {
+            taskToUnbanFromWorld.cancel(false);
+            taskToUnbanFromWorld = null;
+        }
+    }
 
-	public String getBannedFromWorldBy() {
-		return bannedFromWorldBy;
-	}
+    public String getBannedFromWorldBy() {
+        return bannedFromWorldBy;
+    }
 
-	public String getBannedFromWorldReason() {
-		return bannedFromWorldReason;
-	}
+    public String getBannedFromWorldReason() {
+        return bannedFromWorldReason;
+    }
 
-	public String getBannedFromWorldRemainingTime() {
-		long elapsed = 0;
-		if (bannedFromWorldDuring == 0) {
-			return "indetermin?";
-		} else {
-			elapsed = bannedFromWorldDuring - (Calendar.getInstance().getTimeInMillis() - bannedFromWorldDate.getTime());
-			return HumanTime.approximately(elapsed - (elapsed % 1000));
-		}
-	}
+    public String getBannedFromWorldRemainingTime() {
+        long elapsed = 0;
+        if (bannedFromWorldDuring == 0) {
+            return "indetermin?";
+        } else {
+            elapsed = bannedFromWorldDuring - (Calendar.getInstance().getTimeInMillis() - bannedFromWorldDate.getTime());
+            return HumanTime.approximately(elapsed - (elapsed % 1000));
+        }
+    }
 
-	public void setBannedFromWorld(String by, String reason, long duration, Date date) {
-		bannedFromWorld = true;
-		bannedFromWorldBy = by;
-		bannedFromWorldDate = date;
-		bannedFromWorldDuring = duration;
-		bannedFromWorldReason = reason;
-	}
+    public void setBannedFromWorld(String by, String reason, long duration, Date date) {
+        bannedFromWorld = true;
+        bannedFromWorldBy = by;
+        bannedFromWorldDate = date;
+        bannedFromWorldDuring = duration;
+        bannedFromWorldReason = reason;
+    }
 
-	public void increaseWordBanTime() {
-		this.wordBanTime += wordBanTime;
-	}
+    public void increaseWordBanTime() {
+        this.wordBanTime += wordBanTime;
+    }
 
-	public int getWordBanTime() {
-		return this.wordBanTime;
-	}
+    public int getWordBanTime() {
+        return this.wordBanTime;
+    }
 
 	public int getUseAutoGroup() {
 		return useAutoGroup;
@@ -2502,6 +2531,14 @@ public class Player extends Creature {
 
 	public void setUseAutoGroup(int useAutoGroup) {
 		this.useAutoGroup = useAutoGroup;
+	}
+
+	public boolean isUseRobot() {
+		return robot;
+	}
+
+	public void setUseRobot(boolean robot) {
+		this.robot = robot;
 	}
 
 	public int getRobotId() {
@@ -2575,5 +2612,18 @@ public class Player extends Creature {
 
 	public void setInLiveParty(boolean isInLiveParty) {
 		this.isInLiveParty = isInLiveParty;
+	}
+	public FastList<WorldBuff> getWorldBuffList() {
+		return worldBuff;
+	}
+
+	public void addWorldBuff(WorldBuff buff) {
+		if (worldBuff == null) {
+			worldBuff = FastList.newInstance();
+		}
+		worldBuff.add(buff);
+	}
+	public void onLoggedOut() {
+		requester.denyAll();
 	}
 }

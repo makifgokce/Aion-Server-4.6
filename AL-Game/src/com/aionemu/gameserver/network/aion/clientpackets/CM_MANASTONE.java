@@ -21,7 +21,6 @@ import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.model.templates.item.ItemCategory;
 import com.aionemu.gameserver.model.templates.item.actions.EnchantItemAction;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
@@ -44,8 +43,6 @@ public class CM_MANASTONE extends AionClientPacket {
 	private int stoneUniqueId;
 	private int targetItemUniqueId;
 	private int supplementUniqueId;
-	@SuppressWarnings("unused")
-	private ItemCategory actionCategory;
 
 	/**
 	 * @param opcode
@@ -79,15 +76,15 @@ public class CM_MANASTONE extends AionClientPacket {
 		Player player = getConnection().getActivePlayer();
 		VisibleObject obj = player.getKnownList().getObject(npcObjId);
 
+		Item targetItem = player.getEquipment().getEquippedItemByObjId(targetItemUniqueId);
+		if (targetItem == null) {
+			targetItem = player.getInventory().getItemByObjId(targetItemUniqueId);
+		}
 		switch (actionType) {
 			case 1: // enchant stone
 			case 2: // add manastone
 				EnchantItemAction action = new EnchantItemAction();
 				Item manastone = player.getInventory().getItemByObjId(stoneUniqueId);
-				Item targetItem = player.getEquipment().getEquippedItemByObjId(targetItemUniqueId);
-				if (targetItem == null) {
-					targetItem = player.getInventory().getItemByObjId(targetItemUniqueId);
-				}
 				if (action.canAct(player, manastone, targetItem)) {
 					Item supplement = player.getInventory().getItemByObjId(supplementUniqueId);
 					if (supplement != null) {
@@ -99,7 +96,10 @@ public class CM_MANASTONE extends AionClientPacket {
 				}
 				break;
 			case 3: // remove manastone
-				long price = PricesService.getPriceForService(500, player.getRace());
+				double priceRate = PricesService.getGlobalPrices(player.getRace()) * .01;
+				double taxRate = PricesService.getTaxes(player.getRace()) * .01;
+				int level = targetItem.getItemTemplate().getLevel();
+				int price = (int) (priceRate * taxRate * level * 10);
 				if (player.getInventory().getKinah() < price) {
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_NOT_ENOUGH_KINAH(price));
 					return;
@@ -115,4 +115,5 @@ public class CM_MANASTONE extends AionClientPacket {
 				break;
 		}
 	}
+
 }

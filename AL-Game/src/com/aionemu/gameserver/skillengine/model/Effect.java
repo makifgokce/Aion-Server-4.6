@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import javolution.util.FastMap;
-
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.controllers.attack.AttackStatus;
 import com.aionemu.gameserver.controllers.observer.ActionObserver;
@@ -59,6 +57,8 @@ import com.aionemu.gameserver.skillengine.periodicaction.PeriodicActions;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 
+import javolution.util.FastMap;
+
 /**
  * @author ATracer
  * @modified by Wakizashi
@@ -85,6 +85,7 @@ public class Effect implements StatOwner {
 	private float targetX = 0;
 	private float targetY = 0;
 	private float targetZ = 0;
+    private int mpShield = 0;
 	private boolean isPhysicalState = false;
 	private boolean isMagicalState = false;
 	/**
@@ -173,6 +174,7 @@ public class Effect implements StatOwner {
 	 */
 	private int accModBoost = 0;
 	private EffectResult effectResult = EffectResult.NORMAL;
+
 
 	public final Skill getSkill() {
 		return skill;
@@ -341,6 +343,16 @@ public class Effect implements StatOwner {
 	public boolean isMphealInstant() {
 		Effects effects = skillTemplate.getEffects();
 		return effects != null && effects.isMpHealInstant();
+	}
+
+	public boolean isMpAttack() {
+		Effects effects = skillTemplate.getEffects();
+		return effects != null && (effects.isMpAttackInstant() || effects.isMpAttack());
+	}
+
+	public boolean isFpHeal() {
+		Effects effects = skillTemplate.getEffects();
+		return effects != null && effects.isFpHeal();
 	}
 
 	public boolean isToggle() {
@@ -1320,8 +1332,6 @@ public class Effect implements StatOwner {
 			case 18214:
 			case 1789:
 				return 30;
-			case 1774:// Cursecloud
-			case 2225:
             case 19666:
             case 8253:
             case 8308:
@@ -1330,6 +1340,11 @@ public class Effect implements StatOwner {
             case 8712:
             case 8808:
 				return 40; // need 2 cleric dispels or potions
+
+			case 1774:// Cursecloud
+			case 2225:
+			case 2877:
+				return 210; // need 7 cleric dispels or potions
 			case 19512:
 			case 19513: // need find "rule" in templates why those are not
 						// dispellable.
@@ -1445,4 +1460,14 @@ public class Effect implements StatOwner {
 	public void setIsMagicalState(boolean isMagicalState) {
 		this.isMagicalState = isMagicalState;
 	}
+
+	public int getMpShield()
+    {
+      return this.mpShield;
+    }
+
+    public void setMpShield(int mpShield)
+    {
+      this.mpShield = mpShield;
+    }
 }

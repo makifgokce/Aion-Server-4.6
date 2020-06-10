@@ -21,6 +21,7 @@ import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.skillengine.model.Skill;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.WorldMapType;
 
@@ -42,7 +43,7 @@ public class PrisonRestrictions extends AbstractRestrictions {
 	@Override
 	public boolean canAttack(Player player, VisibleObject target) {
 		if (isInPrison(player)) {
-			PacketSendUtility.sendMessage(player, "You cannot attack in prison!");
+			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300034));
 			return false;
 		}
 
@@ -52,7 +53,7 @@ public class PrisonRestrictions extends AbstractRestrictions {
 	@Override
 	public boolean canUseSkill(Player player, Skill skill) {
 		if (isInPrison(player)) {
-			PacketSendUtility.sendMessage(player, "You cannot use skills in prison!");
+			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1400904));
 			return false;
 		}
 
@@ -67,7 +68,7 @@ public class PrisonRestrictions extends AbstractRestrictions {
 	@Override
 	public boolean canChat(Player player) {
 		if (isInPrison(player)) {
-			PacketSendUtility.sendMessage(player, "You cannot chat in prison!");
+			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300811)); // Sohbet fonksiyonunu kullanamazsın.
 			return false;
 		}
 
@@ -107,7 +108,7 @@ public class PrisonRestrictions extends AbstractRestrictions {
 	@Override
 	public boolean canUseItem(Player player, Item item) {
 		if (isInPrison(player)) {
-			PacketSendUtility.sendMessage(player, "You cannot use item in prison!");
+			PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1400904));
 			return false;
 		}
 		return true;

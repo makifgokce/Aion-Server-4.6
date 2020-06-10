@@ -20,13 +20,16 @@ package com.aionemu.gameserver.network.aion.clientpackets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.aionemu.commons.database.dao.DAOManager;
+import com.aionemu.gameserver.dao.PlayerDAO;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_BLOCK_RESPONSE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.services.SocialService;
-import com.aionemu.gameserver.world.World;
+import com.aionemu.gameserver.utils.Util;
 
 /**
  * @author Ben
@@ -36,7 +39,7 @@ public class CM_BLOCK_ADD extends AionClientPacket {
 	private static Logger log = LoggerFactory.getLogger(CM_BLOCK_ADD.class);
 	private String targetName;
 	private String reason;
-
+	private PlayerCommonData pcd;
 	public CM_BLOCK_ADD(int opcode, State state, State... restStates) {
 		super(opcode, state, restStates);
 	}
@@ -56,29 +59,27 @@ public class CM_BLOCK_ADD extends AionClientPacket {
 	@Override
 	protected void runImpl() {
 
-		Player activePlayer = getConnection().getActivePlayer();
-
-		Player targetPlayer = World.getInstance().findPlayer(targetName);
+		final Player activePlayer = getConnection().getActivePlayer();
+		pcd = DAOManager.getDAO(PlayerDAO.class).loadPlayerCommonDataByName(Util.convertName(targetName));
 
 		// Trying to block self
 		if (activePlayer.getName().equalsIgnoreCase(targetName)) {
 			sendPacket(new SM_BLOCK_RESPONSE(SM_BLOCK_RESPONSE.CANT_BLOCK_SELF, targetName));
 		} // List full
-		else if (activePlayer.getBlockList().isFull()) {
+		else if (activePlayer.getCommonData().getBlockList().isFull()) {
 			sendPacket(new SM_BLOCK_RESPONSE(SM_BLOCK_RESPONSE.LIST_FULL, targetName));
 		} // Player offline
-		else if (targetPlayer == null) {
+		else if (pcd == null) {
 			sendPacket(new SM_BLOCK_RESPONSE(SM_BLOCK_RESPONSE.TARGET_NOT_FOUND, targetName));
 		} // Player is your friend
-		else if (activePlayer.getFriendList().getFriend(targetPlayer.getObjectId()) != null) {
+		else if (activePlayer.getCommonData().getFriendList().getFriend(pcd.getPlayerObjId()) != null) {
 			sendPacket(SM_SYSTEM_MESSAGE.STR_BLOCKLIST_NO_BUDDY);
 		} // Player already blocked
-		else if (activePlayer.getBlockList().contains(targetPlayer.getObjectId())) {
+		else if (activePlayer.getCommonData().getBlockList().contains(pcd.getPlayerObjId())) {
 			sendPacket(SM_SYSTEM_MESSAGE.STR_BLOCKLIST_ALREADY_BLOCKED);
 		} // Try and block player
-		else if (!SocialService.addBlockedUser(activePlayer, targetPlayer, reason)) {
-			log.error("Failed to add " + targetPlayer.getName() + " to the block list for " + activePlayer.getName() + " - check database setup.");
+		else if (!SocialService.addBlockedUser(activePlayer, pcd, reason)) {
+			log.error("Failed to add " + pcd.getName() + " to the block list for " + activePlayer.getName() + " - check database setup.");
 		}
-
 	}
 }

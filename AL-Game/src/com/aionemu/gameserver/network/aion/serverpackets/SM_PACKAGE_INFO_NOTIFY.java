@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
 import com.aionemu.gameserver.network.aion.AionConnection;
@@ -25,14 +24,22 @@ import com.aionemu.gameserver.network.aion.AionServerPacket;
  */
 public class SM_PACKAGE_INFO_NOTIFY extends AionServerPacket {
 
-    private int count;
+	private int count;
+	private int packId;
+	private int time;
 
-    public SM_PACKAGE_INFO_NOTIFY(int count) {
-        this.count = count;
-    }
+	public SM_PACKAGE_INFO_NOTIFY(int count, int packId, int time) {
+		this.count = count;
+		this.packId = packId;
+		this.time = time;
+	}
 
-    @Override
-    protected void writeImpl(AionConnection con) {
-        writeH(count);
+	@Override
+	protected void writeImpl(AionConnection con) {
+		writeH(count);
+		if(count > 0) {
+			writeC(packId); // packId?
+			writeD(time); // Gold-packet Expire
+		}
 	}
 }

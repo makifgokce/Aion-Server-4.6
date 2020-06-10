@@ -17,6 +17,21 @@
 
 package com.aionemu.gameserver.dataholders;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.drop.Drop;
 import com.aionemu.gameserver.model.drop.DropGroup;
@@ -26,25 +41,6 @@ import com.aionemu.gameserver.model.templates.npc.NpcTemplate;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.procedure.TObjectProcedure;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author MrPoke
  *
@@ -53,6 +49,7 @@ public class NpcDropData {
 
 	private static Logger log = LoggerFactory.getLogger(DataManager.class);
 	private List<NpcDrop> npcDrop;
+	private static FileChannel roChannel;
 
 	/**
 	 * @return the npcDrop
@@ -76,10 +73,10 @@ public class NpcDropData {
 	@SuppressWarnings("resource")
 	public static NpcDropData load() {
 
-		List<Drop> drops = new ArrayList<Drop>();
-		List<String> names = new ArrayList<String>();
-		List<NpcDrop> npcDrops = new ArrayList<NpcDrop>();
-		FileChannel roChannel = null;
+		List<Drop> drops = new ArrayList<>();
+		List<String> names = new ArrayList<>();
+		List<NpcDrop> npcDrops = new ArrayList<>();
+		roChannel = null;
 		MappedByteBuffer buffer;
 		HashMap<Integer, ArrayList<DropGroup>> xmlGroup = DataManager.XML_NPC_DROP_DATA.getDrops();
 		try {
@@ -107,7 +104,7 @@ public class NpcDropData {
 				int npcId = buffer.getInt();
 
 				int groupCount = buffer.getInt();
-				List<DropGroup> dropGroupList = new ArrayList<DropGroup>(groupCount);
+				List<DropGroup> dropGroupList = new ArrayList<>(groupCount);
 				for (int groupIndex = 0; groupIndex < groupCount; groupIndex++) {
 					Race race;
 					byte raceId = buffer.get();
@@ -126,7 +123,7 @@ public class NpcDropData {
 					String groupName = names.get(buffer.getShort());
 
 					int dropCount = buffer.getInt();
-					List<Drop> dropList = new ArrayList<Drop>(dropCount);
+					List<Drop> dropList = new ArrayList<>(dropCount);
 					for (int dropIndex = 0; dropIndex < dropCount; dropIndex++) {
 						dropList.add(drops.get(buffer.getInt()));
 					}
@@ -134,7 +131,7 @@ public class NpcDropData {
 					dropGroupList.add(dropGroup);
 				}
         		if (xmlGroup.get(npcId) != null) {
-          			dropGroupList.addAll((Collection<DropGroup>)xmlGroup.get(npcId));
+          			dropGroupList.addAll(xmlGroup.get(npcId));
           			xmlGroup.remove(Integer.valueOf(npcId));
         		}
 				NpcDrop npcDrop = new NpcDrop(dropGroupList, npcId);
@@ -148,10 +145,10 @@ public class NpcDropData {
       		if (!xmlGroup.isEmpty()) {
         		Iterator<Map.Entry<Integer, ArrayList<DropGroup>>> iter = xmlGroup.entrySet().iterator();
         		while (iter.hasNext()) {
-          			Map.Entry<Integer, ArrayList<DropGroup>> entry = (Map.Entry)iter.next();
-          			NpcDrop npcDrop = new NpcDrop((List)entry.getValue(), ((Integer)entry.getKey()).intValue());
+          			Map.Entry<Integer, ArrayList<DropGroup>> entry = iter.next();
+          			NpcDrop npcDrop = new NpcDrop(entry.getValue(), entry.getKey().intValue());
           			npcDrops.add(npcDrop);
-          			NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(((Integer)entry.getKey()).intValue());
+          			NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(entry.getKey().intValue());
           			if (npcTemplate != null) {
             			npcTemplate.setNpcDrop(npcDrop);
           			}
@@ -172,7 +169,7 @@ public class NpcDropData {
       		catch (IOException e) {
         		log.error("Drop loader: IO error in drop Loading.");
       		}
-      		NpcDropData dropData = new NpcDropData();
+      		new NpcDropData();
 		} catch (FileNotFoundException e) {
 			log.error("Drop loader: Missing npc_drop.dat!!!");
 		} catch (IOException e) {

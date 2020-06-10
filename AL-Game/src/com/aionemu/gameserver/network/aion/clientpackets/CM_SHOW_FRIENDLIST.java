@@ -21,6 +21,7 @@ import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_FRIEND_LIST;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_MARK_FRIENDLIST;
 
 /**
  * Send when the client requests the friendlist
@@ -46,9 +47,10 @@ public class CM_SHOW_FRIENDLIST extends AionClientPacket {
 	@Override
 	protected void runImpl() {
 		final Player activePlayer = getConnection().getActivePlayer();
-		if (activePlayer != null) {
+		if (activePlayer != null && !activePlayer.getCommonData().getFriendList().getIsFriendListSent()) {
 			sendPacket(new SM_FRIEND_LIST());
-			activePlayer.getFriendList().setIsFriendListSent(true);
+			activePlayer.getCommonData().getFriendList().setIsFriendListSent(true);
 		}
+		sendPacket(new SM_MARK_FRIENDLIST());
 	}
 }

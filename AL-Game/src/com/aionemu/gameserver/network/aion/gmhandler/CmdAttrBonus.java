@@ -19,6 +19,7 @@ package com.aionemu.gameserver.network.aion.gmhandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +54,7 @@ public class CmdAttrBonus extends AbstractGMHandler implements StatOwner {
 			return;
 		}
 
-		String func = matcher.group(2).toUpperCase();
+		String func = matcher.group(2).toUpperCase(Locale.forLanguageTag("en"));
 		Integer value = Integer.parseInt(matcher.group(3));
 
 		System.out.println("func: " + func);

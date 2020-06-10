@@ -28,7 +28,7 @@ import com.aionemu.gameserver.skillengine.model.Effect;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "XPBoostEffect")
-public class XPBoostEffect extends BufEffect {
+public class XPBoostEffect extends BuffEffect {
 
 	@Override
 	public void calculate(Effect effect) {

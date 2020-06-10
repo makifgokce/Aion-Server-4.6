@@ -17,6 +17,8 @@
 
 package admincommands;
 
+import java.util.Locale;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.dao.PlayerDAO;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -66,10 +68,10 @@ public class Ban extends AdminCommand {
 			return;
 		}
 
-		byte type = 3; // Default: full
+		byte type = 1; // Default: full
 		if (params.length > 1) {
 			// Smart Matching
-			String stype = params[1].toLowerCase();
+			String stype = params[1].toLowerCase(Locale.forLanguageTag("en"));
 			if (("account").startsWith(stype)) {
 				type = 1;
 			} else if (("ip").startsWith(stype)) {

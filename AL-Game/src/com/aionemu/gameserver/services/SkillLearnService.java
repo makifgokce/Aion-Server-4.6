@@ -35,6 +35,8 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
  */
 public class SkillLearnService {
 
+	private static Integer skillLevel;
+
 	/**
 	 * @param player
 	 */
@@ -165,7 +167,7 @@ public class SkillLearnService {
 
 	public static void removeSkill(Player player, int skillId) {
 		if (player.getSkillList().isSkillPresent(skillId)) {
-			Integer skillLevel = player.getSkillList().getSkillLevel(skillId);
+			skillLevel = player.getSkillList().getSkillLevel(skillId);
 			if (skillLevel == null) {
 				skillLevel = 1;
 			}

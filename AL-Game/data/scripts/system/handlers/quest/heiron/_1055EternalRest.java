@@ -17,18 +17,29 @@
 
 package quest.heiron;
 
-import com.aionemu.gameserver.model.gameobjects.Creature;
-import com.aionemu.gameserver.model.gameobjects.VisibleObject;
+import static ch.lambdaj.Lambda.maxFrom;
+
+import java.util.Collection;
+import java.util.HashSet;
+
+import com.aionemu.gameserver.configs.main.GroupConfig;
 import com.aionemu.gameserver.model.DialogAction;
+import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.gameobjects.state.CreatureState;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
+import com.aionemu.gameserver.services.drop.DropRegistrationService;
+import com.aionemu.gameserver.services.drop.DropService;
+import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
+import com.aionemu.gameserver.utils.audit.AuditLogger;
 
 /**
  * @author Rhys2002
@@ -161,13 +172,9 @@ public class _1055EternalRest extends QuestHandler {
 				case SETPRO3:
 					if (var == 2) {
 						if (player.getInventory().getItemCountByItemId(182201609) == 0) {
-							if (!giveQuestItem(env, 182201609, 1)) {
-								return true;
-							}
 								VisibleObject target = player.getTarget();
 								Creature creature = (Creature) target;
-								creature.getController().onAttack(player, creature.getLifeStats().getMaxHp() + 1, true);
-								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
+								dropQuestItems(player, creature);
 								return true;
 						}
 					}
@@ -189,13 +196,9 @@ public class _1055EternalRest extends QuestHandler {
 				case SETPRO3:
 					if (var == 2) {
 						if (player.getInventory().getItemCountByItemId(182201610) == 0) {
-							if (!giveQuestItem(env, 182201610, 1)) {
-								return true;
-							}
 								VisibleObject target = player.getTarget();
 								Creature creature = (Creature) target;
-								creature.getController().onAttack(player, creature.getLifeStats().getMaxHp() + 1, true);
-								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
+								dropQuestItems(player, creature);
 								return true;
 						}
 					}
@@ -217,13 +220,9 @@ public class _1055EternalRest extends QuestHandler {
 				case SETPRO3:
 					if (var == 2) {
 						if (player.getInventory().getItemCountByItemId(182201611) == 0) {
-							if (!giveQuestItem(env, 182201611, 1)) {
-								return true;
-							}
 								VisibleObject target = player.getTarget();
 								Creature creature = (Creature) target;
-								creature.getController().onAttack(player, creature.getLifeStats().getMaxHp() + 1, true);
-								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
+								dropQuestItems(player, creature);
 								return true;
 						}
 					}
@@ -245,13 +244,9 @@ public class _1055EternalRest extends QuestHandler {
 				case SETPRO3:
 					if (var == 2) {
 						if (player.getInventory().getItemCountByItemId(182201612) == 0) {
-							if (!giveQuestItem(env, 182201612, 1)) {
-								return true;
-							}
 								VisibleObject target = player.getTarget();
 								Creature creature = (Creature) target;
-								creature.getController().onAttack(player, creature.getLifeStats().getMaxHp() + 1, true);
-								PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
+								dropQuestItems(player, creature);
 								return true;
 						}
 					}
@@ -265,5 +260,32 @@ public class _1055EternalRest extends QuestHandler {
 			}
 		}
 		return false;
+	}
+
+	private void dropQuestItems(Player player, Creature npc) {
+		if (npc.isInState(CreatureState.DEAD)) {
+			AuditLogger.info(player, "Attempted multiple Chest looting!");
+			return;
+		}
+
+		npc.getController().onDie(player);
+		Collection<Player> players = new HashSet<>();
+		if (player.isInGroup2()) {
+			for (Player member : player.getPlayerGroup2().getOnlineMembers()) {
+				if (MathUtil.isIn3dRange(member, npc, GroupConfig.GROUP_MAX_DISTANCE)) {
+					players.add(member);
+				}
+			}
+		} else if (player.isInAlliance2()) {
+			for (Player member : player.getPlayerAlliance2().getOnlineMembers()) {
+				if (MathUtil.isIn3dRange(member, npc, GroupConfig.GROUP_MAX_DISTANCE)) {
+					players.add(member);
+				}
+			}
+		} else {
+			players.add(player);
+		}
+		DropRegistrationService.getInstance().registerDrop((Npc) npc, player, maxFrom(players).getLevel(), players);
+		DropService.getInstance().requestDropList(player, npc.getObjectId());
 	}
 }

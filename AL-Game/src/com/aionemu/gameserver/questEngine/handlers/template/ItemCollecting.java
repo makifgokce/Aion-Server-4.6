@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.questEngine.handlers.template;
 
 import java.util.HashSet;
@@ -22,9 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
-import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
@@ -36,17 +35,16 @@ import com.aionemu.gameserver.services.QuestService;
  */
 public class ItemCollecting extends QuestHandler {
 
-	private final Set<Integer> startNpcs = new HashSet<Integer>();
-	private final Set<Integer> actionItems = new HashSet<Integer>();
-	private final Set<Integer> endNpcs = new HashSet<Integer>();
+	private final Set<Integer> startNpcs = new HashSet<>();
+	private final Set<Integer> actionItems = new HashSet<>();
+	private final Set<Integer> endNpcs = new HashSet<>();
 	private final int questMovie;
 	private final int nextNpcId;
 	private final int startDialogId;
 	private final int startDialogId2;
 	private final int itemId;
 
-	public ItemCollecting(int questId, List<Integer> startNpcIds, int nextNpcId, List<Integer> actionItemIds, List<Integer> endNpcIds, int questMovie,
-			int startDialogId, int startDialogId2, int itemId) {
+	public ItemCollecting(int questId, List<Integer> startNpcIds, int nextNpcId, List<Integer> actionItemIds, List<Integer> endNpcIds, int questMovie, int startDialogId, int startDialogId2, int itemId) {
 		super(questId);
 		startNpcs.addAll(startNpcIds);
 		startNpcs.remove(0);
@@ -57,7 +55,8 @@ public class ItemCollecting extends QuestHandler {
 		}
 		if (endNpcIds == null) {
 			endNpcs.addAll(startNpcs);
-		} else {
+		}
+		else {
 			endNpcs.addAll(endNpcIds);
 			endNpcs.remove(0);
 		}
@@ -103,7 +102,12 @@ public class ItemCollecting extends QuestHandler {
 			if (startNpcs.isEmpty() || startNpcs.contains(targetId)) {
 				switch (dialog) {
 					case QUEST_SELECT: {
-						return sendQuestDialog(env, startDialogId != 0 ? startDialogId : 1011);
+						if (startDialogId != 0) {
+							return sendQuestDialog(env, startDialogId);
+						}
+						else {
+							return sendQuestDialog(env, 1011);
+						}
 					}
 					case SETPRO1: {
 						QuestService.startQuest(env);
@@ -123,7 +127,8 @@ public class ItemCollecting extends QuestHandler {
 					}
 				}
 			}
-		} else if (qs.getStatus() == QuestStatus.START) {
+		}
+		else if (qs.getStatus() == QuestStatus.START) {
 			int var = qs.getQuestVarById(0);
 			if (targetId == nextNpcId && var == 0) {
 				switch (dialog) {
@@ -136,18 +141,45 @@ public class ItemCollecting extends QuestHandler {
 					default:
 						break;
 				}
-			} else if (endNpcs.contains(targetId)) {
+			}
+			else if (endNpcs.contains(targetId)) {
 				switch (dialog) {
 					case QUEST_SELECT: {
-						return sendQuestDialog(env, startDialogId2 != 0 ? startDialogId2 : 2375);
+						if (startDialogId2 != 0) {
+							if (startDialogId2 == 5) {
+								qs.setStatus(QuestStatus.REWARD);
+								updateQuestStatus(env);
+							}
+							return sendQuestDialog(env, startDialogId2);
+						}
+						else {
+							return sendQuestDialog(env, 2375);
+						}
 					}
 					case CHECK_USER_HAS_QUEST_ITEM: {
-						return checkQuestItems(env, var, var, true, 5, 2716);// 1004);
-																				// //
-																				// reward
+						if (QuestService.collectItemCheck(env, true)) {
+							qs.setStatus(QuestStatus.REWARD);
+							updateQuestStatus(env);
+							return sendQuestDialog(env, 5);
+						}
+						else {
+							if (startDialogId2 != 0) { // TEMP FIX
+								return sendQuestDialog(env, 10001);
+							}
+							else {
+								return sendQuestDialog(env, 2716);
+							}
+						}
 					}
 					case CHECK_USER_HAS_QUEST_ITEM_SIMPLE: {
-						return checkQuestItemsSimple(env, var, var, true, 5, 0, 0); // reward
+						if (QuestService.collectItemCheck(env, true)) {
+							qs.setStatus(QuestStatus.REWARD);
+							updateQuestStatus(env);
+							return sendQuestDialog(env, 5);
+						}
+						else {
+							return closeDialogWindow(env);
+						}
 					}
 					case FINISH_DIALOG: {
 						return sendQuestSelectionDialog(env);
@@ -169,10 +201,12 @@ public class ItemCollecting extends QuestHandler {
 					default:
 						break;
 				}
-			} else if (targetId != 0 && actionItems.contains(targetId)) {
+			}
+			else if (targetId != 0 && actionItems.contains(targetId)) {
 				return true; // looting
 			}
-		} else if (qs.getStatus() == QuestStatus.REWARD) {
+		}
+		else if (qs.getStatus() == QuestStatus.REWARD) {
 			if (endNpcs.contains(targetId)) {
 				if (itemId != 0) {
 					removeQuestItem(env, itemId, 1);

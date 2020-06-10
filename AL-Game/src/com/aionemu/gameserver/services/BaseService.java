@@ -17,6 +17,11 @@
 
 package com.aionemu.gameserver.services;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.base.BaseLocation;
@@ -24,13 +29,11 @@ import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_NPC_INFO;
 import com.aionemu.gameserver.services.base.Base;
 import com.aionemu.gameserver.utils.PacketSendUtility;
+import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.knownlist.Visitor;
-import javolution.util.FastMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import javolution.util.FastMap;
 
 /**
  * @author Source
@@ -69,14 +72,21 @@ public class BaseService {
 			if (active.containsKey(id)) {
 				return;
 			}
-			base = new Base<BaseLocation>(getBaseLocation(id));
+			base = new Base<>(getBaseLocation(id));
 			active.put(id, base);
 		}
 
-		base.start();
+		ThreadPoolManager.getInstance().schedule(new Runnable() {
+			@Override
+			public void run() {
+				base.start();
+				broadcastUpdate(getBaseLocation(id));
+			}
+		}, 15000);
+
 	}
 
-	public void stop(int id) {
+	public void stop(final int id) {
 		if (!isActive(id)) {
 			log.info("Trying to stop not active base:" + id);
 			return;
@@ -103,8 +113,8 @@ public class BaseService {
 		}
 
 		getActiveBase(id).setRace(race);
-		stop(id);
 		broadcastUpdate(getBaseLocation(id));
+		stop(id);
 	}
 
 	public boolean isActive(int id) {

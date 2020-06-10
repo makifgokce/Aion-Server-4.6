@@ -17,6 +17,12 @@
 
 package com.aionemu.gameserver.services.item;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.main.LoggingConfig;
 import com.aionemu.gameserver.dao.ItemStoneListDAO;
@@ -42,11 +48,6 @@ import com.aionemu.gameserver.utils.idfactory.IDFactory;
 import com.aionemu.gameserver.world.World;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author KID
@@ -129,7 +130,7 @@ public class ItemService {
 		while (!inventory.isFull(itemTemplate.getExtraInventoryId()) && count > 0) {
 			Item newItem = ItemFactory.newItem(itemTemplate.getTemplateId());
 
-			if (newItem.getExpireTime() != 0) {
+			if (newItem.getItemTemplate().getExpireTime() != 0) {
 				ExpireTimerTask.getInstance().addTask(newItem, player);
 			}
 			if (sourceItem != null) {
@@ -161,6 +162,9 @@ public class ItemService {
 		}
 		if (sourceItem.isSoulBound()) {
 			newItem.setSoulBound(true);
+		}
+		if (sourceItem.getBonusEnchant() > 0) {
+			newItem.setBonusEnchant(sourceItem.getBonusEnchant());
 		}
 		newItem.setBonusNumber(sourceItem.getBonusNumber());
 		newItem.setRandomStats(sourceItem.getRandomStats());
@@ -321,4 +325,5 @@ public class ItemService {
 
         return newItem;
     }
+
 }

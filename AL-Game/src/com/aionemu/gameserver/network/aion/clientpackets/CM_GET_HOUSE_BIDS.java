@@ -44,16 +44,18 @@ public class CM_GET_HOUSE_BIDS extends AionClientPacket {
 
 	@Override
 	protected void runImpl() {
-		Player player = getConnection().getActivePlayer();
-		HouseBidEntry playerBid = HousingBidService.getInstance().getLastPlayerBid(player.getObjectId());
+		if(this.getConnection().getState() == State.IN_GAME) {
+			Player player = getConnection().getActivePlayer();
+			HouseBidEntry playerBid = HousingBidService.getInstance().getLastPlayerBid(player.getObjectId());
 
-		// TODO: [RR] check player bids placement in sniffs, it's just a guess ;)
-		List<HouseBidEntry> houseBids = HousingBidService.getInstance().getHouseBidEntries(player.getRace());
-		ListSplitter<HouseBidEntry> splitter = new ListSplitter<HouseBidEntry>(houseBids, 181);
-		while (!splitter.isLast()) {
-			List<HouseBidEntry> packetBids = splitter.getNext();
-			HouseBidEntry playerData = splitter.isLast() ? playerBid : null;
-			PacketSendUtility.sendPacket(player, new SM_HOUSE_BIDS(splitter.isFirst(), splitter.isLast(), playerData, packetBids));
+			// TODO: [RR] check player bids placement in sniffs, it's just a guess ;)
+			List<HouseBidEntry> houseBids = HousingBidService.getInstance().getHouseBidEntries(player.getRace());
+			ListSplitter<HouseBidEntry> splitter = new ListSplitter<>(houseBids, 181);
+			while (!splitter.isLast()) {
+				List<HouseBidEntry> packetBids = splitter.getNext();
+				HouseBidEntry playerData = splitter.isLast() ? playerBid : null;
+				PacketSendUtility.sendPacket(player, new SM_HOUSE_BIDS(splitter.isFirst(), splitter.isLast(), playerData, packetBids));
+			}
 		}
 	}
 }

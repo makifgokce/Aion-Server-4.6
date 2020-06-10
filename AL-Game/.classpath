@@ -27,6 +27,6 @@
 	<classpathentry kind="lib" path="libs/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="lib" path="libs/trove4j-3.0.3.jar"/>
 	<classpathentry kind="lib" path="libs/xercesImpl-2.8.1.jar"/>
-	<classpathentry kind="lib" path="libs/al-commons.jar"/>
+	<classpathentry kind="lib" path="libs/al-commons.jar" sourcepath="libs/al-commons.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -38,6 +38,8 @@ import com.aionemu.gameserver.services.base.Base;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
 
+import java.util.Locale;
+
 import org.apache.commons.lang.math.NumberUtils;
 
 @SuppressWarnings("rawtypes")
@@ -45,7 +47,7 @@ public class BaseCommand extends AdminCommand {
 
 	private static final String COMMAND_LIST = "list";
 	private static final String COMMAND_CAPTURE = "capture";
-	private static final String COMMAND_ASSAULT = "assault";
+	//private static final String COMMAND_ASSAULT = "assault";
 
 	public BaseCommand() {
 		super("base");
@@ -65,9 +67,9 @@ public class BaseCommand extends AdminCommand {
 		else if (COMMAND_CAPTURE.equals(params[0])) {
 			capture(player, params);
 		}
-		else if (COMMAND_ASSAULT.equals(params[0])) {
+/**		else if (COMMAND_ASSAULT.equals(params[0])) {
 			assault(player, params);
-		}
+		}*/
 	}
 
 	protected boolean isValidBaseLocationId(Player player, int baseId) {
@@ -103,7 +105,7 @@ public class BaseCommand extends AdminCommand {
 		// check if params2 is race
 		Race race = null;
 		try {
-			race = Race.valueOf(params[2].toUpperCase());
+			race = Race.valueOf(params[2].toUpperCase(Locale.forLanguageTag("en")));
 		}
 		catch (IllegalArgumentException e) {
 			//ignore
@@ -122,7 +124,7 @@ public class BaseCommand extends AdminCommand {
 			BaseService.getInstance().capture(baseId, race);
 		}
 	}
-
+/**
 	protected void assault(Player player, String[] params) {
 		if (params.length < 3 || !NumberUtils.isNumber(params[1])) {
 			showHelp(player);
@@ -161,7 +163,7 @@ public class BaseCommand extends AdminCommand {
 			}
 		}
 	}
-
+*/
 	protected void showHelp(Player player) {
 		PacketSendUtility.sendMessage(player, "AdminCommand //base Help\n"
 				+ "//base list\n"

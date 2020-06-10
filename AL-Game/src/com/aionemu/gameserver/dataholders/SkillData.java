@@ -111,4 +111,8 @@ public class SkillData {
 		}
 		return cooldownGroups.get(cooldownId);
 	}
+	
+	public TIntObjectHashMap<SkillTemplate> getSkillData() {
+        return skillData;
+    }
 }

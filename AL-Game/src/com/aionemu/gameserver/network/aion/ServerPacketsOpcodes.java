@@ -32,10 +32,10 @@ import com.aionemu.gameserver.network.aion.serverpackets.*;
  */
 public class ServerPacketsOpcodes {
 
-	private static Map<Class<? extends AionServerPacket>, Integer> opcodes = new HashMap<Class<? extends AionServerPacket>, Integer>();
+	private static Map<Class<? extends AionServerPacket>, Integer> opcodes = new HashMap<>();
 
 	static {
-		Set<Integer> idSet = new HashSet<Integer>();
+		Set<Integer> idSet = new HashSet<>();
 
 		addPacketOpcode(SM_VERSION_CHECK.class, 0x00, idSet); // 4.5
 		addPacketOpcode(SM_STATS_INFO.class, 0x01, idSet); // 4.5
@@ -45,6 +45,7 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_STATUPDATE_DP.class, 0x06, idSet); // 4.5
 		addPacketOpcode(SM_DP_INFO.class, 0x07, idSet); // 4.5
 		addPacketOpcode(SM_STATUPDATE_EXP.class, 0x08, idSet); // 4.5
+		// 0x09
 		addPacketOpcode(SM_NPC_ASSEMBLER.class, 0x0A, idSet); // 4.5
 		addPacketOpcode(SM_LEGION_UPDATE_NICKNAME.class, 0x0B, idSet); // 4.5
 		addPacketOpcode(SM_LEGION_TABS.class, 0x0C, idSet); // 4.5
@@ -53,6 +54,8 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_PLAYER_SPAWN.class, 0x0F, idSet); // 4.5
 		addPacketOpcode(SM_FORTRESS_INFO.class, 0xF3, idSet); // 4.5
 		addPacketOpcode(SM_GATHERABLE_INFO.class, 0x11, idSet); // 4.5
+		// 0x12
+		// 0x13
 		addPacketOpcode(SM_TELEPORT_LOC.class, 0x14, idSet); // 4.5
 		addPacketOpcode(SM_PLAYER_MOVE.class, 0x15, idSet); // 4.5
 		addPacketOpcode(SM_DELETE.class, 0x16, idSet); // 4.5
@@ -80,25 +83,35 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_SKILL_LIST.class, 0x2C, idSet); // 4.5
 		addPacketOpcode(SM_SKILL_REMOVE.class, 0x2D, idSet); // 4.5
 		addPacketOpcode(SM_SKILL_ACTIVATION.class, 0x2E, idSet); // 4.5
+		// 0x2F
+		// 0x30
 		addPacketOpcode(SM_ABNORMAL_STATE.class, 0x31, idSet); // 4.5
 		addPacketOpcode(SM_ABNORMAL_EFFECT.class, 0x32, idSet); // 4.5
 		addPacketOpcode(SM_SKILL_COOLDOWN.class, 0x33, idSet); // 4.5
 		addPacketOpcode(SM_QUESTION_WINDOW.class, 0x34, idSet); // 4.5
+		addPacketOpcode(SM_DUEL_REQUEST_CANCEL.class, 0x35, idSet); // 4.5
 		addPacketOpcode(SM_ATTACK.class, 0x36, idSet); // 4.5
 		addPacketOpcode(SM_MOVE.class, 0x37, idSet); // 4.5
+		// 0x38
 		addPacketOpcode(SM_HEADING_UPDATE.class, 0x39, idSet); // 4.5
 		addPacketOpcode(SM_TRANSFORM.class, 0x3A, idSet); // 4.5
+		// 0x3B CM_LEGION_TABS
 		addPacketOpcode(SM_DIALOG_WINDOW.class, 0x3C, idSet); // 4.5
+		// 0x3D
 		addPacketOpcode(SM_SELL_ITEM.class, 0x3E, idSet); // 4.5
+		// 0x3F CM_LEGION_TABS
 		addPacketOpcode(SM_VIEW_PLAYER_DETAILS.class, 0x41, idSet); // 4.5
+		// 0x42
 		addPacketOpcode(SM_WEATHER.class, 0x43, idSet); // 4.5
 		addPacketOpcode(SM_PLAYER_STATE.class, 0x44, idSet); // 4.5
+		addPacketOpcode(SM_RECALL_INSTANT.class, 0x45, idSet); // 4.5
 		addPacketOpcode(SM_LEVEL_UPDATE.class, 0x46, idSet); // 4.5
 		addPacketOpcode(SM_QUEST_LIST.class, 0x47, idSet); // 4.5
 		addPacketOpcode(SM_KEY.class, 0x48, idSet); // 4.5
 		addPacketOpcode(SM_SUMMON_PANEL_REMOVE.class, 0x49, idSet); // 4.5
 		addPacketOpcode(SM_EXCHANGE_REQUEST.class, 0x4A, idSet); // 4.5
 		addPacketOpcode(SM_EXCHANGE_ADD_ITEM.class, 0x4B, idSet); // 4.5
+		// 0x4C
 		addPacketOpcode(SM_EXCHANGE_ADD_KINAH.class, 0x4D, idSet); // 4.5
 		addPacketOpcode(SM_EXCHANGE_CONFIRMATION.class, 0x4E, idSet); // 4.5
 		addPacketOpcode(SM_EMOTION_LIST.class, 0x4F, idSet); // 4.5
@@ -113,12 +126,24 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_SHOW_NPC_ON_MAP.class, 0x59, idSet); // 4.5
 		addPacketOpcode(SM_GROUP_INFO.class, 0x5A, idSet); // 4.5
 		addPacketOpcode(SM_GROUP_MEMBER_INFO.class, 0x5B, idSet); // 4.5
+		// 0x5C
+		// 0x5D
+		// 0x5E
+		// 0x5F
+		// 0x60
+		// 0x61
 		addPacketOpcode(SM_QUIT_RESPONSE.class, 0x62, idSet); // 4.5
-		addPacketOpcode(SM_CHAT_WINDOW.class, 0x63, idSet); // 4.5// //4.5
+		addPacketOpcode(SM_CHAT_WINDOW.class, 0x63, idSet); // 4.5
+		// 0x64
 		addPacketOpcode(SM_PET.class, 0x65, idSet); // 4.5
+		// 0x66
 		addPacketOpcode(SM_ITEM_COOLDOWN.class, 0x67, idSet); // 4.5
 		addPacketOpcode(SM_UPDATE_NOTE.class, 0x68, idSet); // 4.5
 		addPacketOpcode(SM_PLAY_MOVIE.class, 0x69, idSet); // 4.5
+		// 0x6A
+		// 0x6B
+		// 0x6C
+		// 0x6D // bilinmeyen hata
 		addPacketOpcode(SM_LEGION_INFO.class, 0x6E, idSet); // 4.5
 		addPacketOpcode(SM_LEGION_ADD_MEMBER.class, 0x6F, idSet); // 4.5
 		addPacketOpcode(SM_LEGION_LEAVE_MEMBER.class, 0x70, idSet); // 4.5
@@ -126,30 +151,40 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_LEGION_UPDATE_TITLE.class, 0x72, idSet); // 4.5
 		// addPacketOpcode(SM_ATTACK_STATUS_MESSAGE.class, 0x73, idSet); //4.5 TODO
 		addPacketOpcode(SM_HOUSE_REGISTRY.class, 0x74, idSet); // 4.5
+		// 0x75
+		// 0x76
 		addPacketOpcode(SM_LEGION_UPDATE_SELF_INTRO.class, 0x77, idSet); // 4.5
+		// 0x78
 		addPacketOpcode(SM_INSTANCE_SCORE.class, 0x79, idSet); // 4.5
-		// addPacketOpcode(SM_RIFT_STATUS.class, 0x8C, idSet); //4.5
 		addPacketOpcode(SM_AUTO_GROUP.class, 0x7A, idSet); // 4.5
 		addPacketOpcode(SM_QUEST_COMPLETED_LIST.class, 0x7B, idSet); // 4.5
 		addPacketOpcode(SM_QUEST_ACTION.class, 0x7C, idSet); // 4.5
+        addPacketOpcode(SM_GAMEGUARD.class, 0x7D, idSet); // 4.6
+		// 0x7E
 		addPacketOpcode(SM_NEARBY_QUESTS.class, 0x7F, idSet); // 4.5
 		addPacketOpcode(SM_PING_RESPONSE.class, 0x80, idSet); // 4.5
+		// 0x81
 		addPacketOpcode(SM_CUBE_UPDATE.class, 0x82, idSet); // 4.5
 		addPacketOpcode(SM_HOUSE_SCRIPTS.class, 0x83, idSet); // 4.5
 		addPacketOpcode(SM_FRIEND_LIST.class, 0x84, idSet); // 4.5
+		// 0x85
 		addPacketOpcode(SM_PRIVATE_STORE.class, 0x86, idSet); // 4.5
 		addPacketOpcode(SM_GROUP_LOOT.class, 0x87, idSet); // 4.5
 		addPacketOpcode(SM_ABYSS_RANK_UPDATE.class, 0x88, idSet); // 4.5
 		addPacketOpcode(SM_MAY_LOGIN_INTO_GAME.class, 0x89, idSet); // 4.5
 		addPacketOpcode(SM_ABYSS_RANKING_PLAYERS.class, 0x8A, idSet); // 4.5
 		addPacketOpcode(SM_ABYSS_RANKING_LEGIONS.class, 0x8B, idSet); // 4.5
+		// addPacketOpcode(SM_RIFT_STATUS.class, 0x8C, idSet); //4.5
 		addPacketOpcode(SM_INSTANCE_INFO.class, 0x8D, idSet); // 4.5
 		addPacketOpcode(SM_PONG.class, 0x8E, idSet); // 4.5
+		// 0x8F
 		addPacketOpcode(SM_KISK_UPDATE.class, 0x90, idSet); // 4.5
 		addPacketOpcode(SM_PRIVATE_STORE_NAME.class, 0x91, idSet); // 4.5
 		addPacketOpcode(SM_BROKER_SERVICE.class, 0x92, idSet); // 4.5
+		// 0x93
 		addPacketOpcode(SM_MOTION.class, 0x94, idSet); // 4.5
-		// addPacketOpcode(SM_95.class, 0x95, idSet); //4.5 // TODO
+		addPacketOpcode(SM_CHECK_MAIL_SIZE.class, 0x95, idSet); //4.5 // TODO
+		// 0x96
 		addPacketOpcode(SM_TRADE_IN_LIST.class, 0x97, idSet); // 4.5
 		// addPacketOpcode(SM_RELOG_RELATED.class, 0x98, idSet); //4.5 // TODO
 		// addPacketOpcode(SM_BROKER_REGISTRATION_SERVICE.class, 0x93, idSet); //4.5
@@ -166,6 +201,7 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_SUMMON_USESKILL.class, 0xA2, idSet); // 4.5
 		addPacketOpcode(SM_WINDSTREAM.class, 0xA3, idSet); // 4.5
 		addPacketOpcode(SM_WINDSTREAM_ANNOUNCE.class, 0xA4, idSet); // 4.5
+		// 0xA5
 		addPacketOpcode(SM_FIND_GROUP.class, 0xA6, idSet); // 4.5
 		addPacketOpcode(SM_REPURCHASE.class, 0xA7, idSet); // 4.5
 		addPacketOpcode(SM_WAREHOUSE_INFO.class, 0xA8, idSet); // 4.5
@@ -186,8 +222,13 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_ITEM_USAGE_ANIMATION.class, 0xB7, idSet); // 4.5
 		addPacketOpcode(SM_CUSTOM_SETTINGS.class, 0xB8, idSet); // 4.5
 		addPacketOpcode(SM_DUEL.class, 0xB9, idSet); // 4.5
+		// 0xBA
 		addPacketOpcode(SM_PET_EMOTE.class, 0xBB, idSet); // 4.5
+		// 0xBC oyundaki herşeyi sildi
+		// 0xBD
+		// 0xBE
 		addPacketOpcode(SM_QUESTIONNAIRE.class, 0xBF, idSet); // 4.5
+		// 0xC0
 		addPacketOpcode(SM_DIE.class, 0xC1, idSet); // 4.5
 		addPacketOpcode(SM_RESURRECT.class, 0xC2, idSet); // 4.5
 		addPacketOpcode(SM_FORCED_MOVE.class, 0xC3, idSet); // 4.5
@@ -207,6 +248,7 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_SIEGE_LOCATION_INFO.class, 0xD1, idSet); // 4.5
 		addPacketOpcode(SM_SIEGE_LOCATION_STATE.class, 0xD2, idSet); // 4.5
 		addPacketOpcode(SM_PLAYER_SEARCH.class, 0xD3, idSet); // 4.5
+		// 0xD4 Lejyon amblemi yükleme mesajı
 		addPacketOpcode(SM_LEGION_SEND_EMBLEM.class, 0xD5, idSet); // 4.5
 		addPacketOpcode(SM_LEGION_SEND_EMBLEM_DATA.class, 0xD6, idSet); // 4.5
 		addPacketOpcode(SM_LEGION_UPDATE_EMBLEM.class, 0xD7, idSet); // 4.5
@@ -220,11 +262,13 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_FRIEND_NOTIFY.class, 0xE1, idSet); // 4.5
 		addPacketOpcode(SM_TOWNS_LIST.class, 0xE2, idSet); // 4.5
 		addPacketOpcode(SM_FRIEND_STATUS.class, 0xE3, idSet); // 4.5
+		// 0xE4 CM_L2AUTH_LOGIN_CHECK
 		addPacketOpcode(SM_CHANNEL_INFO.class, 0xE5, idSet); // 4.5
 		addPacketOpcode(SM_CHAT_INIT.class, 0xE6, idSet); // 4.5
 		addPacketOpcode(SM_MACRO_LIST.class, 0xE7, idSet); // 4.5
 		addPacketOpcode(SM_MACRO_RESULT.class, 0xE8, idSet); // 4.5
 		addPacketOpcode(SM_NICKNAME_CHECK_RESPONSE.class, 0xE9, idSet); // 4.5
+		// 0xEA
 		addPacketOpcode(SM_BIND_POINT_INFO.class, 0xEB, idSet); // 4.5
 		addPacketOpcode(SM_RIFT_ANNOUNCE.class, 0xEC, idSet); // 4.5
 		addPacketOpcode(SM_ABYSS_RANK.class, 0xED, idSet); // 4.5
@@ -232,14 +276,18 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_FRIEND_UPDATE.class, 0xF0, idSet); // 4.5
 		addPacketOpcode(SM_LEARN_RECIPE.class, 0xF1, idSet); // 4.5
 		addPacketOpcode(SM_RECIPE_DELETE.class, 0xF2, idSet); // 4.5
+		// 0xF3
 		addPacketOpcode(SM_FLY_TIME.class, 0xF4, idSet); // 4.5
 		addPacketOpcode(SM_ALLIANCE_INFO.class, 0xF5, idSet); // 4.5
 		addPacketOpcode(SM_ALLIANCE_MEMBER_INFO.class, 0xF6, idSet); // 4.5
 		addPacketOpcode(SM_LEAVE_GROUP_MEMBER.class, 0xF7, idSet); // 4.5
+		// 0xF8
 		addPacketOpcode(SM_SHOW_BRAND.class, 0xF9, idSet); // 4.5
 		addPacketOpcode(SM_ALLIANCE_READY_CHECK.class, 0xFA, idSet); // 4.5
+		// 0xFB
 		addPacketOpcode(SM_PRICES.class, 0xFC, idSet); // 4.5
 		addPacketOpcode(SM_TRADELIST.class, 0xFD, idSet); // 4.5
+		// 0xFE
 		addPacketOpcode(SM_RECONNECT_KEY.class, 0xFF, idSet); // 4.5
 		addPacketOpcode(SM_INSTANCE_STAGE_INFO.class, 0x8C, idSet); // 4.5
 		addPacketOpcode(SM_HOUSE_BIDS.class, 0x100, idSet); // 4.5
@@ -264,7 +312,6 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_DISPUTE_LAND.class, 0x11B, idSet); // 4.5
 		addPacketOpcode(SM_HOUSE_TELEPORT.class, 0xDD, idSet); // 4.5
 		addPacketOpcode(SM_CHALLENGE_LIST.class, 0x118, idSet); // 4.5
-		addPacketOpcode(SM_STATS_STATUS_UNK.class, 0x196, idSet); // 4.5
 		addPacketOpcode(SM_ACCOUNT_ACCESS_PROPERTIES.class, 0xEE, idSet); // 4.5
 		addPacketOpcode(SM_MEGAPHONE.class, 0x11D, idSet); // 4.5
 		addPacketOpcode(SM_SECURITY_TOKEN.class, 0x112, idSet); // 4.5
@@ -272,18 +319,18 @@ public class ServerPacketsOpcodes {
 		addPacketOpcode(SM_QUEST_REPEAT.class, 0x122, idSet); // 4.5
 		addPacketOpcode(SM_FAST_TRACK_MOVE.class, 0x105, idSet);
 		addPacketOpcode(SM_AFTER_TIME_CHECK.class, 0x124, idSet); // 4.6.2 checked
-		// addPacketOpcode(SM_UNK_4_5.class, 0x123, idSet); //4.5
-		// addPacketOpcode(SM_FIRST_SHOW_DECOMPOSABLE.class, 0x11C, idSet); //4.5
-		// addPacketOpcode(SM_SECONDARY_SHOW_DECOMPOSABLE.class, 0x11E, idSet); //4.5
-		// addPacketOpcode(SM_STATE_UNK.class, 0xFE, idSet); //4.5
-		// addPacketOpcode(SM_FB_UNK.class, 0xFB, idSet); //4.5
-		// addPacketOpcode(SM_A5_UNK.class, 0xA5, idSet); //4.5
-		// addPacketOpcode(SM_BD_UNK.class, 0xBD, idSet); //4.5
-		// addPacketOpcode(SM_DB_UNK.class, 0xDB, idSet); //4.5
-		// addPacketOpcode(SM_104_UNK.class, 0x104, idSet); //4.5
+		addPacketOpcode(SM_UNK_4_5.class, 0x123, idSet); //4.5
+		addPacketOpcode(SM_PLAYER_PROTECTION.class, 0xFE, idSet); //4.5
+		addPacketOpcode(SM_FB_UNK.class, 0xFB, idSet); //4.5
+		addPacketOpcode(SM_A5_UNK.class, 0xA5, idSet); //4.5
+		addPacketOpcode(SM_BD_UNK.class, 0xBD, idSet); //4.5
+		addPacketOpcode(SM_GM_COMMAND_ACTION.class, 0xDB, idSet); //4.5
+		addPacketOpcode(SM_104_UNK.class, 0x104, idSet); //4.5
 		addPacketOpcode(SM_SELECT_ITEM_LIST.class, 0x11C, idSet); // 4.6.2 checked
         addPacketOpcode(SM_SELECT_ITEM_ADD.class, 0x11E, idSet); // 4.6.2 checked
+		addPacketOpcode(SM_MAC_ADDRESS.class, 0x166, idSet);
 		addPacketOpcode(SM_CUSTOM_PACKET.class, 99999, idSet); // 4.5
+
 	}
 
 	static int getOpcode(Class<? extends AionServerPacket> packetClass) {

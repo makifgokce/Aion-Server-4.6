@@ -31,6 +31,7 @@ import com.aionemu.gameserver.model.TribeClass;
 import com.aionemu.gameserver.model.actions.PlayerMode;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.Pet;
+import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.BindPointPosition;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -43,9 +44,26 @@ import com.aionemu.gameserver.model.templates.portal.PortalPath;
 import com.aionemu.gameserver.model.templates.portal.PortalScroll;
 import com.aionemu.gameserver.model.templates.spawns.SpawnSearchResult;
 import com.aionemu.gameserver.model.templates.spawns.SpawnSpotTemplate;
-import com.aionemu.gameserver.model.templates.teleport.*;
+import com.aionemu.gameserver.model.templates.teleport.TelelocationTemplate;
+import com.aionemu.gameserver.model.templates.teleport.TeleportLocation;
+import com.aionemu.gameserver.model.templates.teleport.TeleportType;
+import com.aionemu.gameserver.model.templates.teleport.TeleporterTemplate;
 import com.aionemu.gameserver.model.templates.world.WorldMapTemplate;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_BIND_POINT_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_CHANNEL_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_DELETE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_FAST_TRACK;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_FAST_TRACK_MOVE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_LEGION_UPDATE_MEMBER;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_MOTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_SPAWN;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SERIAL_KILLER;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_STATS_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TELEPORT_LOC;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TELEPORT_MAP;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.DuelService;
@@ -192,7 +210,7 @@ public class TeleportService2 {
 		Storage inventory = player.getInventory();
 
 		// TODO: Price vary depending on the influence ratio
-		int basePrice = (int) (location.getPrice());
+		int basePrice = (location.getPrice());
 		// TODO check for location.getPricePvp()
 
 		long transportationPrice = PricesService.getPriceForService(basePrice, player.getRace());
@@ -248,6 +266,10 @@ public class TeleportService2 {
 			if (pet != null) {
 				World.getInstance().setPosition(pet, pos.getMapId(), player.getInstanceId(), pos.getX(), pos.getY(), pos.getZ(), pos.getHeading());
 			}
+			Summon summon = player.getSummon();
+			if (summon != null) {
+				World.getInstance().setPosition(summon, pos.getMapId(), player.getInstanceId(), pos.getX(), pos.getY(), pos.getZ(), pos.getHeading());
+			}
 			PacketSendUtility.sendPacket(player, new SM_STATS_INFO(player));
 			PacketSendUtility.sendPacket(player, new SM_CHANNEL_INFO(player.getPosition()));
 			player.setPortAnimation(4); // Beam exit animation
@@ -258,6 +280,9 @@ public class TeleportService2 {
 			player.getController().updateZone();
 			if (pet != null) {
 				World.getInstance().spawn(pet);
+			}
+			if (summon != null) {
+				World.getInstance().spawn(summon);
 			}
 			player.getKnownList().clear();
 			player.updateKnownlist();
@@ -387,6 +412,11 @@ public class TeleportService2 {
 			if (pet != null) {
 				World.getInstance().spawn(pet);
 			}
+			Summon summon = player.getSummon();
+			if (summon != null) {
+				World.getInstance().spawn(summon);
+				summon.getEffectController().sendEffectIconsTo(player);
+			}
 			player.setPortAnimation(0);
 		} else {
 			/**
@@ -394,6 +424,11 @@ public class TeleportService2 {
 			 */
 			PacketSendUtility.sendPacket(player, new SM_CHANNEL_INFO(player.getPosition()));
 			PacketSendUtility.sendPacket(player, new SM_PLAYER_SPAWN(player));
+			Summon summon = player.getSummon();
+			if (summon != null) {
+				World.getInstance().setPosition(summon, worldId, instanceId, x, y, z, heading);
+				World.getInstance().spawn(summon);
+			}
 		}
 		if (player.isLegionMember()) {
 			PacketSendUtility.broadcastPacketToLegion(player.getLegion(), new SM_LEGION_UPDATE_MEMBER(player, 0, ""));

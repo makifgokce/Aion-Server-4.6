@@ -17,19 +17,35 @@
 
 package com.aionemu.gameserver.controllers;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.ai2.event.AIEventType;
 import com.aionemu.gameserver.ai2.poll.AIQuestion;
+import com.aionemu.gameserver.configs.main.GroupConfig;
 import com.aionemu.gameserver.controllers.attack.AggroInfo;
 import com.aionemu.gameserver.controllers.attack.AggroList;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.TaskId;
-import com.aionemu.gameserver.model.gameobjects.*;
+import com.aionemu.gameserver.model.gameobjects.AionObject;
+import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.Summon;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.RewardType;
+import com.aionemu.gameserver.model.gameobjects.siege.SiegeNpc;
 import com.aionemu.gameserver.model.gameobjects.state.CreatureState;
 import com.aionemu.gameserver.model.team2.TemporaryPlayerTeam;
+import com.aionemu.gameserver.model.team2.alliance.PlayerAlliance;
 import com.aionemu.gameserver.model.team2.common.service.PlayerTeamDistributionService;
+import com.aionemu.gameserver.model.team2.group.PlayerGroup;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.LOG;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.TYPE;
@@ -37,8 +53,10 @@ import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.services.DialogService;
+import com.aionemu.gameserver.services.DuelService;
 import com.aionemu.gameserver.services.RespawnService;
 import com.aionemu.gameserver.services.SiegeService;
+import com.aionemu.gameserver.services.WorldBuffService;
 import com.aionemu.gameserver.services.abyss.AbyssPointsService;
 import com.aionemu.gameserver.services.drop.DropRegistrationService;
 import com.aionemu.gameserver.services.drop.DropService;
@@ -47,11 +65,6 @@ import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.stats.StatFunctions;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.concurrent.Future;
 
 /**
  * This class is for controlling Npc's
@@ -122,7 +135,7 @@ public class NpcController extends CreatureController<Npc> {
 	@Override
 	public void onDespawn() {
 		Npc owner = getOwner();
-		DropService.getInstance().unregisterDrop(getOwner());
+		DropService.getInstance().unregisterDrop(owner);
 		owner.getAi2().onGeneralEvent(AIEventType.DESPAWNED);
 		super.onDespawn();
 	}
@@ -191,6 +204,11 @@ public class NpcController extends CreatureController<Npc> {
 		super.doReward();
 		AggroList list = getOwner().getAggroList();
 		Collection<AggroInfo> finalList = list.getFinalDamageList(true);
+
+		if (getOwner() instanceof SiegeNpc) {
+			rewardSiegeNpc();
+		}
+
 		AionObject winner = list.getMostDamage();
 
 		if (winner == null) {
@@ -302,12 +320,18 @@ public class NpcController extends CreatureController<Npc> {
 		super.onAttack(actingCreature, skillId, type, damage, notifyAttack, log);
 
 		Npc npc = getOwner();
+		if(npc.getMaster() instanceof Player && actingCreature instanceof Player) {
+			if (DuelService.getInstance().isDueling(npc.getMaster().getObjectId(), actingCreature.getObjectId()) && damage > npc.getMaster().getLifeStats().getCurrentHp()) {
+				damage = npc.getMaster().getLifeStats().getCurrentHp() - 1;
+				DuelService.getInstance().loseDuel((Player) npc.getMaster());
+			}
 
+		}
 		if (actingCreature instanceof Player) {
 			QuestEngine.getInstance().onAttack(new QuestEnv(npc, (Player) actingCreature, 0, 0));
 		}
 
-		PacketSendUtility.broadcastPacket(npc, new SM_ATTACK_STATUS(npc, type, skillId, damage, log));
+		PacketSendUtility.broadcastPacket(npc, new SM_ATTACK_STATUS(npc, actingCreature, type, skillId, damage, log));
 	}
 
 	@Override
@@ -328,12 +352,63 @@ public class NpcController extends CreatureController<Npc> {
 			onDelete();
 		}
 		super.onReturnHome();
+		WorldBuffService.getInstance().onReturnHome(getOwner());
 	}
 
 	@Override
 	public void onEnterZone(ZoneInstance zoneInstance) {
 		if (zoneInstance.getAreaTemplate().getZoneName() == null) {
 			log.error("No name found for a Zone in the map " + zoneInstance.getAreaTemplate().getWorldId());
+		}
+	}
+
+	private void rewardSiegeNpc() {
+		int totalDamage = getOwner().getAggroList().getTotalDamage();
+		for (AggroInfo aggro : getOwner().getAggroList().getFinalDamageList(true)) {
+			float percentage = aggro.getDamage() / totalDamage;
+			List<Player> players = new ArrayList<>();
+			if (aggro.getAttacker() instanceof Player) {
+				Player player = (Player) aggro.getAttacker();
+				if (MathUtil.isIn3dRange(player, getOwner(), GroupConfig.GROUP_MAX_DISTANCE) && !player.getLifeStats().isAlreadyDead()) {
+					int apPlayerReward = Math.round(StatFunctions.calculatePvEApGained(player, getOwner()) * percentage);
+					AbyssPointsService.addAp(player, getOwner(), apPlayerReward);
+				}
+			}
+			else if (aggro.getAttacker() instanceof PlayerGroup) {
+				PlayerGroup group = (PlayerGroup) aggro.getAttacker();
+				for (Player member : group.getMembers()) {
+					if (MathUtil.isIn3dRange(member, getOwner(), GroupConfig.GROUP_MAX_DISTANCE) && !member.getLifeStats().isAlreadyDead()) {
+						players.add(member);
+					}
+				}
+				if (!players.isEmpty()) {
+					for (Player member : players) {
+						int baseApReward = StatFunctions.calculatePvEApGained(member, getOwner());
+						int apRewardPerMember = Math.round(baseApReward * percentage / players.size());
+						if (apRewardPerMember > 0) {
+							AbyssPointsService.addAp(member, getOwner(), apRewardPerMember);
+						}
+					}
+				}
+			}
+			else if ((aggro.getAttacker() instanceof PlayerAlliance)) {
+				PlayerAlliance alliance = (PlayerAlliance) aggro.getAttacker();
+				players = new ArrayList<>();
+				for (Player member : alliance.getMembers()) {
+					if (MathUtil.isIn3dRange(member, getOwner(), GroupConfig.GROUP_MAX_DISTANCE) && !member.getLifeStats().isAlreadyDead()) {
+						players.add(member);
+					}
+				}
+				if (!players.isEmpty()) {
+					for (Player member : players) {
+						int baseApReward = StatFunctions.calculatePvEApGained(member, getOwner());
+						int apRewardPerMember = Math.round(baseApReward * percentage / players.size());
+						if (apRewardPerMember > 0) {
+							AbyssPointsService.addAp(member, getOwner(), apRewardPerMember);
+						}
+					}
+				}
+			}
 		}
 	}
 

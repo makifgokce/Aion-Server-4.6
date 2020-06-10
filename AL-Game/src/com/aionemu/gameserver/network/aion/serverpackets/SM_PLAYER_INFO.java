@@ -20,9 +20,6 @@ package com.aionemu.gameserver.network.aion.serverpackets;
 
 import java.util.List;
 
-import com.aionemu.gameserver.configs.administration.AdminConfig;
-import com.aionemu.gameserver.configs.main.MembershipConfig;
-import com.aionemu.gameserver.configs.main.WeddingsConfig;
 import com.aionemu.gameserver.model.Gender;
 import com.aionemu.gameserver.model.actions.PlayerMode;
 import com.aionemu.gameserver.model.gameobjects.Item;
@@ -33,7 +30,6 @@ import com.aionemu.gameserver.model.items.GodStone;
 import com.aionemu.gameserver.model.items.ItemSlot;
 import com.aionemu.gameserver.model.stats.calc.Stat2;
 import com.aionemu.gameserver.model.team.legion.LegionEmblemType;
-import com.aionemu.gameserver.model.templates.item.ArmorType;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 
@@ -116,65 +112,7 @@ public class SM_PLAYER_INFO extends AionServerPacket {
 
 		// * = Several Custom Tags  = * modified by Voidstar and  Himiko
 
-        String nameFormat = "%s";
-        String playerName = player.getName();
-        StringBuilder sb = new StringBuilder(nameFormat);
-		if (player.getClientConnection() != null) {
-
-		// * = Premium & VIP Membership
-            if (MembershipConfig.PREMIUM_TAG_DISPLAY) {
-                switch (player.getClientConnection().getAccount().getMembership()) {
-                    case 1:
-                        nameFormat = sb.insert(0, MembershipConfig.TAG_PREMIUM.substring(0, 2)).toString();
-                        break;
-                    case 2:
-                        nameFormat = sb.insert(0, MembershipConfig.TAG_VIP.substring(0, 2)).toString();
-                        break;
-                }
-            }
-		// * = Wedding
-
-            if (player.isMarried()) {
-                nameFormat = sb.insert(0, WeddingsConfig.TAG_WEDDING.substring(0, 2)).toString();
-            }
-		// * = Server Staff Access Level
-
-            if (AdminConfig.CUSTOMTAG_ENABLE && player.isGmMode()) {
-                switch (player.getClientConnection().getAccount().getAccessLevel()) {
-                    case 1:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS1.substring(0, AdminConfig.CUSTOMTAG_ACCESS1.length() - 3)).toString();
-                        break;
-                    case 2:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS2.substring(0, AdminConfig.CUSTOMTAG_ACCESS2.length() - 3)).toString();
-                        break;
-                    case 3:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS3.substring(0, AdminConfig.CUSTOMTAG_ACCESS3.length() - 3)).toString();
-                        break;
-                    case 4:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS4.substring(0, AdminConfig.CUSTOMTAG_ACCESS4.length() - 3)).toString();
-                        break;
-                    case 5:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS5.substring(0, AdminConfig.CUSTOMTAG_ACCESS5.length() - 3)).toString();
-                        break;
-                    case 6:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS6.substring(0, AdminConfig.CUSTOMTAG_ACCESS6.length() - 3)).toString();
-                        break;
-                    case 7:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS7.substring(0, AdminConfig.CUSTOMTAG_ACCESS7.length() - 3)).toString();
-                        break;
-                    case 8:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS8.substring(0, AdminConfig.CUSTOMTAG_ACCESS8.length() - 3)).toString();
-                        break;
-                    case 9:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS9.substring(0, AdminConfig.CUSTOMTAG_ACCESS9.length() - 3)).toString();
-                        break;
-                    case 10:
-                        nameFormat = sb.insert(0, AdminConfig.CUSTOMTAG_ACCESS10.substring(0, AdminConfig.CUSTOMTAG_ACCESS10.length() - 3)).toString();
-                        break;
-                    }
-                }
-            }
-        writeS(String.format(nameFormat, player.getName()));
+        writeS(player.getName());
 
 		writeH(pcd.getTitleId());
         writeH(player.getCommonData().isHaveMentorFlag() ? 1 : 0);
@@ -219,7 +157,7 @@ public class SM_PLAYER_INFO extends AionServerPacket {
             writeD(godStone != null ? godStone.getItemId() : 0);
             writeD(item.getItemColor());
             if(item.getAuthorize() > 0) {
-	            if(item.getItemTemplate().getArmorType() == ArmorType.FEATHER) {
+	            if(item.getItemTemplate().isPlume()) {
                     float authorize = item.getAuthorize() / 5;
                    if(item.getAuthorize() >= 5) {
                         authorize = authorize > 2.0F ? 2.0F : authorize;
@@ -346,8 +284,8 @@ public class SM_PLAYER_INFO extends AionServerPacket {
         writeS(player.getCommonData().getNote()); // note show in right down windows if your target on player
 
         writeH(player.getLevel()); // [level]
-        writeH(player.getPlayerSettings().getDisplay()); // unk - 0x04
-        writeH(player.getPlayerSettings().getDeny()); // unk - 0x00
+        writeH(pcd.getPlayerSettings().getDisplay()); // unk - 0x04
+        writeH(pcd.getPlayerSettings().getDeny()); // unk - 0x00
         writeH(player.getAbyssRank().getRank().getId()); // abyss rank
 
         writeH(0x00); // unk - 0x01

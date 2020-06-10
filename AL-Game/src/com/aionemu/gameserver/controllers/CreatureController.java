@@ -17,6 +17,12 @@
 
 package com.aionemu.gameserver.controllers;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.ai2.AI2;
 import com.aionemu.gameserver.ai2.AISubState;
@@ -41,6 +47,9 @@ import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.LOG;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.TYPE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_MOVE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SKILL_CANCEL;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TARGET_SELECTED;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_TARGET_UPDATE;
+import com.aionemu.gameserver.services.WorldBuffService;
 import com.aionemu.gameserver.skillengine.SkillEngine;
 import com.aionemu.gameserver.skillengine.model.ChargeSkill;
 import com.aionemu.gameserver.skillengine.model.HealType;
@@ -53,12 +62,8 @@ import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.knownlist.Visitor;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
 import com.aionemu.gameserver.world.zone.ZoneUpdateService;
-import javolution.util.FastMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.concurrent.Future;
+import javolution.util.FastMap;
 
 /**
  * This class is for controlling Creatures [npc's, players etc]
@@ -271,6 +276,15 @@ public abstract class CreatureController<T extends Creature> extends VisibleObje
 				object.getAi2().onCreatureEvent(AIEventType.CREATURE_NEEDS_SUPPORT, getOwner());
 			}
 		});
+		// If the attacked player does not target the attacker, add it to the attacker.
+		if (getOwner() instanceof Player && attacker instanceof Player) {
+			if (getOwner().getTarget() == null || getOwner().getTarget() instanceof Player && !((Player) getOwner().getTarget()).isEnemy(getOwner())) {
+				Player player = (Player) getOwner();
+				player.setTarget(attacker);
+				PacketSendUtility.sendPacket(player, new SM_TARGET_SELECTED(player));
+				PacketSendUtility.broadcastPacket(player, new SM_TARGET_UPDATE(player));
+			}
+		}
 	}
 
 	/**
@@ -602,6 +616,7 @@ public abstract class CreatureController<T extends Creature> extends VisibleObje
 	@Override
 	public void onAfterSpawn() {
 		super.onAfterSpawn();
+		WorldBuffService.getInstance().onAfterSpawn(getOwner());
 		getOwner().revalidateZones();
 	}
 }

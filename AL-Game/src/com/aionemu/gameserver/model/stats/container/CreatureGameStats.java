@@ -17,24 +17,30 @@
 
 package com.aionemu.gameserver.model.stats.container;
 
-import com.aionemu.gameserver.model.SkillElement;
-import com.aionemu.gameserver.model.gameobjects.Creature;
-import com.aionemu.gameserver.model.gameobjects.Item;
-import com.aionemu.gameserver.model.items.ManaStone;
-import com.aionemu.gameserver.model.stats.calc.*;
-import com.aionemu.gameserver.model.stats.calc.functions.IStatFunction;
-import com.aionemu.gameserver.model.stats.calc.functions.StatFunction;
-import com.aionemu.gameserver.model.stats.calc.functions.StatFunctionProxy;
-import javolution.util.FastMap;
-import javolution.util.FastMap.Entry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.aionemu.gameserver.model.SkillElement;
+import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.Item;
+import com.aionemu.gameserver.model.items.ManaStone;
+import com.aionemu.gameserver.model.stats.calc.AdditionStat;
+import com.aionemu.gameserver.model.stats.calc.ReverseStat;
+import com.aionemu.gameserver.model.stats.calc.Stat2;
+import com.aionemu.gameserver.model.stats.calc.StatCapUtil;
+import com.aionemu.gameserver.model.stats.calc.StatOwner;
+import com.aionemu.gameserver.model.stats.calc.functions.IStatFunction;
+import com.aionemu.gameserver.model.stats.calc.functions.StatFunction;
+import com.aionemu.gameserver.model.stats.calc.functions.StatFunctionProxy;
+
+import javolution.util.FastMap;
+import javolution.util.FastMap.Entry;
 
 /**
  * @author xavier
@@ -57,7 +63,7 @@ public abstract class CreatureGameStats<T extends Creature> {
 
 	protected CreatureGameStats(T owner) {
 		this.owner = owner;
-		this.stats = new FastMap<StatEnum, TreeSet<IStatFunction>>();
+		this.stats = new FastMap<>();
 	}
 
 	/**
@@ -149,22 +155,22 @@ public abstract class CreatureGameStats<T extends Creature> {
 	}
 
 	public Stat2 getStat(StatEnum statEnum, int base) {
-		Stat2 stat = new AdditionStat(statEnum, base, (Creature) owner);
+		Stat2 stat = new AdditionStat(statEnum, base, owner);
 		return getStat(statEnum, stat);
 	}
 
 	public Stat2 getStat(StatEnum statEnum, int base, float bonusRate) {
-		Stat2 stat = new AdditionStat(statEnum, base, (Creature) owner, bonusRate);
+		Stat2 stat = new AdditionStat(statEnum, base, owner, bonusRate);
 		return getStat(statEnum, stat);
 	}
 
 	public Stat2 getReverseStat(StatEnum statEnum, int base) {
-		Stat2 stat = new ReverseStat(statEnum, base, (Creature) owner);
+		Stat2 stat = new ReverseStat(statEnum, base, owner);
 		return getStat(statEnum, stat);
 	}
 
 	public Stat2 getReverseStat(StatEnum statEnum, int base, float bonusRate) {
-		Stat2 stat = new ReverseStat(statEnum, base, (Creature) owner, bonusRate);
+		Stat2 stat = new ReverseStat(statEnum, base, owner, bonusRate);
 		return getStat(statEnum, stat);
 	}
 
@@ -304,12 +310,12 @@ public abstract class CreatureGameStats<T extends Creature> {
 		TreeSet<IStatFunction> allStats = stats.get(stat);
 		if (allStats == null)
 			return null;
-		TreeSet<IStatFunction> tmp = new TreeSet<IStatFunction>();
+		TreeSet<IStatFunction> tmp = new TreeSet<>();
 		List<IStatFunction> setFuncs = null;
 		for (IStatFunction func : allStats) {
 			if (func.getPriority() >= Integer.MAX_VALUE - 10) {
 				if (setFuncs == null)
-					setFuncs = new ArrayList<IStatFunction>();
+					setFuncs = new ArrayList<>();
 				setFuncs.add(func);
 			} else if (setFuncs != null) {
 				// all StatSetFunctions added
@@ -349,7 +355,7 @@ public abstract class CreatureGameStats<T extends Creature> {
 		checkMPStats();
 	}
 
-	private void checkHPStats() {
+	protected void checkHPStats() {
 		Stat2 oldHP = cachedHPStat;
 		cachedHPStat = null;
 		Stat2 newHP = this.getMaxHp();

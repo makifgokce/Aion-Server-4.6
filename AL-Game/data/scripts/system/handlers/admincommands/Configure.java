@@ -18,6 +18,8 @@
 package admincommands;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
+
 import com.aionemu.gameserver.configs.administration.AdminConfig;
 import com.aionemu.gameserver.configs.administration.DeveloperConfig;
 import com.aionemu.gameserver.configs.main.*;
@@ -42,7 +44,7 @@ public class Configure extends AdminCommand {
 			.put("legions", LegionConfig.class).put("logging", LoggingConfig.class).put("membership", MembershipConfig.class).put("name", NameConfig.class)
 			.put("periodicsave", PeriodicSaveConfig.class).put("prices", PricesConfig.class).put("punishment", PunishmentConfig.class)
 			.put("ranking", RankingConfig.class).put("rates", RateConfig.class).put("security", SecurityConfig.class).put("shutdown", ShutdownConfig.class)
-			.put("siege", SiegeConfig.class).put("thread", ThreadConfig.class).put("weddings", WeddingsConfig.class).put("world", WorldConfig.class)
+			.put("siege", SiegeConfig.class).put("thread", ThreadConfig.class).put("world", WorldConfig.class)
 			.put("ipconfig", IPConfig.class).put("network", NetworkConfig.class).build();
 
 	public Configure() {
@@ -71,13 +73,13 @@ public class Configure extends AdminCommand {
 			return;
 		}
 
-		Class<?> classToMofify = commands.get(params[1].toLowerCase());
+		Class<?> classToMofify = commands.get(params[1].toLowerCase(Locale.forLanguageTag("en")));
 
 		if (command.equalsIgnoreCase("show")) {
 			String fieldName = params[2];
 			Field someField;
 			try {
-				someField = classToMofify.getDeclaredField(fieldName.toUpperCase());
+				someField = classToMofify.getDeclaredField(fieldName.toUpperCase(Locale.forLanguageTag("en")));
 				PacketSendUtility.sendMessage(player, "Current value is " + someField.get(null));
 			} catch (Exception e) {
 				PacketSendUtility.sendMessage(player, "Error! Wrong property or value.");
@@ -89,7 +91,7 @@ public class Configure extends AdminCommand {
 			if (classToMofify != null) {
 				Field someField;
 				try {
-					someField = classToMofify.getDeclaredField(fieldName.toUpperCase());
+					someField = classToMofify.getDeclaredField(fieldName.toUpperCase(Locale.forLanguageTag("en")));
 					Class<?> classType = someField.getType();
 					if (classType == String.class) {
 						someField.set(null, newValue);

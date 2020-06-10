@@ -29,8 +29,10 @@ import com.aionemu.gameserver.controllers.observer.ObserverType;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.state.CreatureVisualState;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_NPC_INFO;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_STATE;
 import com.aionemu.gameserver.services.player.PlayerVisualStateService;
 import com.aionemu.gameserver.skillengine.model.Effect;
@@ -44,7 +46,7 @@ import com.aionemu.gameserver.utils.ThreadPoolManager;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HideEffect")
-public class HideEffect extends BufEffect {
+public class HideEffect extends BuffEffect {
 
 	@XmlAttribute
 	protected CreatureVisualState state;
@@ -63,15 +65,24 @@ public class HideEffect extends BufEffect {
 		super.endEffect(effect);
 
 		final Creature effected = effect.getEffected();
+		Player player = null;
 		effected.getEffectController().unsetAbnormal(AbnormalState.HIDE.getId());
-
 		effected.unsetVisualState(state);
 
 		if (effected instanceof Player) {
 			ActionObserver observer = effect.getActionObserver(position);
 			effect.getEffected().getObserveController().removeObserver(observer);
+			player = (Player)effect.getEffected();
 		}
-
+		if (player != null) {
+			Summon summon = player.getSummon();
+			if(summon != null && summon.isSpawned()) {
+				summon.getEffectController().unsetAbnormal(AbnormalState.HIDE.getId());
+				summon.unsetVisualState(state);
+				PacketSendUtility.broadcastPacketAndReceive(player, new SM_NPC_INFO(summon, player));
+				summon.getEffectController().sendEffectIconsTo(player);
+			}
+		}
 		PacketSendUtility.broadcastPacketAndReceive(effected, new SM_PLAYER_STATE(effected));
 
 		// anti-cheat
@@ -85,11 +96,31 @@ public class HideEffect extends BufEffect {
 		super.startEffect(effect);
 
 		final Creature effected = effect.getEffected();
+		Player player = null;
 		effected.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
 		effect.setAbnormal(AbnormalState.HIDE.getId());
-
 		effected.setVisualState(state);
-
+		if(effected instanceof Player) {
+			player = (Player)effect.getEffected();
+			if (player != null) {
+				final Summon summon = player.getSummon();
+				if(summon != null && summon.isSpawned()) {
+					summon.getEffectController().setAbnormal(AbnormalState.HIDE.getId());
+					summon.setVisualState(state);
+					PacketSendUtility.broadcastPacketAndReceive(player, new SM_NPC_INFO(summon, player));
+					AttackUtil.cancelCastOn(summon);
+					summon.getEffectController().sendEffectIconsTo(player);
+					ThreadPoolManager.getInstance().schedule(new Runnable() {
+						@Override
+						public void run() {
+							// do on all who targetting on 'effected' (set target null,
+							// cancel attack skill, cancel npc pursuit)
+							AttackUtil.removeTargetFrom(summon, true);
+						}
+					}, 500);
+				}
+			}
+		}
 		// Cancel targeted enemy cast
 		AttackUtil.cancelCastOn(effected);
 
@@ -123,7 +154,7 @@ public class HideEffect extends BufEffect {
 				@Override
 				public void skilluse(Skill skill) {
 					// [2.5] Allow self buffs = (buffCount - 1)
-					if (skill.isSelfBuff() && bufNumber++ < buffCount) {
+					if (skill.isSelfBuff() && bufNumber++ < buffCount || effect.getSkillId() == 851 || effect.getSkillId() == 858 || effect.getSkillId() == 2731 || effect.getSkillId() == 2735) {
 						return;
 					}
 
@@ -139,20 +170,43 @@ public class HideEffect extends BufEffect {
 				effect.setCancelOnDmg(true);
 			}
 
-			// Remove Hide when attacking
-			effected.getObserveController().attach(new ActionObserver(ObserverType.ATTACK) {
-				@Override
-				public void attack(Creature creature) {
-					effect.endEffect();
-				}
-			});
-
-			effected.getObserveController().attach(new ActionObserver(ObserverType.ITEMUSE) {
+			ActionObserver obItemUse = new ActionObserver(ObserverType.ITEMUSE) {
+				 int useNumber = 1;
 				@Override
 				public void itemused(Item item) {
+					if (item.getItemTemplate().isScroll(item.getItemId()) && useNumber++ < buffCount) {
+						return;
+					}
 					effect.endEffect();
 				}
-			});
+			};
+			effected.getObserveController().addObserver(obItemUse);
+			effect.setActionObserver(obItemUse, position);
+			// Remove Hide when attacking
+			ActionObserver obAttack = new ActionObserver(ObserverType.ATTACK) {
+				@Override
+				public void attack(Creature creature) {
+					if (effect.getSkillId() == 851 || effect.getSkillId() == 858 || effect.getSkillId() == 2731 || effect.getSkillId() == 2735) {
+						return;
+					}
+					effect.endEffect();
+				}
+			};
+			effected.getObserveController().addObserver(obAttack);
+			effect.setActionObserver(obAttack, position);
+
+			ActionObserver obAttacked = new ActionObserver(ObserverType.ATTACKED) {
+				@Override
+				public void attacked(Creature creature) {
+					if (effect.getSkillId() == 851 || effect.getSkillId() == 858 || effect.getSkillId() == 2731 || effect.getSkillId() == 2735) {
+						return;
+					}
+					effect.endEffect();
+				}
+			};
+			effected.getObserveController().addObserver(obAttacked);
+			effect.setActionObserver(obAttacked, position);
+
 			effected.getObserveController().attach(new ActionObserver(ObserverType.NPCDIALOGREQUEST) {
 				@Override
 				public void npcdialogrequested(Npc npc) {

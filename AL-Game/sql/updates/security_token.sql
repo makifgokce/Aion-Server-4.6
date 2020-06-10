@@ -1,1 +1,0 @@
-ALTER TABLE `players` ADD COLUMN `security_token` varchar(32) NOT NULL default '' AFTER `last_transfer_time`

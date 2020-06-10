@@ -17,6 +17,17 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.slf4j.LoggerFactory;
+
+import com.aionemu.commons.database.DB;
+import com.aionemu.commons.database.DatabaseFactory;
+import com.aionemu.commons.database.IUStH;
 import com.aionemu.gameserver.configs.administration.AdminConfig;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gm.GmCommands;
@@ -27,6 +38,8 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.Util;
 import com.aionemu.gameserver.world.World;
 
+import ch.qos.logback.classic.Logger;
+
 /**
  *
  * @author xTz
@@ -36,6 +49,9 @@ public class CM_GM_BOOKMARK extends AionClientPacket {
 	private GmCommands command;
 	private String playerName;
 	private String[] parts;
+	private String bookmark_name = "";
+
+	private static final Logger log = (Logger) LoggerFactory.getLogger(CM_GM_BOOKMARK.class);
 
 	public CM_GM_BOOKMARK(int opcode, State state, State... restStates) {
 		super(opcode, state, restStates);
@@ -59,6 +75,8 @@ public class CM_GM_BOOKMARK extends AionClientPacket {
 		if (admin.getAccessLevel() < AdminConfig.GM_PANEL) {
 			return;
 		}
+
+		PacketSendUtility.sendMessage(admin, "GM_BOOKMARK: " + command.name() + " PlayerName: " + playerName);
 		if (player == null) {
 			PacketSendUtility.sendMessage(admin, "Could not find an online player with that name.");
 			return;
@@ -69,6 +87,8 @@ public class CM_GM_BOOKMARK extends AionClientPacket {
 				break;
 			case INVENTORY:
 				break;
+			case SKILL:
+				break;
 			case TELEPORTTO:
 				TeleportService2.teleportTo(admin, player.getWorldId(), player.getX(), player.getY(), player.getZ());
 				break;
@@ -76,7 +96,10 @@ public class CM_GM_BOOKMARK extends AionClientPacket {
 				// TODO Player Status
 				break;
 			case SEARCH:
-				// TODO Target selected
+				// TODO Player Search
+				PacketSendUtility.sendMessage(admin, "GM_BOOKMARK: " + parts[0] + " | " + parts[1]);
+				break;
+			case QUEST:
 				break;
 			case GM_GUILDHISTORY:
 				// TODO Player Legion Info
@@ -86,9 +109,70 @@ public class CM_GM_BOOKMARK extends AionClientPacket {
 				break;
 			case RECALL:
 				TeleportService2.teleportTo(player, admin.getWorldId(), admin.getX(), admin.getY(), admin.getZ());
+				break;
+			case GM_COMMENT_LIST:
+				break;
+			case GM_COMMENT_ADD:
+				break;
+			case CHECK_BOT1:
+				break;
+			case CHECK_BOT99:
+				break;
+			case BOOKMARK_ADD:
+				bookmark_name = parts[1];
+				if (isBookmarkExists(bookmark_name, admin.getObjectId())) {
+					PacketSendUtility.sendMessage(admin, "Bookmark " + bookmark_name + " already exists !");
+					return;
+				}
+
+				final float x = admin.getX();
+				final float y = admin.getY();
+				final float z = admin.getZ();
+				final int char_id = admin.getObjectId();
+				final int world_id = admin.getWorldId();
+
+				DB.insertUpdate("INSERT INTO bookmark (" + "`name`,`char_id`, `x`, `y`, `z`,`world_id` )" + " VALUES " + "(?, ?, ?, ?, ?, ?)", new IUStH() {
+					@Override
+					public void handleInsertUpdate(PreparedStatement ps) throws SQLException {
+						ps.setString(1, bookmark_name);
+						ps.setInt(2, char_id);
+						ps.setFloat(3, x);
+						ps.setFloat(4, y);
+						ps.setFloat(5, z);
+						ps.setInt(6, world_id);
+						ps.execute();
+					}
+				});
+
+				PacketSendUtility.sendMessage(admin, "Bookmark " + bookmark_name + " sucessfully added to your bookmark list!");
+				break;
+			case GUILD:
+				break;
 			default:
 				PacketSendUtility.sendMessage(admin, "Invalid command: " + command.name());
 				break;
 		}
+	}
+
+	public boolean isBookmarkExists(final String bk_name, final int objId) {
+		Connection con = null;
+		int bkcount = 0;
+		try {
+			con = DatabaseFactory.getConnection();
+			PreparedStatement statement = con.prepareStatement("SELECT count(id) as bkcount FROM bookmark WHERE ? = name AND char_id = ?");
+			statement.setString(1, bk_name);
+			statement.setInt(2, objId);
+			ResultSet rset = statement.executeQuery();
+			while (rset.next()) {
+				bkcount = rset.getInt("bkcount");
+			}
+			rset.close();
+			statement.close();
+		} catch (Exception e) {
+			log.error("Error in reading db", e);
+		} finally {
+			DatabaseFactory.close(con);
+		}
+		return bkcount > 0;
 	}
 }

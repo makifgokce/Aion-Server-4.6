@@ -18,12 +18,27 @@
 
 package com.aionemu.gameserver.model.gameobjects;
 
-import com.aionemu.gameserver.configs.main.MembershipConfig;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.IExpirable;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.model.items.*;
+import com.aionemu.gameserver.model.items.ChargeInfo;
+import com.aionemu.gameserver.model.items.GodStone;
+import com.aionemu.gameserver.model.items.IdianStone;
+import com.aionemu.gameserver.model.items.ItemMask;
+import com.aionemu.gameserver.model.items.ManaStone;
+import com.aionemu.gameserver.model.items.RandomBonusResult;
+import com.aionemu.gameserver.model.items.RandomStats;
 import com.aionemu.gameserver.model.items.storage.IStorage;
 import com.aionemu.gameserver.model.items.storage.ItemStorage;
 import com.aionemu.gameserver.model.items.storage.StorageType;
@@ -37,11 +52,6 @@ import com.aionemu.gameserver.model.templates.item.actions.ItemActions;
 import com.aionemu.gameserver.model.templates.item.bonuses.StatBonusType;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * @author ATracer, Wakizashi, xTz
@@ -74,6 +84,7 @@ public class Item extends AionObject implements IExpirable, StatOwner {
     private int activationCount = 0;
     private ChargeInfo conditioningInfo;
     private int bonusNumber = 0;
+    private int bonusEnchant;
     private List<StatFunction> currentModifiers;
     private RandomStats randomStats;
     private int rndCount;
@@ -98,6 +109,7 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         if (optionSlotBonus != 0) {
             optionalSocket = -1;
         }
+
         this.persistentState = PersistentState.NEW;
         updateChargeInfo(0);
     }
@@ -118,7 +130,7 @@ public class Item extends AionObject implements IExpirable, StatOwner {
      */
     public Item(int objId, int itemId, long itemCount, int itemColor, int colorExpires, String itemCreator, int expireTime,
             int activationCount, boolean isEquipped, boolean isSoulBound, long equipmentSlot, int itemLocation, int enchant, int itemSkin,
-            int fusionedItem, int optionalSocket, int optionalFusionSocket, int charge, int randomBonus, int rndCount, int packCount, boolean isPacked, int authorize) {
+            int fusionedItem, int optionalSocket, int optionalFusionSocket, int charge, int randomBonus, int bns_enchant, int rndCount, int packCount, boolean isPacked, int authorize) {
         super(objId);
 
         this.itemTemplate = DataManager.ITEM_DATA.getItemTemplate(itemId);
@@ -138,6 +150,7 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         this.optionalSocket = optionalSocket;
         this.optionalFusionSocket = optionalFusionSocket;
         this.bonusNumber = randomBonus;
+        this.bonusEnchant = bns_enchant;
         this.rndCount = rndCount;
         this.packCount = packCount;
         this.authorize = authorize;
@@ -480,20 +493,18 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         return manaStones.size();
     }
 
-	private Set<ManaStone> itemStonesCollection() {
-		return new TreeSet<ManaStone>(new Comparator<ManaStone>() {
-            @Override
+    private Set<ManaStone> itemStonesCollection() {
+		return new TreeSet<>(new Comparator<ManaStone>() {
+
+			@Override
 			public int compare(ManaStone o1, ManaStone o2) {
-                if (o1.getSlot() == o2.getSlot()) {
-                    return 0;
-                }
-				if (o1.isSpecial()) {
-					return -1;
+				if (o1.getSlot() == o2.getSlot()) {
+					return 0;
 				}
-                return o1.getSlot() > o2.getSlot() ? 1 : -1;
-            }
-        });
-    }
+				return o1.getSlot() > o2.getSlot() ? 1 : -1;
+			}
+		});
+	}
 
     /**
      * Check manastones without initialization
@@ -609,13 +620,6 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         return isSoulBound;
     }
 
-    private boolean isSoulBound(Player player) {
-        if (player.havePermission(MembershipConfig.DISABLE_SOULBIND)) {
-            return false;
-        }
-            return isSoulBound;
-    }
-
     public void setSoulBound(boolean isSoulBound) {
         this.isSoulBound = isSoulBound;
         setPersistentState(PersistentState.UPDATE_REQUIRED);
@@ -625,7 +629,7 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         if (itemTemplate.isStigma()) {
             return EquipType.STIGMA;
         }
-        if (itemTemplate.isAccessory()) {
+        if (itemTemplate.isAccessory() || itemTemplate.isPlume()) {
         	return EquipType.ARMOR;
         }
         return itemTemplate.getEquipmentType();
@@ -684,39 +688,6 @@ public class Item extends AionObject implements IExpirable, StatOwner {
 	}
 
     /**
-     * @return the mask
-     */
-    public int getItemMask(Player player) {
-    int i = checkConfig(player, itemTemplate.getMask());
-        return i;
-    }
-
-    /**
-     * @param player
-     * @return
-     */
-    private int checkConfig(Player player, int mask) {
-        int newMask = mask;
-        if (player.havePermission(MembershipConfig.STORE_WH_ALL)) {
-            newMask = newMask | ItemMask.STORABLE_IN_WH;
-        }
-        if (player.havePermission(MembershipConfig.STORE_AWH_ALL)) {
-            newMask = newMask | ItemMask.STORABLE_IN_AWH;
-        }
-        if (player.havePermission(MembershipConfig.STORE_LWH_ALL)) {
-            newMask = newMask | ItemMask.STORABLE_IN_LWH;
-        }
-        if (player.havePermission(MembershipConfig.TRADE_ALL)) {
-            newMask = newMask | ItemMask.TRADEABLE;
-        }
-        if (player.havePermission(MembershipConfig.REMODEL_ALL)) {
-            newMask = newMask | ItemMask.REMODELABLE;
-        }
-
-        return newMask;
-    }
-
-    /**
      * Compares two items on their object and item ids
      *
      * @param Item object
@@ -727,24 +698,24 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         return (getObjectId().equals(i.getObjectId())) && (getItemId() == i.getItemId());
     }
 
-    public boolean isStorableinWarehouse(Player player) {
-        return (getItemMask(player) & ItemMask.STORABLE_IN_WH) == ItemMask.STORABLE_IN_WH;
+    public boolean isStorableinWarehouse() {
+        return (getItemMask() & ItemMask.STORABLE_IN_WH) == ItemMask.STORABLE_IN_WH;
     }
 
-    public boolean isStorableinAccWarehouse(Player player) {
-        return (getItemMask(player) & ItemMask.STORABLE_IN_AWH) == ItemMask.STORABLE_IN_AWH && !isSoulBound(player);
+    public boolean isStorableinAccWarehouse() {
+        return (getItemMask() & ItemMask.STORABLE_IN_AWH) == ItemMask.STORABLE_IN_AWH && !isSoulBound();
     }
 
-    public boolean isStorableinLegWarehouse(Player player) {
-        return (getItemMask(player) & ItemMask.STORABLE_IN_LWH) == ItemMask.STORABLE_IN_LWH && !isSoulBound(player);
+    public boolean isStorableinLegWarehouse() {
+        return (getItemMask() & ItemMask.STORABLE_IN_LWH) == ItemMask.STORABLE_IN_LWH && !isSoulBound();
     }
 
-    public boolean isTradeable(Player player) {
-        return (getItemMask(player) & ItemMask.TRADEABLE) == ItemMask.TRADEABLE && !isSoulBound(player);
+    public boolean isTradeable() {
+        return (getItemMask() & ItemMask.TRADEABLE) == ItemMask.TRADEABLE && !isSoulBound();
     }
 
-    public boolean isRemodelable(Player player) {
-        return (getItemMask(player) & ItemMask.REMODELABLE) == ItemMask.REMODELABLE;
+    public boolean isRemodelable() {
+        return (getItemMask() & ItemMask.REMODELABLE) == ItemMask.REMODELABLE;
     }
 
     public boolean isSellable() {
@@ -766,7 +737,9 @@ public class Item extends AionObject implements IExpirable, StatOwner {
     public int getExpireTime() {
         return expireTime;
     }
-
+    public void setExpireTime(int expireTime) {
+    	this.expireTime = expireTime;
+    }
     public int getExpireTimeRemaining() {
         if (expireTime == 0) {
             return 0;
@@ -801,16 +774,16 @@ public class Item extends AionObject implements IExpirable, StatOwner {
             return;
         }
         if (isEquipped()) {
-            player.getEquipment().unEquipItem(getObjectId().intValue(), getEquipmentSlot());
+            player.getEquipment().unEquipItem(getObjectId(), getEquipmentSlot());
         }
 
         for (StorageType i : StorageType.values()) {
-            if (i != StorageType.LEGION_WAREHOUSE) {
+            if (i == StorageType.LEGION_WAREHOUSE) {
                 continue;
             }
             IStorage storage = player.getStorage(i.getId());
 
-            if ((storage != null) && (storage.getItemByObjId(getObjectId().intValue()) != null)) {
+            if (storage != null && storage.getItemByObjId(getObjectId()) != null) {
                 storage.delete(this);
                 switch (i) {
                     case CUBE:
@@ -818,6 +791,33 @@ public class Item extends AionObject implements IExpirable, StatOwner {
                         break;
                     case ACCOUNT_WAREHOUSE:
                     case REGULAR_WAREHOUSE:
+                    case PET_BAG_6:
+                    case PET_BAG_12:
+                    case PET_BAG_18:
+                    case PET_BAG_24:
+                    case CASH_PET_BAG_12:
+                    case CASH_PET_BAG_18:
+                    case CASH_PET_BAG_30:
+                    case CASH_PET_BAG_24:
+                    case PET_BAG_30:
+                    case CASH_PET_BAG_26:
+                    case CASH_PET_BAG_32:
+                    case HOUSE_STORAGE_01:
+                    case HOUSE_STORAGE_02:
+                    case HOUSE_STORAGE_03:
+                    case HOUSE_STORAGE_04:
+                    case HOUSE_STORAGE_05:
+                    case HOUSE_STORAGE_06:
+                    case HOUSE_STORAGE_07:
+                    case HOUSE_STORAGE_08:
+                    case HOUSE_STORAGE_09:
+                    case HOUSE_STORAGE_10:
+                    case HOUSE_STORAGE_11:
+                    case HOUSE_STORAGE_12:
+                    case HOUSE_STORAGE_14:
+                    case HOUSE_STORAGE_16:
+                    case HOUSE_STORAGE_18:
+                    case HOUSE_STORAGE_20:
                         PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1400406, new DescriptionId(getNameId())));
                         break;
                     default:
@@ -901,9 +901,13 @@ public class Item extends AionObject implements IExpirable, StatOwner {
         return bonusNumber;
     }
 
+    public int getBonusEnchant() {
+        return bonusEnchant;
+    }
+
     public List<StatFunction> getCurrentModifiers() {
         if (currentModifiers == null) {
-            currentModifiers = new ArrayList<StatFunction>();
+            currentModifiers = new ArrayList<>();
         }
         return currentModifiers;
     }
@@ -931,6 +935,10 @@ public class Item extends AionObject implements IExpirable, StatOwner {
 
     public void setBonusNumber(int bonusNumber) {
         this.bonusNumber = bonusNumber;
+    }
+
+    public void setBonusEnchant(int bonusEnchant) {
+        this.bonusEnchant = bonusEnchant;
     }
 
     public void setRandomCount(int rndCount) {

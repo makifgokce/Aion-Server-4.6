@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.spawnengine;
 
 import com.aionemu.gameserver.controllers.StaticObjectController;
@@ -52,7 +51,8 @@ public class StaticObjectSpawnManager {
 				staticObject.setKnownlist(new PlayerAwareKnownList(staticObject));
 				bringIntoWorld(staticObject, template, instanceIndex);
 			}
-		} else {
+		}
+		else {
 			for (SpawnTemplate template : spawn.getSpawnTemplates()) {
 				int objectId = IDFactory.getInstance().nextId();
 				StaticObject staticObject = new StaticObject(objectId, new StaticObjectController(), template, objectTemplate);

@@ -65,6 +65,8 @@ public class SkillTemplate {
 	protected int skillId;
 	@XmlAttribute(required = true)
 	protected String name;
+    @XmlAttribute(name = "name_desc")
+    private String namedesc;
 	@XmlAttribute(required = true)
 	protected int nameId;
 	@XmlAttribute
@@ -210,6 +212,9 @@ public class SkillTemplate {
 		return name;
 	}
 
+    public String getNamedesc() {
+        return namedesc;
+    }
 	/**
 	 * @return the nameId
 	 */
@@ -513,5 +518,9 @@ public class SkillTemplate {
 
 	public Conditions getEndConditions() {
 		return endconditions;
+	}
+	
+	public void setNoRemoveAtDie(boolean noRemoveAtDie) {
+		this.noRemoveAtDie = noRemoveAtDie;
 	}
 }

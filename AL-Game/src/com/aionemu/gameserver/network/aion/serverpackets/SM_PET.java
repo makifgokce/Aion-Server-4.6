@@ -23,13 +23,11 @@ import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.gameobjects.Pet;
 import com.aionemu.gameserver.model.gameobjects.PetAction;
 import com.aionemu.gameserver.model.gameobjects.player.PetCommonData;
-import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.templates.pet.PetDopingEntry;
 import com.aionemu.gameserver.model.templates.pet.PetFunctionType;
 import com.aionemu.gameserver.model.templates.pet.PetTemplate;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
-import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author M@xx, xTz, Rolandas
@@ -127,7 +125,7 @@ public class SM_PET extends AionServerPacket {
 
 	@Override
 	protected void writeImpl(AionConnection con) {
-		Player player = con.getActivePlayer();
+		con.getActivePlayer();
 		PetTemplate petTemplate = null;
 		writeH(actionId);
 		switch (actionId) {
@@ -144,7 +142,7 @@ public class SM_PET extends AionServerPacket {
 					writeD(petCommonData.getMasterObjectId());
 					writeD(0);
 					writeD(0);
-					writeD((int) petCommonData.getBirthday());
+					writeD(petCommonData.getBirthday());
 					writeD(expireTime != 0 ? expireTime - (int) (System.currentTimeMillis() / 1000) : 0); // accompanying time
 
 					int specialtyCount = 0;

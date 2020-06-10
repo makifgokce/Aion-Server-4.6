@@ -18,6 +18,7 @@
 package com.aionemu.gameserver.skillengine.effect;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -29,8 +30,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javolution.util.FastList;
 
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.ai2.poll.AIQuestion;
@@ -56,6 +55,8 @@ import com.aionemu.gameserver.skillengine.model.SpellStatus;
 import com.aionemu.gameserver.skillengine.model.TransformType;
 import com.aionemu.gameserver.utils.stats.StatFunctions;
 
+import javolution.util.FastList;
+
 /**
  * @author ATracer
  */
@@ -65,7 +66,7 @@ public abstract class EffectTemplate {
 
 	protected ActionModifiers modifiers;
 	protected List<Change> change;
-	@XmlAttribute
+	@XmlAttribute(name = "effectid")
 	protected int effectid;
 	@XmlAttribute(required = true)
 	protected int duration2;
@@ -438,7 +439,7 @@ public abstract class EffectTemplate {
 	}
 
 	private FastList<Integer> getPreEffects() {
-		FastList<Integer> preEffects = new FastList<Integer>();
+		FastList<Integer> preEffects = new FastList<>();
 
 		if (this.getPreEffect() == null) {
 			return preEffects;
@@ -752,14 +753,14 @@ public abstract class EffectTemplate {
 
 	void afterUnmarshal(Unmarshaller u, Object parent) {
 		EffectType temp = null;
+		String trying = this.getClass().getName().replaceAll("com.aionemu.gameserver.skillengine.effect.", "").replaceAll("Effect", "").toUpperCase(Locale.forLanguageTag("en"));
 		try {
-			temp = EffectType.valueOf(this.getClass().getName().replaceAll("com.aionemu.gameserver.skillengine.effect.", "").replaceAll("Effect", "")
-					.toUpperCase());
+			temp = EffectType.valueOf(trying);
 		} catch (Exception e) {
-			log.info("missing effectype for "
-					+ this.getClass().getName().replaceAll("com.aionemu.gameserver.skillengine.effect.", "").replaceAll("Effect", "").toUpperCase());
+			log.info("[Effect] Missing Effectype for " + trying);
 		}
 
 		this.effectType = temp;
 	}
+
 }

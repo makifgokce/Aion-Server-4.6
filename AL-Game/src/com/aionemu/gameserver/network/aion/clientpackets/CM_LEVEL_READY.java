@@ -25,10 +25,22 @@ import com.aionemu.gameserver.model.templates.windstreams.Location2D;
 import com.aionemu.gameserver.model.templates.windstreams.WindstreamTemplate;
 import com.aionemu.gameserver.network.aion.AionClientPacket;
 import com.aionemu.gameserver.network.aion.AionConnection.State;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_CUBE_UPDATE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_HOUSE_OBJECTS;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INSTANCE_COUNT_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_MOTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_PROTECTION;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_WINDSTREAM_ANNOUNCE;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
-import com.aionemu.gameserver.services.*;
+import com.aionemu.gameserver.services.BaseService;
+import com.aionemu.gameserver.services.FastTrackService;
+import com.aionemu.gameserver.services.SerialKillerService;
+import com.aionemu.gameserver.services.SiegeService;
+import com.aionemu.gameserver.services.TownService;
+import com.aionemu.gameserver.services.WeatherService;
 import com.aionemu.gameserver.services.instance.LivePartyConcertHall;
 import com.aionemu.gameserver.services.rift.RiftInformer;
 import com.aionemu.gameserver.spawnengine.InstanceRiftSpawnManager;
@@ -61,6 +73,7 @@ public class CM_LEVEL_READY extends AionClientPacket {
 		if (activePlayer.isInInstance()) {
 			sendPacket(new SM_INSTANCE_COUNT_INFO(activePlayer.getWorldId(), activePlayer.getInstanceId()));
 		}
+		sendPacket(new SM_PLAYER_PROTECTION(60));
 		sendPacket(new SM_PLAYER_INFO(activePlayer, false));
 		activePlayer.getController().startProtectionActiveTask();
 		sendPacket(new SM_MOTION(activePlayer.getObjectId(), activePlayer.getMotions().getActiveMotions()));
@@ -137,6 +150,7 @@ public class CM_LEVEL_READY extends AionClientPacket {
 		if (pet != null && !pet.isSpawned()) {
 			World.getInstance().spawn(pet);
 		}
+
 		activePlayer.setPortAnimation(0);
 
 		TownService.getInstance().onEnterWorld(activePlayer);

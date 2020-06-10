@@ -17,6 +17,9 @@
 
 package admincommands;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.items.storage.Storage;
@@ -50,13 +53,69 @@ public class Remove extends AdminCommand {
 		}
 
 		try {
-			itemId = Integer.parseInt(params[1]);
-			if (params.length == 3) {
-				itemCount = Long.parseLong(params[2]);
+			String itemStr = params[0];
+			// Some item links have space before Id
+			if (itemStr.equals("[item:")) {
+				itemStr = params[1];
+				Pattern id = Pattern.compile("(\\d{9})");
+				Matcher result = id.matcher(itemStr);
+				if (result.find()) {
+					itemId = Integer.parseInt(result.group(1));
+				}
+
+				if (params.length == 3) {
+					itemCount = Long.parseLong(params[2]);
+				}
+			} else {
+				Pattern id = Pattern.compile("\\[item:(\\d{9})");
+				Matcher result = id.matcher(itemStr);
+
+				if (result.find()) {
+					itemId = Integer.parseInt(result.group(1));
+				} else {
+					itemId = Integer.parseInt(params[0]);
+				}
+
+				if (params.length == 2) {
+					itemCount = Long.parseLong(params[1]);
+				}
 			}
 		} catch (NumberFormatException e) {
-			PacketSendUtility.sendMessage(admin, "Parameters need to be an integer.");
-			return;
+			try {
+				String itemStr = params[1];
+				// Some item links have space before Id
+				if (itemStr.equals("[item:")) {
+					itemStr = params[2];
+					Pattern id = Pattern.compile("(\\d{9})");
+					Matcher result = id.matcher(itemStr);
+					if (result.find()) {
+						itemId = Integer.parseInt(result.group(1));
+					}
+
+					if (params.length == 4) {
+						itemCount = Long.parseLong(params[3]);
+					}
+				} else {
+					Pattern id = Pattern.compile("\\[item:(\\d{9})");
+					Matcher result = id.matcher(itemStr);
+
+					if (result.find()) {
+						itemId = Integer.parseInt(result.group(1));
+					} else {
+						itemId = Integer.parseInt(params[1]);
+					}
+
+					if (params.length == 3) {
+						itemCount = Long.parseLong(params[2]);
+					}
+				}
+			} catch (NumberFormatException ex) {
+				PacketSendUtility.sendMessage(admin, "You must give number to itemid.");
+				return;
+			} catch (Exception ex2) {
+				PacketSendUtility.sendMessage(admin, "Occurs an error.");
+				return;
+			}
 		}
 
 		Storage bag = target.getInventory();

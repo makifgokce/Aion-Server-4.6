@@ -33,6 +33,7 @@ import com.aionemu.gameserver.skillengine.model.Skill;
 import com.aionemu.gameserver.skillengine.model.SkillTemplate;
 import com.aionemu.gameserver.skillengine.model.SkillType;
 import com.aionemu.gameserver.skillengine.model.TransformType;
+import com.aionemu.gameserver.skillengine.properties.TargetRelationAttribute;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
 import com.aionemu.gameserver.world.zone.ZoneName;
@@ -63,15 +64,21 @@ public class PlayerRestrictions extends AbstractRestrictions {
 		}
 
 		// cant ressurect non players and non dead
-		if (skill.getSkillTemplate().hasResurrectEffect()
-				&& (!(target instanceof Player) || !((Creature) target).getLifeStats().isAlreadyDead() || (!((Creature) target).isInState(CreatureState.DEAD) && !((Creature) target)
-						.isInState(CreatureState.FLOATING_CORPSE)))) {
-			return false;
-		}
+		if (skill.getSkillTemplate().hasResurrectEffect()) {
+			if (!(target instanceof Player)) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_TARGET_IS_NOT_VALID);
+				return false;
+			}
+			Player tPlayer = (Player) target;
+			if (target instanceof Player && !tPlayer.getLifeStats().isAlreadyDead()) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_TARGET_IS_NOT_VALID);
+				return false;
+			}
 
-		if (skill.getSkillTemplate().hasItemHealFpEffect() && !player.isInFlyingState()) { // player must be
-			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_RESTRICTION_FLY_ONLY);
-			return false;
+			if((!tPlayer.isInTeam() || player.getObjectId() == target.getObjectId() || player.getPlayerGroup2().getTeamId() != tPlayer.getPlayerGroup2().getTeamId()) && skill.getSkillTemplate().getProperties().getTargetRelation() == TargetRelationAttribute.MYPARTY) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
+				return false;
+			}
 		}
 
 		if (!skill.getSkillTemplate().hasEvadeEffect()) {
@@ -85,6 +92,14 @@ public class PlayerRestrictions extends AbstractRestrictions {
 		if (skill.getSkillTemplate().hasRecallInstant()) {
 			// skill properties should already filter only players
 			if (player.getController().isInCombat() || ((Player) target).getController().isInCombat()) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_Recall_CANNOT_ACCEPT_EFFECT(target.getName()));
+				return false;
+			}
+			if(!player.isInSameTeam((Player) target) && skill.getSkillId() == 1606) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
+				return false;
+			}
+			if (((Player) target).isUsingFlyTeleport() || ((Player) target).isInPlayerMode(PlayerMode.WINDSTREAM)) {
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_Recall_CANNOT_ACCEPT_EFFECT(target.getName()));
 				return false;
 			}
@@ -130,6 +145,31 @@ public class PlayerRestrictions extends AbstractRestrictions {
 			return false;
 		}
 
+		if (template.hasRecallInstant()) {
+			Player tPlayer = (Player) target;
+			if(target instanceof Player) {
+				if (tPlayer == null) {
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
+					return false;
+				} else if (!tPlayer.isInTeam() || player.getObjectId() == target.getObjectId() || player.getPlayerGroup2().getTeamId() != tPlayer.getPlayerGroup2().getTeamId()) {
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
+					return false;
+				} else if (player.getWorldId() != target.getWorldId() || player.isInInstance() || tPlayer.isUsingFlyTeleport() || tPlayer.isInPlayerMode(PlayerMode.WINDSTREAM)) {
+					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_Recall_CANNOT_ACCEPT_EFFECT(target.getName()));
+					return false;
+				}
+			} else {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
+				return false;
+			}
+
+			/**
+			if (player.getPlayerGroup2().getTeamId() != target.getPlayerGroup2().getTeamId() || player.getObjectId() == target.getObjectId()){
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
+				return false;
+			} */
+		}
+
 		// in 3.0 players can use remove shock even when silenced
 		if (template.getType() == SkillType.MAGICAL && player.getEffectController().isAbnormalSet(AbnormalState.SILENCE) && !template.hasEvadeEffect()) {
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_CANT_CAST_MAGIC_SKILL_WHILE_SILENCED);
@@ -158,15 +198,19 @@ public class PlayerRestrictions extends AbstractRestrictions {
 				return false;
 			}
 		}
-
 		if (template.hasResurrectEffect()) {
 			if (!(target instanceof Player)) {
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_TARGET_IS_NOT_VALID);
 				return false;
 			}
-			Player targetPlayer = (Player) target;
-			if (!targetPlayer.isInState(CreatureState.DEAD)) {
+			Player tPlayer = (Player) target;
+			if (target instanceof Player && !tPlayer.getLifeStats().isAlreadyDead()) {
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_TARGET_IS_NOT_VALID);
+				return false;
+			}
+
+			if((!tPlayer.isInTeam() || player.getObjectId() == target.getObjectId() || player.getPlayerGroup2().getTeamId() != tPlayer.getPlayerGroup2().getTeamId()) && skill.getSkillTemplate().getProperties().getTargetRelation() == TargetRelationAttribute.MYPARTY) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_SKILL_INVALID_TARGET_PARTY_ONLY);
 				return false;
 			}
 		}

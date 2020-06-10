@@ -531,12 +531,12 @@
         <monster var="0" npc_ids="230160" end_var="11"/>
     </monster_hunt>	
     <monster_hunt id="12812" start_npc_ids="801232" end_npc_ids="801232">
-        <monster var="0" npc_ids="233234 232546 232547" end_var="5"/>
+        <monster var="0" npc_ids="232546 232547" end_var="5"/>
         <monster var="0" npc_ids="232548 233215" end_var="5"/>
     </monster_hunt>
     <monster_hunt id="12813" start_npc_ids="801232" end_npc_ids="801232">
         <monster var="0" npc_ids="232607 232608 232609" end_var="5"/>
-        <monster var="0" npc_ids="232729 232730 232731" end_var="5"/>
+        <monster var="0" npc_ids="233234 232729 232730 232731" end_var="5"/>
     </monster_hunt>
     <monster_hunt id="12814" start_npc_ids="801233" end_npc_ids="801233">
         <monster var="0" npc_ids="230173" end_var="5"/>

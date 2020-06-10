@@ -20,6 +20,7 @@ package com.aionemu.gameserver.network.aion.clientpackets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.model.gameobjects.player.FriendList.Status;
@@ -79,7 +80,7 @@ public class CM_PLAYER_SEARCH extends AionClientPacket {
 
 		Iterator<Player> it = World.getInstance().getPlayersIterator();
 
-		List<Player> matches = new ArrayList<Player>(MAX_RESULTS);
+		List<Player> matches = new ArrayList<>(MAX_RESULTS);
 
 		if (activePlayer.getLevel() < CustomConfig.LEVEL_TO_SEARCH) {
 			sendPacket(SM_SYSTEM_MESSAGE.STR_CANT_WHO_LEVEL(String.valueOf(CustomConfig.LEVEL_TO_SEARCH)));
@@ -89,13 +90,13 @@ public class CM_PLAYER_SEARCH extends AionClientPacket {
 			Player player = it.next();
 			if (!player.isSpawned()) {
 				continue;
-			} else if (player.getFriendList().getStatus() == Status.OFFLINE) {
+			} else if (player.getCommonData().getFriendList().getStatus() == Status.OFFLINE) {
 				continue;
 			} else if (player.isGM() && !CustomConfig.SEARCH_GM_LIST) {
 				continue;
 			} else if (lfgOnly == 1 && !player.isLookingForGroup()) {
 				continue;
-			} else if (!name.isEmpty() && !player.getName().toLowerCase().contains(name.toLowerCase())) {
+			} else if (!name.isEmpty() && !player.getName().toLowerCase(Locale.forLanguageTag("en")).contains(name.toLowerCase(Locale.forLanguageTag("en")))) {
 				continue;
 			} else if (minLevel != 0xFF && player.getLevel() < minLevel) {
 				continue;
@@ -106,6 +107,8 @@ public class CM_PLAYER_SEARCH extends AionClientPacket {
 			} else if (region > 0 && player.getActiveRegion().getMapId() != region) {
 				continue;
 			} else if ((player.getRace() != activePlayer.getRace()) && (!CustomConfig.FACTIONS_SEARCH_MODE)) {
+				continue;
+			} else if (player.getObjectId() == activePlayer.getObjectId()) {
 				continue;
 			} else // This player matches criteria
 			{

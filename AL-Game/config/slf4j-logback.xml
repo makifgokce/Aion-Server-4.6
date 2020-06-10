@@ -64,6 +64,20 @@
             <Pattern>%date %message%n</Pattern>
         </encoder>
     </appender>
+    <appender name="app_delete_character" class="ch.qos.logback.core.FileAppender">
+        <file>${logFolder}/delete_character.log</file>
+        <append>true</append>
+        <encoder>
+            <Pattern>%date %message%n</Pattern>
+        </encoder>
+    </appender>
+    <appender name="app_delete_item" class="ch.qos.logback.core.FileAppender">
+        <file>${logFolder}/delete_item.log</file>
+        <append>true</append>
+        <encoder>
+            <Pattern>%date %message%n</Pattern>
+        </encoder>
+    </appender>
     <appender name="app_exchange" class="ch.qos.logback.core.FileAppender">
         <file>${logFolder}/exchange.log</file>
         <append>true</append>
@@ -202,6 +216,12 @@
     </logger>
     <logger name="CRAFT_LOG" additivity="false">
         <appender-ref ref="app_craft"/>
+    </logger>
+    <logger name="DELETE_CHARACTER_LOG">
+        <appender-ref ref="app_delete_character"/>
+    </logger>
+    <logger name="DELETE_ITEM_LOG" additivity="false">
+        <appender-ref ref="app_delete_item"/>
     </logger>
     <logger name="EXCHANGE_LOG">
         <appender-ref ref="app_exchange"/>

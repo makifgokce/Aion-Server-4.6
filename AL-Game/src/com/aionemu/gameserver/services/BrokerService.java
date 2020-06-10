@@ -17,11 +17,24 @@
 
 package com.aionemu.gameserver.services;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.main.LoggingConfig;
 import com.aionemu.gameserver.configs.main.SecurityConfig;
 import com.aionemu.gameserver.dao.BrokerDAO;
 import com.aionemu.gameserver.dao.InventoryDAO;
+import com.aionemu.gameserver.dao.ItemStoneListDAO;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.broker.BrokerItemMask;
 import com.aionemu.gameserver.model.broker.BrokerMessages;
@@ -43,13 +56,8 @@ import com.aionemu.gameserver.taskmanager.AbstractFIFOPeriodicTaskManager;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
-import javolution.util.FastMap;
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.Timestamp;
-import java.util.*;
+import javolution.util.FastMap;
 
 /**
  * @author kosyachok
@@ -84,7 +92,7 @@ public class BrokerService {
 	}
 
 	private void initBrokerService() {
-		log.info("Loading broker...");
+		log.info("[BrokerService]Loading broker...");
 		int loadedBrokerItemsCount = 0;
 		int loadedSettledItemsCount = 0;
 
@@ -109,8 +117,7 @@ public class BrokerService {
 				}
 			}
 		}
-
-		log.info("Broker loaded with " + loadedBrokerItemsCount + " broker items, " + loadedSettledItemsCount + " settled items.");
+		log.info("[BrokerService]Broker loaded with " + loadedBrokerItemsCount + " broker items, " + loadedSettledItemsCount + " settled items.");
 	}
 
 	/**
@@ -149,7 +156,7 @@ public class BrokerService {
 		getPlayerCache(player).setBrokerStartPageCache(startPage);
 
 		if (itemList != null) {
-			List<BrokerItem> itemsFound = new ArrayList<BrokerItem>();
+			List<BrokerItem> itemsFound = new ArrayList<>();
 			for (BrokerItem item : searchItems) {
 				if (itemList.contains(item.getItemId())) {
 					itemsFound.add(item);
@@ -165,7 +172,13 @@ public class BrokerService {
 
 		sortBrokerItems(searchItems, sortType);
 		searchItems = getRequestedPage(searchItems, startPage);
-
+		for(BrokerItem it : searchItems) {
+			if (it.getItem().getItemTemplate().isArmor() || it.getItem().getItemTemplate().isWeapon()) {
+				if(it.getItem().getItemStones() == null || it.getItem().getFusionStones() == null) {
+					DAOManager.getDAO(ItemStoneListDAO.class).load(Collections.singletonList(it.getItem()));
+				}
+			}
+		}
 		PacketSendUtility.sendPacket(player, new SM_BROKER_SERVICE(searchItems, totalSearchItemsCount, startPage));
 	}
 
@@ -176,7 +189,7 @@ public class BrokerService {
 	 * @return
 	 */
 	private BrokerItem[] getItemsByMask(Player player, int clientMask, boolean cached) {
-		List<BrokerItem> searchItems = new ArrayList<BrokerItem>();
+		List<BrokerItem> searchItems = new ArrayList<>();
 		BrokerItemMask brokerMask = BrokerItemMask.getBrokerMaskById(clientMask);
 		if (cached) {
 			BrokerItem[] brokerItems = getFilteredItems(player);
@@ -229,7 +242,7 @@ public class BrokerService {
 	 * @return
 	 */
 	private BrokerItem[] getRequestedPage(BrokerItem[] brokerItems, int startPage) {
-		List<BrokerItem> page = new ArrayList<BrokerItem>();
+		List<BrokerItem> page = new ArrayList<>();
 		int startingElement = startPage * 9;
 		for (int i = startingElement, limit = 0; i < brokerItems.length && limit < 45; i++, limit++) {
 			page.add(brokerItems[i]);
@@ -273,6 +286,8 @@ public class BrokerService {
 	 */
 	public void buyBrokerItem(Player player, int itemUniqueId) {
 		boolean isEmptyCache = getFilteredItems(player).length == 0;
+		// boolean isF2p = player.getF2p().getF2pAccount().getActive() == true;
+
 		Race playerRace = player.getRace();
 
 		BrokerItem buyingItem = getRaceBrokerItems(playerRace).get(itemUniqueId);
@@ -284,7 +299,6 @@ public class BrokerService {
 		if (buyingItem == null) {
 			return;
 		}
-
 		if ((buyingItem.isSold() || buyingItem.isSettled()) && (buyingItem.getItem() != null)) {
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_VENDOR_SOLD_OUT(buyingItem.getItem().getNameId()));
 			return;
@@ -306,6 +320,10 @@ public class BrokerService {
 				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_VENDOR_SOLD_OUT(buyingItem.getItem().getNameId()));
 				return;
 			}
+			// if	(!isF2p && !buyingItem.isGoldPack())	{
+				// PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1700016));
+				// return;
+			// }
 
 			Item item = buyingItem.getItem();
 			long price = buyingItem.getPrice();
@@ -329,8 +347,8 @@ public class BrokerService {
 			Item boughtItem = player.getInventory().add(item);
 
 			if (LoggingConfig.LOG_BROKER_EXCHANGE) {
-				log.info("[BROKER EXCHANGE] > [Player: " + player.getName() + "] bought [Item: " + buyingItem.getItemId() + "] " + "[Count: "
-						+ buyingItem.getItemCount() + (LoggingConfig.ENABLE_ADVANCED_LOGGING ? "] [Item Name: " + item.getItemName() : "]") + " from [Player: "
+				log.info("[BROKER EXCHANGE] > (Buy) [Player: " + player.getName() + "] bought [Item: " + buyingItem.getItemId() + "] " + "[Count: "
+						+ buyingItem.getItemCount() + (LoggingConfig.ENABLE_ADVANCED_LOGGING ? "] [Item Name: " + item.getItemTemplate().getName() : "]") + " from [Player: "
 						+ buyingItem.getSeller() + "] for [Price: " + buyingItem.getPrice() + "]");
 			}
 
@@ -424,11 +442,9 @@ public class BrokerService {
 			return;
 		}
 
-		// Check Trade Hack
-		if (!itemToRegister.isTradeable(player)) {
+		if (!itemToRegister.isTradeable() && !itemToRegister.isPacked()) {
 			return;
 		}
-
 		if (!AdminService.getInstance().canOperate(player, null, itemToRegister, "broker")) {
 			return;
 		}
@@ -485,7 +501,10 @@ public class BrokerService {
 				elyosBrokerItems.put(newBrokerItem.getItemUniqueId(), newBrokerItem);
 				break;
 		}
-
+		if (LoggingConfig.LOG_BROKER_EXCHANGE) {
+			log.info("[BROKER EXCHANGE] > (Register) [Player: " + player.getName() + "] bought [Item: " + newBrokerItem.getItemId() + "] " + "[Count: "
+					+ newBrokerItem.getItemCount() + (LoggingConfig.ENABLE_ADVANCED_LOGGING ? "] [Item Name: " + newBrokerItem.getItem().getItemTemplate().getName() : "]") + " [Price: " + newBrokerItem.getPrice() + "]");
+		}
 		BrokerOpSaveTask bost = new BrokerOpSaveTask(newBrokerItem, itemToRegister, player.getInventory().getKinahItem(), player.getObjectId());
 		saveManager.add(bost);
 
@@ -498,12 +517,17 @@ public class BrokerService {
 	public void showRegisteredItems(Player player) {
 		Map<Integer, BrokerItem> brokerItems = getRaceBrokerItems(player.getRace());
 
-		List<BrokerItem> registeredItems = new ArrayList<BrokerItem>();
+		List<BrokerItem> registeredItems = new ArrayList<>();
 		int playerId = player.getObjectId();
 
 		for (BrokerItem item : brokerItems.values()) {
 			if (item != null && item.getItem() != null && playerId == item.getSellerId()) {
 				registeredItems.add(item);
+				if (item.getItem().getItemTemplate().isArmor() || item.getItem().getItemTemplate().isWeapon()) {
+					if(item.getItem().getItemStones() == null || item.getItem().getFusionStones() == null) {
+						DAOManager.getDAO(ItemStoneListDAO.class).load(Collections.singletonList(item.getItem()));
+					}
+				}
 			}
 		}
 
@@ -551,9 +575,10 @@ public class BrokerService {
 	/**
 	 * @param player
 	 */
-	public void showSettledItems(Player player) {
+	public void showSettledItems(Player player, int page) {
+		BrokerItem[] searchItems = null;
 		Map<Integer, BrokerItem> brokerSettledItems = getRaceBrokerSettledItems(player.getRace());
-		List<BrokerItem> settledItems = new ArrayList<BrokerItem>();
+		List<BrokerItem> settledItems = new ArrayList<>();
 		int playerId = player.getObjectId();
 		long totalKinah = 0;
 		for (BrokerItem item : brokerSettledItems.values()) {
@@ -564,16 +589,18 @@ public class BrokerService {
 				}
 			}
 		}
-		PacketSendUtility.sendPacket(player, new SM_BROKER_SERVICE(settledItems.toArray(new BrokerItem[settledItems.size()]), totalKinah));
+		searchItems = settledItems.toArray(new BrokerItem[settledItems.size()]);
+		searchItems = getRequestedPage(searchItems, page);
+		PacketSendUtility.sendPacket(player, new SM_BROKER_SERVICE(searchItems, totalKinah));
 	}
 
 	/**
 	 * @param PlayerCommonData
 	 */
-	public long getCollectedMoney(PlayerCommonData playerCommonData) {
+	public int getCollectedMoney(PlayerCommonData playerCommonData) {
 		Map<Integer, BrokerItem> brokerSettledItems = getRaceBrokerSettledItems(playerCommonData.getRace());
 		int playerId = playerCommonData.getPlayerObjId();
-		long totalKinah = 0;
+		int totalKinah = 0;
 		for (BrokerItem item : brokerSettledItems.values()) {
 			if (item != null && playerId == item.getSellerId()) {
 				if (item.isSold()) {
@@ -603,7 +630,7 @@ public class BrokerService {
 	public void settleAccount(Player player) {
 		Race playerRace = player.getRace();
 		Map<Integer, BrokerItem> brokerSettledItems = getRaceBrokerSettledItems(playerRace);
-		List<BrokerItem> collectedItems = new ArrayList<BrokerItem>();
+		List<BrokerItem> collectedItems = new ArrayList<>();
 		int playerId = player.getObjectId();
 		long kinahCollect = 0;
 		boolean itemsLeft = false;
@@ -663,7 +690,7 @@ public class BrokerService {
 
 		player.getInventory().increaseKinah(kinahCollect);
 
-		showSettledItems(player);
+		showSettledItems(player, 0);
 
 		if (!itemsLeft) {
 			PacketSendUtility.sendPacket(player, new SM_BROKER_SERVICE(false, 0));
@@ -678,8 +705,8 @@ public class BrokerService {
 
 		for (BrokerItem item : asmoBrokerItems.values()) {
 			if (item != null && item.getExpireTime().getTime() <= currentTime.getTime()) {
-				putToSettled(Race.ASMODIANS, item, false);
-				// this.expireItem(Race.ASMODIANS, item);
+				//putToSettled(Race.ASMODIANS, item, false);
+				this.expireItem(Race.ASMODIANS, item);
 				asmodianBrokerItems.remove(item.getItemUniqueId());
 			}
 		}
@@ -816,6 +843,9 @@ public class BrokerService {
 			}
 			if (kinahItem != null) {
 				DAOManager.getDAO(InventoryDAO.class).store(kinahItem, playerId);
+			}
+			if(item != null && (item.getItemTemplate().isArmor() || item.getItemTemplate().isWeapon())){
+				DAOManager.getDAO(ItemStoneListDAO.class).save(Collections.singletonList(item));
 			}
 		}
 	}

@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.model.gm;
 
+import java.util.Locale;
+
 /**
  * @author Ever - Magenik
  */
@@ -31,6 +33,7 @@ public enum GmPanelCommands {
 	SET_MAKEUP_BONUS,
 	SET_VITALPOINT,
 	SET_DISABLE_ITEMUSE_GAUGE,
+	SET_ENCHANTCOUNT,
 	PARTYRECALL,
 	ATTRBONUS,
 	TELEPORTTO,
@@ -73,10 +76,12 @@ public enum GmPanelCommands {
 
 	public static GmPanelCommands getValue(String command) {
 		for (GmPanelCommands value : values()) {
-			if (value.name().equals(command.toUpperCase())) {
+			String name = command.toUpperCase(Locale.forLanguageTag("en"));
+			if (value.name().equals(name)) {
 				return value;
 			}
 		}
-		throw new IllegalArgumentException("Invalid GmPanelCommands id: " + command);
+		throw new IllegalArgumentException("Invalid GmPanelCommands id: " + command.toUpperCase(Locale.forLanguageTag("en")));
 	}
+
 }

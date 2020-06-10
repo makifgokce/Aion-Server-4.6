@@ -62,12 +62,12 @@ public class SpawnEngine {
 	 */
 	public static VisibleObject spawnObject(SpawnTemplate spawn, int instanceIndex) {
 		final VisibleObject visObj = getSpawnedObject(spawn, instanceIndex);
-		if (spawn.isEventSpawn()) {
-			spawn.getEventTemplate().addSpawnedObject(visObj);
-		}
+        if (spawn.isEventSpawn()) {
+            spawn.getEventTemplate().addSpawnedObject(visObj);
+        }
 
-		spawn.addVisibleObject(visObj);
-		return visObj;
+        spawn.setVisibleObject(visObj);
+        return visObj;
 	}
 
 	private static VisibleObject getSpawnedObject(SpawnTemplate spawn, int instanceIndex) {

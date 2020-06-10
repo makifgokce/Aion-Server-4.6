@@ -17,9 +17,15 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import java.util.Locale;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.configs.administration.AdminConfig;
 import com.aionemu.gameserver.model.EmotionType;
 import com.aionemu.gameserver.model.actions.PlayerMode;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.state.CreatureState;
 import com.aionemu.gameserver.model.templates.zone.ZoneType;
@@ -28,9 +34,8 @@ import com.aionemu.gameserver.network.aion.AionConnection.State;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_EMOTION;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.skillengine.effect.AbnormalState;
+import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author SoulKeeper
@@ -113,7 +118,7 @@ public class CM_EMOTION extends AionClientPacket {
 				heading = (byte) readC();
 				break;
 			default:
-				log.error("Unknown emotion type? 0x" + Integer.toHexString(et/* !!!!! */).toUpperCase());
+				log.error("Unknown emotion type? 0x" + Integer.toHexString(et/* !!!!! */).toUpperCase(Locale.forLanguageTag("en")));
 				break;
 		}
 	}
@@ -250,6 +255,18 @@ public class CM_EMOTION extends AionClientPacket {
 
 		if (player.getEmotions().canUse(emotion)) {
 			PacketSendUtility.broadcastPacket(player, new SM_EMOTION(player, emotionType, emotion, x, y, z, heading, getTargetObjectId(player)), true);
+			if(player.isGM() && emotionType == EmotionType.EMOTE) {
+				for (VisibleObject obj : player.getKnownList().getKnownObjects().values()) {
+					if (obj != null && obj instanceof Player) {
+						Player target = (Player) obj;
+						if (MathUtil.isIn3dRange(player, obj, 30)) {
+							if(canUseEmotion(target)) {
+								PacketSendUtility.broadcastPacket(target, new SM_EMOTION(target, emotionType, emotion, target.getX(), target.getY(), target.getZ(), target.getHeading(), getTargetObjectId(target)), true);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -260,5 +277,42 @@ public class CM_EMOTION extends AionClientPacket {
 	private final int getTargetObjectId(Player player) {
 		int target = player.getTarget() == null ? 0 : player.getTarget().getObjectId();
 		return target != 0 ? target : this.targetObjectId;
+	}
+
+	private boolean canUseEmotion(Player player) {
+		if (player.getLifeStats().isAlreadyDead()) {
+			return false;
+		}
+
+		if (player.getEffectController().isAbnormalState(AbnormalState.CANT_MOVE_STATE) || player.getEffectController().isUnderFear()) {
+			return false;
+		}
+
+		if (player.getState() == CreatureState.PRIVATE_SHOP.getId() || player.isAttackMode()
+				&& (emotionType == EmotionType.CHAIR_SIT || emotionType == EmotionType.JUMP)) {
+			return false;
+		}
+
+		if (player.getState() == CreatureState.LOOTING.getId() && emotionType == EmotionType.NEUTRALMODE) {
+			return false;
+		}
+		if(player.isCasting()) {
+			return false;
+		}
+		if(player.isTrading()) {
+			return false;
+		}
+		if (emotionType != EmotionType.SELECT_TARGET) {
+			player.getController().cancelCurrentSkill();
+		}
+
+		// check for stance
+		if (player.getController().isUnderStance()) {
+			if (emotionType == EmotionType.SIT || emotionType == EmotionType.JUMP || emotionType == EmotionType.NEUTRALMODE
+					|| emotionType == EmotionType.NEUTRALMODE2 || emotionType == EmotionType.ATTACKMODE || emotionType == EmotionType.ATTACKMODE2) {
+				player.getController().stopStance();
+			}
+		}
+		return true;
 	}
 }

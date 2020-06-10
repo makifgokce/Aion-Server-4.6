@@ -10,57 +10,70 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.services.siegeservice;
+
+import java.util.concurrent.Future;
 
 import com.aionemu.gameserver.model.gameobjects.siege.SiegeNpc;
 import com.aionemu.gameserver.model.siege.SiegeLocation;
 import com.aionemu.gameserver.model.siege.SiegeRace;
-import java.util.concurrent.Future;
 
 /**
  * @author Luzien
  */
 public abstract class Assault<siege extends Siege<?>> {
 
-	protected final SiegeLocation siegeLocation;
-	protected final int locationId;
-	protected final SiegeNpc boss;
-	protected final int worldId;
-	protected Future<?> dredgionTask;
-	protected Future<?> spawnTask;
+    protected final SiegeLocation siegeLocation;
+    protected final int locationId;
+    protected final SiegeNpc boss;
+    protected final int worldId;
+    protected Future<?> dredgionTask;
+    protected Future<?> spawnTask;
 
-	public Assault(Siege<?> siege) {
-		this.siegeLocation = siege.getSiegeLocation();
-		this.boss = siege.getBoss();
-		this.locationId = siege.getSiegeLocationId();
-		this.worldId = siege.getSiegeLocation().getWorldId();
-	}
+    public Assault(Siege<?> siege) {
+        this.siegeLocation = siege.getSiegeLocation();
+        this.boss = siege.getBoss();
+        this.locationId = siege.getSiegeLocationId();
+        this.worldId = siege.getSiegeLocation().getWorldId();
+    }
 
-	public int getWorldId() {
-		return worldId;
-	}
+    public int getWorldId() {
+        return worldId;
+    }
 
-	public void startAssault(int delay) {
-		scheduleAssault(delay);
-	}
+    public void startAssault(int delay) {
+        scheduleAssault(delay);
+    }
 
-	public void finishAssault(boolean captured) {
-		if (dredgionTask != null && !dredgionTask.isDone()) {
-			dredgionTask.cancel(true);
-		}
-		if (spawnTask != null && !spawnTask.isDone()) {
-			spawnTask.cancel(true);
-		}
+    public void finishAssault(boolean captured) {
+        if (dredgionTask != null && !dredgionTask.isDone()) {
+            dredgionTask.cancel(true);
+        }
+        if (spawnTask != null && !spawnTask.isDone()) {
+            spawnTask.cancel(true);
+        }
 
-		onAssaultFinish(captured && siegeLocation.getRace().equals(SiegeRace.BALAUR));
-	}
+        onAssaultFinish(captured && siegeLocation.getRace().equals(SiegeRace.BALAUR));
+    }
 
-	protected abstract void onAssaultFinish(boolean captured);
+    protected abstract void onAssaultFinish(boolean captured);
 
-	protected abstract void scheduleAssault(int delay);
+    protected abstract void scheduleAssault(int delay);
 }

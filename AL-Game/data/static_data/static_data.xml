@@ -149,6 +149,7 @@
     <import file="instance_bonusattr/instance_bonusattr.xml"/>
     <import file="housing/housing_objects.xml"/>
     <import file="ride/ride.xml"/>
+	<import file="world_buff/world_buffs.xml"/>
     <import file="robot/robot.xml"/>
     <import file="instance_exit/instance_exit.xml"/>
     <import file="portals/portal_loc.xml"/>

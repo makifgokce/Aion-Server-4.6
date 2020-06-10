@@ -23,6 +23,7 @@ import com.aionemu.gameserver.controllers.movement.PlayerMoveController;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_FORCED_MOVE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_GAMEGUARD;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_MOVE;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_QUIT_RESPONSE;
 import com.aionemu.gameserver.skillengine.effect.AbnormalState;
@@ -196,4 +197,15 @@ public class AntiHackService {
 			player.prevMoveType = type;
 		}
 	}
+
+	public static void checkAionBin(int size, Player player) {
+        int legitSize = 212;//AION 4.7.5.7
+
+        if (size != legitSize) {
+            AuditLogger.info(player, "Detected modified aion.bin");
+            player.getClientConnection().close(new SM_QUIT_RESPONSE(), false);
+        }
+
+        PacketSendUtility.sendPacket(player, new SM_GAMEGUARD(size));
+    }
 }

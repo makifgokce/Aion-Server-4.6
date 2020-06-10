@@ -421,7 +421,7 @@
 			<spot x="2543.76" y="1155.72" z="2800.29" h="111"/>
 		</spawn>
 		<!-- Stone Plate from Ruins of Roah -->
-		<spawn npc_id="700303" respawn_time="295">
+		<spawn npc_id="700303" respawn_time="15">
 			<spot x="2698.09" y="667.5" z="2924.45" static_id="1017"/>
 			<spot x="2648.55" y="687.442" z="2901.36" static_id="1030"/>
 			<spot x="2660.74" y="628.528" z="2926.56" static_id="1011"/>

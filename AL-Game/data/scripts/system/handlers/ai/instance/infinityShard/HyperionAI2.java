@@ -14,92 +14,148 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package ai.instance.infinityShard;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import ai.AggressiveNpcAI2;
-
-import com.aionemu.commons.network.util.ThreadPoolManager;
 import com.aionemu.gameserver.ai2.AI2Actions;
 import com.aionemu.gameserver.ai2.AIName;
+import com.aionemu.gameserver.ai2.handler.AggroEventHandler;
+import com.aionemu.gameserver.ai2.handler.CreatureEventHandler;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
-import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.skillengine.SkillEngine;
+import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.WorldMapInstance;
 
+import ai.GeneralNpcAI2;
+
 /**
- * @author Eloann
- * @rework Swig
+ * @author nightm
+ * @reworked Himiko
  */
 @AIName("hyperion")
-public class HyperionAI2 extends AggressiveNpcAI2 {
+public class HyperionAI2 extends GeneralNpcAI2 {
 
-	private AtomicBoolean isHome = new AtomicBoolean(true);
-	private Future<?> skillTask;
-	private Future<?> BlasterTask;
-	private Future<?> EnergyTask;
-	protected List<Integer> percents = new ArrayList<Integer>();
+	private Future<?> Cast;
+	private int castc = 0;
+
+	protected List<Integer> percents = new ArrayList<>();
+
+	@Override
+	protected void handleCreatureSee(Creature creature) {
+		CreatureEventHandler.onCreatureSee(this, creature);
+	}
+
+	@Override
+	protected void handleCreatureAggro(Creature creature) {
+		if (canThink())
+			AggroEventHandler.onAggro(this, creature);
+
+	}
+
+	@Override
+	protected boolean handleGuardAgainstAttacker(Creature attacker) {
+		return AggroEventHandler.onGuardAgainstAttacker(this, attacker);
+	}
 
 	@Override
 	protected void handleAttack(Creature creature) {
 		super.handleAttack(creature);
-		if (isHome.compareAndSet(true, false)) {
-			startSkillTask();
-			startBlasterTask();
-			startEnergyTask();
-		}
 		checkPercentage(getLifeStats().getHpPercentage());
+	}
+
+	private void addPercent() {
+		percents.clear();
+		Collections.addAll(percents, new Integer[] { 100, 85, 80, 70, 60, 55, 54, 50, 46, 45, 40, 35, 25, 23, 20, 18, 10, 8, 5, 3 });
 	}
 
 	private synchronized void checkPercentage(int hpPercentage) {
 		for (Integer percent : percents) {
 			if (hpPercentage <= percent) {
 				switch (percent) {
-					case 75:
-					case 60:
-					case 55:
-						spawnHyperionNormal1();
+					case 100:
+						StartCast();
+						break;
+					case 85:
+						castc = 1;
+						StartCast();
 						break;
 					case 80:
-					case 47:
-						AI2Actions.useSkill(this, 21245);
-						spawnHyperionEasy();
+						SkillEngine.getInstance().getSkill(getOwner(), 21253, 60, getOwner()).useNoAnimationSkill();
+						FirstWave();
 						break;
-					case 52:
-					case 35:
-					case 20:
-						AI2Actions.useSkill(this, 21253);
-						spawnHyperionNormal();
+					case 70:
+						castc = 1;
+						StartCast2();
+						FirstWave();
+						break;
+					case 60:
+						castc = 0;
+						StartCast3();
+						FourthWave();
+						break;
+					case 55:
+						castc = 0;
+						StartCast4();
+						SecondWave();
+						break;
+					case 54:
+						SkillEngine.getInstance().getSkill(getOwner(), 21244, 60, getOwner()).useNoAnimationSkill();
 						break;
 					case 50:
-					case 25:
-						AI2Actions.useSkill(this, 21244);
-						spawnHyperionHard();
+						castc = 0;
+						StartCast4();
+						SecondWave();
+						break;
+					case 46:
+						SkillEngine.getInstance().getSkill(getOwner(), 21244, 60, getOwner()).useNoAnimationSkill();
+						break;
+					case 45:
+						castc = 1;
+						StartCast5();
+						FifthWave();
 						break;
 					case 40:
-						AI2Actions.useSkill(this, 21244);
+						SkillEngine.getInstance().getSkill(getOwner(), 21248, 60, getOwner()).useNoAnimationSkill();
+						TurrendWave();
 						break;
-					case 30:
-						cancelEnergyTask();
-						AI2Actions.useSkill(this, 21248);
-						spawnHyperionHard();
+					case 35:
+						castc = 1;
+						StartCast2();
+						break;
+					case 25:
+						castc = 1;
+						StartCast5();
+						ThirdWave();
+						break;
+					case 23:
+						SkillEngine.getInstance().getSkill(getOwner(), 21244, 60, getOwner()).useNoAnimationSkill();
+						break;
+					case 20:
+						castc = 0;
+						StartCast4();
+						ThirdWave();
+						break;
+					case 18:
+						SkillEngine.getInstance().getSkill(getOwner(), 21244, 60, getOwner()).useNoAnimationSkill();
 						break;
 					case 10:
-						AI2Actions.useSkill(this, 21246);
-						spawnHyperionNormal();
+						SkillEngine.getInstance().getSkill(getOwner(), 21246, 60, getOwner()).useNoAnimationSkill();
+						EndWave();
+						break;
+					case 8:
+						SkillEngine.getInstance().getSkill(getOwner(), 21249, 60, getOwner()).useNoAnimationSkill();
 						break;
 					case 5:
-						AI2Actions.useSkill(this, 21249);
+						castc = 0;
+						StartCast4();
 						break;
-					case 2:
-						AI2Actions.useSkill(this, 21249);
+					case 3:
+						SkillEngine.getInstance().getSkill(getOwner(), 21249, 60, getOwner()).useNoAnimationSkill();
 						break;
 				}
 				percents.remove(percent);
@@ -108,134 +164,243 @@ public class HyperionAI2 extends AggressiveNpcAI2 {
 		}
 	}
 
-	private void spawnHyperionEasy() {
-		spawn(231096, 148.12894f, 148.34091f, 124.03375f, (byte) 105);
-		spawn(233292, 108.5921f, 145.41702f, 114.03043f, (byte) 20);
-		spawn(231103, 132.1073f, 127.7515f, 112.1236f, (byte) 35);
-		spawn(231103, 129.2615f, 137.8656f, 110.5048f, (byte) 82);
-		spawn(231103, 125.4013f, 129.6880f, 112.1227f, (byte) 22);
-		spawn(233289, 110.090965f, 128.28905f, 124.15179f, (byte) 43);
-	}
+	private void StartCast() {
 
-	private void spawnHyperionNormal() {
-		spawn(233288, 148.12894f, 148.34091f, 124.03375f, (byte) 105);
-		spawn(233294, 108.5921f, 145.41702f, 114.03043f, (byte) 20);
-		spawn(231103, 150.05635f, 128.56758f, 114.49583f, (byte) 16);
-		spawn(231103, 136.9867f, 133.6464f, 112.1236f, (byte) 52);
-		spawn(231103, 124.3499f, 145.8533f, 112.1236f, (byte) 101);
-		spawn(233296, 110.090965f, 128.28905f, 124.15179f, (byte) 43);
-	}
+		Cast = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
 
-	private void spawnHyperionNormal1() {
-		spawn(233292, 148.12894f, 148.34091f, 124.03375f, (byte) 105);
-		spawn(233294, 108.5921f, 145.41702f, 114.03043f, (byte) 20);
-		spawn(233295, 150.05635f, 128.56758f, 114.49583f, (byte) 16);
-		spawn(231103, 140.8518f, 139.3699f, 112.1228f, (byte) 63);
-		spawn(231103, 119.3952f, 140.4778f, 112.1228f, (byte) 114);
-		spawn(233295, 110.090965f, 128.28905f, 124.15179f, (byte) 43);
-	}
-
-	private void spawnHyperionHard() {
-		spawn(233288, 148.12894f, 148.34091f, 124.03375f, (byte) 105);
-		spawn(233299, 148.12894f, 148.34091f, 124.03375f, (byte) 105);
-		spawn(233294, 108.5921f, 145.41702f, 114.03043f, (byte) 20);
-		spawn(233298, 150.05635f, 128.56758f, 114.49583f, (byte) 16);
-		spawn(231103, 134.50612f, 141.6616f, 112.1228f, (byte) 72);
-		spawn(231103, 121.2149f, 133.1198f, 112.1220f, (byte) 10);
-		spawn(231103, 125.4013f, 129.68802f, 112.1227f, (byte) 22);
-		spawn(233298, 110.090965f, 128.28905f, 124.15179f, (byte) 43);
-	}
-
-	private void addPercent() {
-		percents.clear();
-		Collections.addAll(percents, new Integer[] { 80, 75, 60, 55, 52, 50, 40, 35, 30, 25, 20, 10, 5, 2 });
-	}
-
-	private void startSkillTask() {
-		skillTask = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
-				if (isAlreadyDead()) {
-					cancelskillTask();
-				} else {
-					Throw();
-				}
+				if (castc >= 3)
+					Cast.cancel(false);
+				Cast1();
+				castc++;
 			}
-		}, 30000, 120000);
+		},6000, 6000);
+
 	}
 
-	private void startBlasterTask() {
-		BlasterTask = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+	private void Cast1() {
+		SkillEngine.getInstance().getSkill(getOwner(), 21241, 60, getOwner()).useNoAnimationSkill();
+	}
+
+	private void StartCast2() {
+
+		Cast = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
 			@Override
 			public void run() {
-				if (isAlreadyDead()) {
-					cancelBlasterTask();
-				} else {
-					Blaster();
-				}
+				if (castc >= 3)
+					Cast.cancel(false);
+				Cast2();
+				castc++;
 			}
-		}, 2000, 90000);
+		}, 1 * 1000 * 1, 3 * 1000 * 1);
+
 	}
 
-	private void startEnergyTask() {
-		EnergyTask = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+	private void Cast2() {
+		switch (castc) {
+			case 1:
+				SkillEngine.getInstance().getSkill(getOwner(), 21250, 60, getOwner()).useNoAnimationSkill();
+				break;
+			case 2:
+				SkillEngine.getInstance().getSkill(getOwner(), 21251, 60, getOwner()).useNoAnimationSkill();
+				break;
+		}
+	}
+
+	private void StartCast3() {
+
+		Cast = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
 			@Override
 			public void run() {
-				if (isAlreadyDead()) {
-					cancelEnergyTask();
-				} else {
-					Energy();
-				}
+				if (castc >= 4)
+					Cast.cancel(false);
+				Cast3();
+				castc++;
 			}
-		}, 10000, 160000);
+		}, 1 * 1000 * 1, 3 * 1000 * 1);
+
 	}
 
-	private void cancelskillTask() {
-		if (skillTask != null && !skillTask.isCancelled()) {
-			skillTask.cancel(true);
+	private void Cast3() {
+		switch (castc) {
+			case 0:
+				SkillEngine.getInstance().getSkill(getOwner(), 21250, 60, getOwner()).useNoAnimationSkill();
+				break;
+			case 1:
+				SkillEngine.getInstance().getSkill(getOwner(), 21251, 60, getOwner()).useNoAnimationSkill();
+				break;
+			case 2:
+				SkillEngine.getInstance().getSkill(getOwner(), 21245, 60, getOwner()).useNoAnimationSkill();
+				break;
+			case 3:
+				SkillEngine.getInstance().getSkill(getOwner(), 21253, 60, getOwner()).useNoAnimationSkill();
+				break;
 		}
 	}
 
-	private void cancelBlasterTask() {
-		if (BlasterTask != null && !BlasterTask.isCancelled()) {
-			BlasterTask.cancel(true);
-		}
-	}
+	private void StartCast4() {
 
-	private void cancelEnergyTask() {
-		if (EnergyTask != null && !EnergyTask.isCancelled()) {
-			EnergyTask.cancel(true);
-		}
-	}
+		Cast = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
 
-	private void Throw() {
-		SkillEngine.getInstance().getSkill(getOwner(), 21250, 55, getOwner()).useNoAnimationSkill();
-		ThreadPoolManager.getInstance().schedule(new Runnable() {
 			@Override
 			public void run() {
-				SkillEngine.getInstance().getSkill(getOwner(), 21251, 55, getOwner()).useNoAnimationSkill();
+				if (castc >= 3)
+					Cast.cancel(false);
+				Cast4();
+				castc++;
 			}
-		}, 5000);
+		}, 1 * 1000 * 1, 3 * 1000 * 1);
+
 	}
 
-	private void Blaster() {
-		SkillEngine.getInstance().getSkill(getOwner(), 21241, 60, getOwner().getTarget()).useNoAnimationSkill();
-		Player target = getRandomTarget();
-		if (target == null) {
+	private void Cast4() {
+		switch (castc) {
+			case 0:
+				SkillEngine.getInstance().getSkill(getOwner(), 21250, 60, getOwner()).useNoAnimationSkill();
+				break;
+			case 1:
+				SkillEngine.getInstance().getSkill(getOwner(), 21251, 60, getOwner()).useNoAnimationSkill();
+				break;
+			case 2:
+				SkillEngine.getInstance().getSkill(getOwner(), 21253, 60, getOwner()).useNoAnimationSkill();
+				break;
 		}
 	}
 
-	private void Energy() {
-		SkillEngine.getInstance().getSkill(getOwner(), 21247, 60, getOwner().getTarget()).useNoAnimationSkill();
-		Player target = getRandomTarget();
-		if (target == null) {
+	private void StartCast5() {
+
+		Cast = ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
+
+			@Override
+			public void run() {
+				if (castc >= 3)
+					Cast.cancel(false);
+				Cast5();
+				castc++;
+			}
+		}, 1 * 1000 * 1, 5 * 1000 * 1);
+
+	}
+
+	private void Cast5() {
+		switch (castc) {
+			case 1:
+				AI2Actions.useSkill(this, 21241);
+				break;
+			case 2:
+				AI2Actions.useSkill(this, 21245);
+				break;
 		}
+	}
+
+	private void FirstWave() {
+
+		spawn(231096, 149.32f, 146.91f, 124.23f, (byte) 38, "A2142518112", 0);	// Hiperion Desteği Dövüşçüsü		(Group 1)
+		spawn(231097, 147.89f, 145.47f, 124.33f, (byte) 36, "A2142518112", 1);	// Hiperion Desteği Keşif Eri		(Group 1)
+		spawn(231098, 153.48f, 147.11f, 124.40f, (byte) 36, "A2142518112", 2);	// Hiperion Desteği Sıhhiyesi		(Group 1)
+		spawn(233297, 108.59f, 130.80f, 124.46f, (byte) 97, "B2142518141", 0);	// Hiperion Desteği Taarruz Askeri	(Group 2)
+		spawn(233298, 110.97f, 130.15f, 124.30f, (byte) 97, "B2142518141", 1);	// Hiperion Desteği Canisi			(Group 2)
+
+	}
+
+	private void SecondWave() {
+
+		spawn(231096, 108.59f, 130.80f, 124.46f, (byte) 97, "B2142518141", 0);	// Hiperion Desteği Dövüşçüsü		(Group 2)
+		spawn(231097, 110.97f, 130.15f, 124.30f, (byte) 97, "B2142518141", 1);	// Hiperion Desteği Keşif Eri		(Group 2)
+		spawn(231098, 106.31f, 127.48f, 124.23f, (byte) 97, "B2142518141", 2);	// Hiperion Desteği Sıhhiyesi		(Group 2)
+		spawn(233297, 149.32f, 146.91f, 124.23f, (byte) 38, "A2142518112", 0);	// Hiperion Desteği Taarruz Askeri	(Group 1)
+		spawn(233298, 147.89f, 145.47f, 124.33f, (byte) 36, "A2142518112", 1);	// Hiperion Desteği Canisi			(Group 1)
+		spawn(233299, 153.48f, 147.11f, 124.40f, (byte) 36, "A2142518112", 2);	// Hiperion Desteği Şifacısı		(Group 1)
+		spawn(231103, 123.109f, 145.36f, 112.12f, (byte) 0);	// Hand
+		spawn(231103, 123.26f, 130.70f, 112.17f, (byte) 0);		// Hand
+	}
+
+	private void TurrendWave() {
+		spawn(231102, 107.53553f, 142.51953f, 127.03997f, (byte) 0);
+		spawn(231102, 113.86417f, 154.06656f, 127.68255f, (byte) 110);
+		spawn(231102, 144.52719f, 122.26577f, 127.44639f, (byte) 45);
+		spawn(231102, 150.33377f, 132.67754f, 126.57981f, (byte) 50);
+	}
+
+	private void ThirdWave() {
+
+		spawn(233291, 149.32f, 146.91f, 124.23f, (byte) 38, "A2142518112", 0);	// Hiperion Desteği Sihirbazı 		(Group 1)
+		spawn(231097, 147.89f, 145.47f, 124.33f, (byte) 36, "A2142518112", 1);	// Hiperion Desteği Keşif Eri 		(Group 1)
+		spawn(231098, 153.48f, 147.11f, 124.40f, (byte) 36, "A2142518112", 2);	// Hiperion Desteği Sıhhiyesi 		(Group 1)
+		spawn(233297, 108.59f, 130.80f, 124.35f, (byte) 97, "B2142518141", 0);	// Hiperion Desteği Taarruz Askeri 	(Group 2)
+		spawn(233298, 110.97f, 130.15f, 124.30f, (byte) 97, "B2142518141", 1);	// Hiperion Desteği Canisi 			(Group 2)
+		spawn(233299, 106.31f, 127.48f, 124.23f, (byte) 97, "B2142518141", 2);	// Hiperion Desteği Şifacısı 		(Group 2)
+		spawn(231103, 123.109f, 145.36f, 112.12f, (byte) 0);	// Hand
+		spawn(231103, 123.26f, 130.70f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.74f, 129.67f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 139.07f, 142.46f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.26f, 117.27f, 116.74f, (byte) 0);		// Hand
+	}
+
+	private void FourthWave() {
+
+		spawn(231096, 149.32f, 146.91f, 124.23f, (byte) 38, "A2142518112", 0);	// Hiperion Desteği Dövüşçüsü 		(Group 1)
+		spawn(231097, 147.89f, 145.47f, 124.33f, (byte) 36, "A2142518112", 1);	// Hiperion Desteği Keşif Eri 		(Group 1)
+		spawn(231098, 153.48f, 147.11f, 124.40f, (byte) 36, "A2142518112", 2);	// Hiperion Desteği Sıhhiyesi 		(Group 1)
+		spawn(233301, 108.59f, 130.80f, 124.35f, (byte) 97, "B2142518141", 0);	// Hiperion Desteği Büyücüsü	 	(Group 2)
+		spawn(233298, 110.97f, 130.15f, 124.30f, (byte) 97, "B2142518141", 1);	// Hiperion Desteği Canisi 			(Group 2)
+		spawn(233299, 106.31f, 127.48f, 124.23f, (byte) 97, "B2142518141", 2);	// Hiperion Desteği Şifacısı 		(Group 2)
+		spawn(231103, 123.109f, 145.36f, 112.12f, (byte) 0);	// Hand
+		spawn(231103, 123.26f, 130.70f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.74f, 129.67f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 139.07f, 142.46f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.26f, 117.27f, 116.74f, (byte) 0);		// Hand
+
+	}
+
+	private void FifthWave() {
+
+		spawn(233291, 149.32f, 146.91f, 124.23f, (byte) 38, "A2142518112", 0);	// Hiperion Desteği Sihirbazı 		(Group 1)
+		spawn(231097, 147.89f, 145.47f, 124.33f, (byte) 36, "A2142518112", 1);	// Hiperion Desteği Keşif Eri 		(Group 1)
+		spawn(231098, 153.48f, 147.11f, 124.40f, (byte) 36, "A2142518112", 2);	// Hiperion Desteği Sıhhiyesi 		(Group 1)
+		spawn(233301, 108.59f, 130.80f, 124.35f, (byte) 97, "B2142518141", 0);	// Hiperion Desteği Büyücüsü	 	(Group 2)
+		spawn(233298, 110.97f, 130.15f, 124.30f, (byte) 97, "B2142518141", 1);	// Hiperion Desteği Canisi 			(Group 2)
+		spawn(233299, 106.31f, 127.48f, 124.23f, (byte) 97, "B2142518141", 2);	// Hiperion Desteği Şifacısı 		(Group 2)
+		spawn(231103, 123.109f, 145.36f, 112.12f, (byte) 0);	// Hand
+		spawn(231103, 123.26f, 130.70f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.74f, 129.67f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 139.07f, 142.46f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.26f, 117.27f, 116.74f, (byte) 0);		// Hand
+
+	}
+
+	private void EndWave() {
+
+		spawn(233297, 151.50f, 142.70f, 124.65f, (byte) 38, "A2142518112", 0);	// Hiperion Desteği Sihirbazı 		(Group 1)
+		spawn(233291, 149.32f, 146.91f, 124.23f, (byte) 38, "A2142518112", 1);	// Hiperion Desteği Sihirbazı 		(Group 1)
+		spawn(231097, 147.89f, 145.47f, 124.33f, (byte) 36, "A2142518112", 2);	// Hiperion Desteği Keşif Eri 		(Group 1)
+		spawn(231098, 153.48f, 147.11f, 124.40f, (byte) 36, "A2142518112", 3);	// Hiperion Desteği Sıhhiyesi 		(Group 1)
+		spawn(231096, 106.73f, 132.61f, 124.63f, (byte) 97, "B2142518141", 0);	// Hiperion Desteği Dövüşçüsü	 	(Group 2)
+		spawn(233301, 108.59f, 130.80f, 124.35f, (byte) 97, "B2142518141", 1);	// Hiperion Desteği Büyücüsü	 	(Group 2)
+		spawn(233298, 110.97f, 130.15f, 124.30f, (byte) 97, "B2142518141", 2);	// Hiperion Desteği Canisi 			(Group 2)
+		spawn(233299, 106.31f, 127.48f, 124.23f, (byte) 97, "B2142518141", 3);	// Hiperion Desteği Şifacısı 		(Group 2)
+		spawn(231103, 123.109f, 145.36f, 112.12f, (byte) 0);	// Hand
+		spawn(231103, 123.26f, 130.70f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.74f, 129.67f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 139.07f, 142.46f, 112.17f, (byte) 0);		// Hand
+		spawn(231103, 135.26f, 117.27f, 116.74f, (byte) 0);		// Hand
+
 	}
 
 	@Override
 	protected void handleSpawned() {
 		super.handleSpawned();
 		addPercent();
+	}
+
+	@Override
+	protected void handleDespawned() {
+		super.handleDespawned();
+		percents.clear();
+		despawnAdds();
 	}
 
 	private void deleteNpcs(List<Npc> npcs) {
@@ -249,46 +414,28 @@ public class HyperionAI2 extends AggressiveNpcAI2 {
 	private void despawnAdds() {
 		WorldMapInstance instance = getPosition().getWorldMapInstance();
 		deleteNpcs(instance.getNpcs(231096));
-		deleteNpcs(instance.getNpcs(233292));
+		deleteNpcs(instance.getNpcs(231097));
+		deleteNpcs(instance.getNpcs(231098));
 		deleteNpcs(instance.getNpcs(231103));
-		deleteNpcs(instance.getNpcs(233289));
-		deleteNpcs(instance.getNpcs(233288));
-		deleteNpcs(instance.getNpcs(233294));
-		deleteNpcs(instance.getNpcs(233296));
-		deleteNpcs(instance.getNpcs(233295));
-		deleteNpcs(instance.getNpcs(233299));
-		deleteNpcs(instance.getNpcs(233298));
 		deleteNpcs(instance.getNpcs(231104));
-	}
-
-	@Override
-	protected void handleBackHome() {
-		super.handleBackHome();
-		addPercent();
-		cancelskillTask();
-		cancelBlasterTask();
-		cancelEnergyTask();
-		isHome.set(true);
-		despawnAdds();
-	}
-
-	@Override
-	protected void handleDespawned() {
-		super.handleDespawned();
-		percents.clear();
-		despawnAdds();
-		cancelskillTask();
-		cancelBlasterTask();
-		cancelEnergyTask();
+		deleteNpcs(instance.getNpcs(233288));
+		deleteNpcs(instance.getNpcs(233289));
+		deleteNpcs(instance.getNpcs(233292));
+		deleteNpcs(instance.getNpcs(233294));
+		deleteNpcs(instance.getNpcs(233295));
+		deleteNpcs(instance.getNpcs(233296));
+		deleteNpcs(instance.getNpcs(233297));
+		deleteNpcs(instance.getNpcs(233298));
+		deleteNpcs(instance.getNpcs(233299));
 	}
 
 	@Override
 	protected void handleDied() {
-		super.handleDied();
 		percents.clear();
-		cancelskillTask();
-		cancelBlasterTask();
-		cancelEnergyTask();
+		if (Cast != null) {
+			Cast.cancel(false);
+		}
+		super.handleDied();
 		despawnAdds();
 	}
 }

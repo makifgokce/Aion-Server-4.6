@@ -54,6 +54,7 @@ public class NpcGameStats extends CreatureGameStats<Npc> {
 
 	@Override
 	protected void onStatsChange() {
+		super.checkHPStats();
 		checkSpeedStats();
 	}
 

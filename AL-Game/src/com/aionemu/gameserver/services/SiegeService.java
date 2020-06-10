@@ -17,6 +17,21 @@
 
 package com.aionemu.gameserver.services;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import org.quartz.JobDetail;
+import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.commons.services.CronService;
 import com.aionemu.commons.utils.Rnd;
@@ -30,7 +45,14 @@ import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.siege.SiegeNpc;
-import com.aionemu.gameserver.model.siege.*;
+import com.aionemu.gameserver.model.siege.ArtifactLocation;
+import com.aionemu.gameserver.model.siege.FortressLocation;
+import com.aionemu.gameserver.model.siege.Influence;
+import com.aionemu.gameserver.model.siege.OutpostLocation;
+import com.aionemu.gameserver.model.siege.SiegeLocation;
+import com.aionemu.gameserver.model.siege.SiegeModType;
+import com.aionemu.gameserver.model.siege.SiegeRace;
+import com.aionemu.gameserver.model.siege.SourceLocation;
 import com.aionemu.gameserver.model.stats.container.NpcLifeStats;
 import com.aionemu.gameserver.model.templates.npc.NpcRating;
 import com.aionemu.gameserver.model.templates.npc.NpcTemplate;
@@ -38,8 +60,22 @@ import com.aionemu.gameserver.model.templates.spawns.SpawnGroup2;
 import com.aionemu.gameserver.model.templates.spawns.SpawnTemplate;
 import com.aionemu.gameserver.model.templates.spawns.siegespawns.SiegeSpawnTemplate;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
-import com.aionemu.gameserver.network.aion.serverpackets.*;
-import com.aionemu.gameserver.services.siegeservice.*;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_ABYSS_ARTIFACT_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_FORTRESS_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_FORTRESS_STATUS;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_INFLUENCE_RATIO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_RIFT_ANNOUNCE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SHIELD_EFFECT;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SIEGE_LOCATION_INFO;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SIEGE_LOCATION_STATE;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
+import com.aionemu.gameserver.services.siegeservice.ArtifactSiege;
+import com.aionemu.gameserver.services.siegeservice.FortressSiege;
+import com.aionemu.gameserver.services.siegeservice.OutpostSiege;
+import com.aionemu.gameserver.services.siegeservice.Siege;
+import com.aionemu.gameserver.services.siegeservice.SiegeException;
+import com.aionemu.gameserver.services.siegeservice.SiegeStartRunnable;
+import com.aionemu.gameserver.services.siegeservice.SourceSiege;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
 import com.aionemu.gameserver.skillengine.SkillEngine;
 import com.aionemu.gameserver.spawnengine.SpawnEngine;
@@ -53,16 +89,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import java.util.*;
-
-import javax.annotation.Nullable;
-
 import javolution.util.FastMap;
-
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 3.0 siege update
@@ -116,11 +143,11 @@ public class SiegeService {
 	 * (Top rigft)
 	 */
 	private boolean cl, cr, tl, tr;
-	private FastMap<Integer, VisibleObject> tiamarantaPortals = new FastMap<Integer, VisibleObject>();
-	private FastMap<Integer, VisibleObject> tiamarantaEyeBoss = new FastMap<Integer, VisibleObject>();
-	private FastMap<Integer, VisibleObject> moltenusAbyssBoss = new FastMap<Integer, VisibleObject>();
+	private FastMap<Integer, VisibleObject> tiamarantaPortals = new FastMap<>();
+	private FastMap<Integer, VisibleObject> tiamarantaEyeBoss = new FastMap<>();
+	private FastMap<Integer, VisibleObject> moltenusAbyssBoss = new FastMap<>();
 	// Player list on RVR Event.
-	private List<Player> rvrPlayersOnEvent = new ArrayList<Player>();
+	private List<Player> rvrPlayersOnEvent = new ArrayList<>();
 
 	/**
 	 * Returns the single instance of siege service
@@ -143,7 +170,6 @@ public class SiegeService {
 	public void initSiegeLocations() {
 		if (SiegeConfig.SIEGE_ENABLED) {
 			log.info("Initializing sieges...");
-
 			if (siegeSchedule != null) {
 				log.error("SiegeService should not be initialized two times!");
 				return;
@@ -706,7 +732,7 @@ public class SiegeService {
 	}
 
 	public Map<Integer, SiegeLocation> getSiegeLocations(int worldId) {
-		Map<Integer, SiegeLocation> mapLocations = new FastMap<Integer, SiegeLocation>();
+		Map<Integer, SiegeLocation> mapLocations = new FastMap<>();
 		for (SiegeLocation location : getSiegeLocations().values()) {
 			if (location.getWorldId() == worldId) {
 				mapLocations.put(location.getLocationId(), location);
@@ -1056,8 +1082,8 @@ public class SiegeService {
 
 	public void onEnterSiegeWorld(Player player) {
 		// Second part only for siege world
-		FastMap<Integer, SiegeLocation> worldLocations = new FastMap<Integer, SiegeLocation>();
-		FastMap<Integer, ArtifactLocation> worldArtifacts = new FastMap<Integer, ArtifactLocation>();
+		FastMap<Integer, SiegeLocation> worldLocations = new FastMap<>();
+		FastMap<Integer, ArtifactLocation> worldArtifacts = new FastMap<>();
 
 		for (SiegeLocation location : getSiegeLocations().values()) {
 			if (location.getWorldId() == player.getWorldId()) {
@@ -1142,7 +1168,7 @@ public class SiegeService {
 
 	// clear RVR event players list
 	public void clearRvrPlayersOnEvent() {
-		rvrPlayersOnEvent = new ArrayList<Player>();
+		rvrPlayersOnEvent = new ArrayList<>();
 	}
 
 	public void fortressBuffApply(Player player) {

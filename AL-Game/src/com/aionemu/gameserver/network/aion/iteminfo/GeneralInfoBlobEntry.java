@@ -39,7 +39,7 @@ public class GeneralInfoBlobEntry extends ItemBlobEntry {
 	@Override
 	public void writeThisBlob(ByteBuffer buf) {// TODO what with kinah?
 		Item item = ownerItem;
-		writeH(buf, item.getItemMask(owner));
+		writeH(buf, item.getItemMask());
 		writeQ(buf, item.getItemCount());
 		writeS(buf, item.getItemCreator());// Creator name
 		writeC(buf, 0);

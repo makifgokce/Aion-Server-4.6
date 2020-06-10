@@ -17,8 +17,6 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
-import com.aionemu.gameserver.configs.main.MembershipConfig;
-import com.aionemu.gameserver.configs.main.WeddingsConfig;
 import com.aionemu.gameserver.model.gameobjects.player.DeniedStatus;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.team2.alliance.PlayerAllianceService;
@@ -60,24 +58,6 @@ public class CM_INVITE_TO_GROUP extends AionClientPacket {
 	@Override
 	protected void runImpl() {
 
-		name = ChatUtil.getRealAdminName(name);
-
-		name = name.replace(WeddingsConfig.TAG_WEDDING, "");
-
-		name = name.replace(MembershipConfig.TAG_PREMIUM, "");
-		name = name.replace(MembershipConfig.TAG_VIP, "");
-
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS1]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS2]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS3]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS4]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS5]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS6]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS7]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS8]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS9]", "");
-		name = name.replace("[AdminConfig.CUSTOMTAG_ACCESS10]", "");
-
 		final Player inviter = getConnection().getActivePlayer();
 		final String playerName = Util.convertName(name);
 
@@ -89,7 +69,7 @@ public class CM_INVITE_TO_GROUP extends AionClientPacket {
 
 		final Player invited = World.getInstance().findPlayer(playerName);
 		if (invited != null) {
-			if (invited.getPlayerSettings().isInDeniedStatus(DeniedStatus.GROUP)) {
+			if (invited.getCommonData().getPlayerSettings().isInDeniedStatus(DeniedStatus.GROUP)) {
 				sendPacket(SM_SYSTEM_MESSAGE.STR_MSG_REJECTED_INVITE_PARTY(invited.getName()));
 				return;
 			}

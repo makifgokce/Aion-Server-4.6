@@ -101,6 +101,7 @@ public final class DataManager {
 	public static InstanceBuffData INSTANCE_BUFF_DATA;
 	public static HousingObjectData HOUSING_OBJECT_DATA;
 	public static RideData RIDE_DATA;
+	public static WorldBuffData WORLD_BUFF_DATA;
 	public static InstanceExitData INSTANCE_EXIT_DATA;
 	public static PortalLocData PORTAL_LOC_DATA;
 	public static Portal2Data PORTAL2_DATA;
@@ -206,6 +207,7 @@ public final class DataManager {
 		INSTANCE_BUFF_DATA = data.instanceBuffData;
 		HOUSING_OBJECT_DATA = data.housingObjectData;
 		RIDE_DATA = data.rideData;
+		WORLD_BUFF_DATA = data.buffData;
 		INSTANCE_EXIT_DATA = data.instanceExitData;
 		PORTAL_LOC_DATA = data.portalLocData;
 		PORTAL2_DATA = data.portalTemplate2;

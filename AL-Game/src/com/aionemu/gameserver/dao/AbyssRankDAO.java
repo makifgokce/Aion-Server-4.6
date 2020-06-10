@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.dao;
 
 import java.util.ArrayList;
@@ -30,31 +29,35 @@ import com.aionemu.gameserver.utils.stats.AbyssRankEnum;
 
 /**
  * @author ATracer
+ * @rework Phantom_KNA
  */
 public abstract class AbyssRankDAO implements DAO {
 
-	@Override
-	public final String getClassName() {
-		return AbyssRankDAO.class.getName();
-	}
+    @Override
+    public final String getClassName() {
+        return AbyssRankDAO.class.getName();
+    }
 
-	public abstract void loadAbyssRank(Player player);
+	public abstract List<Integer> RankPlayers(final int rank); //DailyReduceGp
 
-	public abstract AbyssRank loadAbyssRank(int playerId);
+	public abstract void updateGloryPoints(final int playerId, final int gp); //DailyReduceGp
 
-	public abstract boolean storeAbyssRank(Player player);
+    public abstract void loadAbyssRank(Player player);
 
-	public abstract ArrayList<AbyssRankingResult> getAbyssRankingPlayers(Race race, final int maxOfflineDays);
+    public abstract AbyssRank loadAbyssRank(int playerId);
 
-	public abstract ArrayList<AbyssRankingResult> getAbyssRankingLegions(Race race);
+    public abstract boolean storeAbyssRank(Player player);
 
-	public abstract Map<Integer, Integer> loadPlayersAp(Race race, final int lowerApLimit, final int maxOfflineDays);
+    public abstract ArrayList<AbyssRankingResult> getAbyssRankingPlayers(Race race, final int maxOfflineDays);
 
-	public abstract Map<Integer, Integer> loadPlayersGp(Race race, final int lowerGpLimit, final int maxOfflineDays);
+    public abstract ArrayList<AbyssRankingResult> getAbyssRankingLegions(Race race);
 
-	public abstract void updateAbyssRank(int playerId, AbyssRankEnum rankEnum);
+    public abstract Map<Integer, Integer> loadPlayersAp(Race race, final int lowerApLimit);
 
-	public abstract void updateRankList(final int maxOfflineDays);
+    public abstract Map<Integer, Integer> loadPlayersGp(Race race, final int lowerGpLimit, final int maxOfflineDays);
 
-	public abstract void removePlayer(List<Player> listP);
+    public abstract void updateAbyssRank(int playerId, AbyssRankEnum rankEnum);
+
+    public abstract void updateRankList(final int maxOfflineDays);
+
 }

@@ -17,6 +17,19 @@
 
 package mysql5;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.DB;
 import com.aionemu.commons.database.DatabaseFactory;
 import com.aionemu.commons.utils.GenericValidator;
@@ -32,18 +45,8 @@ import com.aionemu.gameserver.model.items.storage.StorageType;
 import com.aionemu.gameserver.services.item.ItemService;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import javolution.util.FastList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import javolution.util.FastList;
 
 /**
  * @author ATracer
@@ -51,9 +54,9 @@ import java.util.List;
 public class MySQL5InventoryDAO extends InventoryDAO {
 
 	private static final Logger log = LoggerFactory.getLogger(MySQL5InventoryDAO.class);
-	public static final String SELECT_QUERY = "SELECT `item_unique_id`, `item_id`, `item_count`, `item_color`, `color_expires`, `item_creator`, `expire_time`, `activation_count`, `is_equiped`, `is_soul_bound`, `slot`, `enchant`, `item_skin`, `fusioned_item`, `optional_socket`, `optional_fusion_socket`, `charge`, `rnd_bonus`, `rnd_count`, `pack_count`, `is_packed`, `authorize` FROM `inventory` WHERE `item_owner`=? AND `item_location`=? AND `is_equiped`=?";
-	public static final String INSERT_QUERY = "INSERT INTO `inventory` (`item_unique_id`, `item_id`, `item_count`, `item_color`, `color_expires`, `item_creator`, `expire_time`, `activation_count`, `item_owner`, `is_equiped`, is_soul_bound, `slot`, `item_location`, `enchant`, `item_skin`, `fusioned_item`, `optional_socket`, `optional_fusion_socket`, `charge`, `rnd_bonus`, `rnd_count`, `pack_count`, `is_packed`, `authorize`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	public static final String UPDATE_QUERY = "UPDATE inventory SET  item_count=?, item_color=?, color_expires=?, item_creator=?, expire_time=?, activation_count=?,item_owner=?, is_equiped=?, is_soul_bound=?, slot=?, item_location=?, enchant=?, item_skin=?, fusioned_item=?, optional_socket=?, optional_fusion_socket=?, charge=?, rnd_bonus=?, rnd_count=?, pack_count=?, is_packed=?, authorize=? WHERE item_unique_id=?";
+	public static final String SELECT_QUERY = "SELECT `item_unique_id`, `item_id`, `item_count`, `item_color`, `color_expires`, `item_creator`, `expire_time`, `activation_count`, `is_equiped`, `is_soul_bound`, `slot`, `enchant`, `item_skin`, `fusioned_item`, `optional_socket`, `optional_fusion_socket`, `charge`, `rnd_bonus`, `bns_enchant`, `rnd_count`, `pack_count`, `is_packed`, `authorize` FROM `inventory` WHERE `item_owner`=? AND `item_location`=? AND `is_equiped`=?";
+	public static final String INSERT_QUERY = "INSERT INTO `inventory` (`item_unique_id`, `item_id`, `item_count`, `item_color`, `color_expires`, `item_creator`, `expire_time`, `activation_count`, `item_owner`, `is_equiped`, is_soul_bound, `slot`, `item_location`, `enchant`, `item_skin`, `fusioned_item`, `optional_socket`, `optional_fusion_socket`, `charge`, `rnd_bonus`, `bns_enchant`, `rnd_count`, `pack_count`, `is_packed`, `authorize`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	public static final String UPDATE_QUERY = "UPDATE inventory SET  item_count=?, item_color=?, color_expires=?, item_creator=?, expire_time=?, activation_count=?,item_owner=?, is_equiped=?, is_soul_bound=?, slot=?, item_location=?, enchant=?, item_skin=?, fusioned_item=?, optional_socket=?, optional_fusion_socket=?, charge=?, rnd_bonus=?, bns_enchant=?, rnd_count=?, pack_count=?, is_packed=?, authorize=? WHERE item_unique_id=?";
 	public static final String DELETE_QUERY = "DELETE FROM inventory WHERE item_unique_id=?";
 	public static final String DELETE_CLEAN_QUERY = "DELETE FROM inventory WHERE item_owner=? AND item_location != 2"; // legion
 																														// warehouse
@@ -192,7 +195,7 @@ public class MySQL5InventoryDAO extends InventoryDAO {
 
 	@Override
 	public List<Item> loadEquipment(int playerId) {
-		final List<Item> items = new ArrayList<Item>();
+		final List<Item> items = new ArrayList<>();
 		final int storage = 0;
 		final int equipped = 1;
 
@@ -237,12 +240,13 @@ public class MySQL5InventoryDAO extends InventoryDAO {
 		int optionalFusionSocket = rset.getInt("optional_fusion_socket");
 		int charge = rset.getInt("charge");
 		int randomBonus = rset.getInt("rnd_bonus");
+		int bns_enchant = rset.getInt("bns_enchant");
 		int rndCount = rset.getInt("rnd_count");
 		int packCount = rset.getInt("pack_count");
 		int isPacked = rset.getInt("is_packed");
 		int authorize = rset.getInt("authorize");
 		return new Item(itemUniqueId, itemId, itemCount, itemColor, colorExpireTime, itemCreator, expireTime, activationCount, isEquiped == 1,
-				isSoulBound == 1, slot, storage, enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge, randomBonus, rndCount,
+				isSoulBound == 1, slot, storage, enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge, randomBonus, bns_enchant, rndCount,
 				packCount, isPacked == 1, authorize);
 	}
 
@@ -408,10 +412,11 @@ public class MySQL5InventoryDAO extends InventoryDAO {
 				stmt.setInt(18, item.getOptionalFusionSocket());
 				stmt.setInt(19, item.getChargePoints());
 				stmt.setInt(20, item.getBonusNumber());
-				stmt.setInt(21, item.getRandomCount());
-				stmt.setInt(22, item.getPackCount());
-				stmt.setBoolean(23, item.isPacked());
-				stmt.setInt(24, item.getAuthorize());
+				stmt.setInt(21, item.getBonusEnchant());
+				stmt.setInt(22, item.getRandomCount());
+				stmt.setInt(23, item.getPackCount());
+				stmt.setBoolean(24, item.isPacked());
+				stmt.setInt(25, item.getAuthorize());
 				stmt.addBatch();
 			}
 
@@ -455,11 +460,12 @@ public class MySQL5InventoryDAO extends InventoryDAO {
 				stmt.setInt(16, item.getOptionalFusionSocket());
 				stmt.setInt(17, item.getChargePoints());
 				stmt.setInt(18, item.getBonusNumber());
-				stmt.setInt(19, item.getRandomCount());
-				stmt.setInt(20, item.getPackCount());
-				stmt.setBoolean(21, item.isPacked());
-				stmt.setInt(22, item.getAuthorize());
-				stmt.setInt(23, item.getObjectId());
+				stmt.setInt(19, item.getBonusEnchant());
+				stmt.setInt(20, item.getRandomCount());
+				stmt.setInt(21, item.getPackCount());
+				stmt.setBoolean(22, item.isPacked());
+				stmt.setInt(23, item.getAuthorize());
+				stmt.setInt(24, item.getObjectId());
 				stmt.addBatch();
 			}
 

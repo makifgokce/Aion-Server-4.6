@@ -69,8 +69,7 @@ public class ChatCommandsLoader implements ClassListener {
 		if (!Modifier.isPublic(modifiers))
 			return false;
 
-		if (!ClassUtils.isSubclass(clazz, AdminCommand.class) && !ClassUtils.isSubclass(clazz, PlayerCommand.class)
-				&& !ClassUtils.isSubclass(clazz, WeddingCommand.class))
+		if (!ClassUtils.isSubclass(clazz, AdminCommand.class))
 			return false;
 		return true;
 	}

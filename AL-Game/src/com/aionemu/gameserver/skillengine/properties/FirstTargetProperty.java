@@ -101,7 +101,7 @@ public class FirstTargetProperty {
 						TargetRelationAttribute relation = skill.getSkillTemplate().getProperties().getTargetRelation();
 						TargetRangeAttribute type = skill.getSkillTemplate().getProperties().getTargetType();
 						if ((relation != TargetRelationAttribute.ALL && relation != TargetRelationAttribute.MYPARTY) || type == TargetRangeAttribute.PARTY
-								|| skill.getSkillId() == 2353) { // TODO: Remove
+								|| skill.getSkillId() == 2353 || skill.getSkillId() != 1057 || skill.getSkillId() != 1128) { // TODO: Remove
 																	// ID, find
 																	// logic!
 							PacketSendUtility.sendPacket((Player) skill.getEffector(), SM_SYSTEM_MESSAGE.STR_SKILL_TARGET_IS_NOT_VALID);

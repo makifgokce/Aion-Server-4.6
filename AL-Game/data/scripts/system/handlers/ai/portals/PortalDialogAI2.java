@@ -17,8 +17,9 @@
 
 package ai.portals;
 
+import java.util.List;
+
 import com.aionemu.gameserver.ai2.AIName;
-import com.aionemu.gameserver.ai2.handler.*;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.model.autogroup.AutoGroupType;
@@ -34,8 +35,6 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 import com.aionemu.gameserver.services.teleport.PortalService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-
-import java.util.List;
 
 /**
  * @author xTz
@@ -57,7 +56,7 @@ public class PortalDialogAI2 extends PortalAI2 {
 	protected void handleDialogStart(Player player) {
 		if (getTalkDelay() == 0) {
 			checkDialog(player);
-		} 
+		}
 		else {
 			super.handleDialogStart(player);
 		}
@@ -153,19 +152,19 @@ public class PortalDialogAI2 extends PortalAI2 {
 			if (!isRewardStep) { // normal dialog
 				PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), questDialogId));
 			}
-		} 
+		}
 		else if (playerCanStartQuest) { // start quest dialog
 			PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), startingDialogId));
-		} 
-		else // show teleportation dialog 
+		}
+		else // show teleportation dialog
 		{
 			switch (npcId) {
-				case 804621:				
-				case 804622:	
-				case 730841:			
+				case 804621:
+				case 804622:
+				case 730841: // Runadium
 				case 730883:
-					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), questDialogId));
-					break;					
+					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), questDialogId, 0));
+					break;
 				case 831117:
 				case 831131:
 					PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 1012, 0));

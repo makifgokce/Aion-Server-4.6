@@ -10,11 +10,23 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.skillengine.effect;
 
 import java.util.concurrent.Future;
@@ -47,52 +59,53 @@ import com.aionemu.gameserver.utils.ThreadPoolManager;
 @XmlType(name = "SummonServantEffect")
 public class SummonServantEffect extends SummonEffect {
 
-	private static final Logger log = LoggerFactory.getLogger(SummonServantEffect.class);
-	@XmlAttribute(name = "skill_id", required = true)
-	protected int skillId;
+    private static final Logger log = LoggerFactory.getLogger(SummonServantEffect.class);
+    @XmlAttribute(name = "skill_id", required = true)
+    protected int skillId;
 
-	@Override
-	public void applyEffect(Effect effect) {
-		Creature effector = effect.getEffector();
-		float x = effector.getX();
-		float y = effector.getY();
-		float z = effector.getZ();
-		spawnServant(effect, time, NpcObjectType.SERVANT, x, y, z);
-	}
+    @Override
+    public void applyEffect(Effect effect) {
+        Creature effector = effect.getEffector();
+        float x = effector.getX();
+        float y = effector.getY();
+        float z = effector.getZ();
+        spawnServant(effect, time, NpcObjectType.SERVANT, x, y, z);
+    }
 
-	/**
-	 * @param effect
-	 * @param time
-	 */
-	protected Servant spawnServant(Effect effect, int time, NpcObjectType npcObjectType, float x, float y, float z) {
-		Creature effector = effect.getEffector();
-		byte heading = effector.getHeading();
-		int worldId = effector.getWorldId();
-		int instanceId = effector.getInstanceId();
+    /**
+     * @param effect
+     * @param time
+     */
+    protected Servant spawnServant(Effect effect, int time, NpcObjectType npcObjectType, float x, float y, float z) {
+        Creature effector = effect.getEffector();
+        byte heading = effector.getHeading();
+        int worldId = effector.getWorldId();
+        int instanceId = effector.getInstanceId();
 
-		final Creature target = (Creature) effector.getTarget();
-		final Creature effected = (Creature) effect.getEffected();
+        final Creature target = (Creature) effector.getTarget();
+        final Creature effected = effect.getEffected();
 
-		SkillTemplate template = effect.getSkillTemplate();
+        SkillTemplate template = effect.getSkillTemplate();
 
-		if (template.getProperties().getFirstTarget() != FirstTargetAttribute.ME && target == null) {
-			log.warn("Servant trying to attack null target!!");
-			return null;
-		}
+        if (template.getProperties().getFirstTarget() != FirstTargetAttribute.ME && target == null) {
+            log.warn("Servant trying to attack null target!!");
+            return null;
+        }
 
-		SpawnTemplate spawn = SpawnEngine.addNewSingleTimeSpawn(worldId, npcId, x, y, z, heading);
-		final Servant servant = VisibleObjectSpawner.spawnServant(spawn, instanceId, effector, skillId, effect.getSkillLevel(), npcObjectType);
+        SpawnTemplate spawn = SpawnEngine.addNewSingleTimeSpawn(worldId, npcId, x, y, z, heading);
+        final Servant servant = VisibleObjectSpawner.spawnServant(spawn, instanceId, effector, skillId,
+                effect.getSkillLevel(), npcObjectType);
 
-		Future<?> task = ThreadPoolManager.getInstance().schedule(new Runnable() {
-			@Override
-			public void run() {
-				servant.getController().onDelete();
-			}
-		}, time * 1000);
-		servant.getController().addTask(TaskId.DESPAWN, task);
-		if (servant.getNpcObjectType() != NpcObjectType.TOTEM) {
-			servant.getAi2().onCreatureEvent(AIEventType.ATTACK, (target != null ? target : effected));
-		}
-		return servant;
-	}
+        Future<?> task = ThreadPoolManager.getInstance().schedule(new Runnable() {
+            @Override
+            public void run() {
+                servant.getController().onDelete();
+            }
+        }, time * 1000);
+        servant.getController().addTask(TaskId.DESPAWN, task);
+        if (servant.getNpcObjectType() != NpcObjectType.TOTEM) {
+            servant.getAi2().onCreatureEvent(AIEventType.ATTACK, (target != null ? target : effected));
+        }
+        return servant;
+    }
 }

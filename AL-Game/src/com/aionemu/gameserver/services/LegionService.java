@@ -21,10 +21,11 @@ import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javolution.util.FastList;
-
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,16 @@ import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.RequestResponseHandler;
 import com.aionemu.gameserver.model.items.storage.IStorage;
 import com.aionemu.gameserver.model.items.storage.StorageType;
-import com.aionemu.gameserver.model.team.legion.*;
+import com.aionemu.gameserver.model.team.legion.Legion;
+import com.aionemu.gameserver.model.team.legion.LegionEmblem;
+import com.aionemu.gameserver.model.team.legion.LegionEmblemType;
+import com.aionemu.gameserver.model.team.legion.LegionHistory;
+import com.aionemu.gameserver.model.team.legion.LegionHistoryType;
+import com.aionemu.gameserver.model.team.legion.LegionMember;
+import com.aionemu.gameserver.model.team.legion.LegionMemberEx;
+import com.aionemu.gameserver.model.team.legion.LegionPermissionsMask;
+import com.aionemu.gameserver.model.team.legion.LegionRank;
+import com.aionemu.gameserver.model.team.legion.LegionWarehouse;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_DIALOG_WINDOW;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ICON_INFO;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_LEGION_ADD_MEMBER;
@@ -69,10 +79,7 @@ import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.container.LegionContainer;
 import com.aionemu.gameserver.world.container.LegionMemberContainer;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
+import javolution.util.FastList;
 
 /**
  * This class is designed to do all the work related with loading/storing
@@ -962,7 +969,7 @@ public class LegionService {
 	 * @param legion
 	 */
 	public ArrayList<LegionMemberEx> loadLegionMemberExList(Legion legion, Integer objExcluded) {
-		ArrayList<LegionMemberEx> legionMembers = new ArrayList<LegionMemberEx>();
+		ArrayList<LegionMemberEx> legionMembers = new ArrayList<>();
 		for (Integer memberObjId : legion.getLegionMembers()) {
 			LegionMemberEx legionMemberEx;
 			if (objExcluded != null && objExcluded.equals(memberObjId)) {
@@ -991,7 +998,7 @@ public class LegionService {
 			int storageId = StorageType.LEGION_WAREHOUSE.getId();
 			boolean isEmpty = items.isEmpty();
 			if (!isEmpty) {
-				ListSplitter<Item> splitter = new ListSplitter<Item>(items, 10);
+				ListSplitter<Item> splitter = new ListSplitter<>(items, 10);
 				while (!splitter.isLast()) {
 					PacketSendUtility.sendPacket(player, new SM_WAREHOUSE_INFO(splitter.getNext(), storageId, whLvl, splitter.isFirst(), player));
 				}
@@ -1307,7 +1314,7 @@ public class LegionService {
 		// Send the new legion member the required legion packets
 		PacketSendUtility.sendPacket(player, new SM_LEGION_INFO(legion));
 		ArrayList<LegionMemberEx> totalMembers = loadLegionMemberExList(legion, player.getObjectId());
-		ListSplitter<LegionMemberEx> splits = new ListSplitter<LegionMemberEx>(totalMembers, 128);
+		ListSplitter<LegionMemberEx> splits = new ListSplitter<>(totalMembers, 128);
 		// Send the member list to the new legion member
 		while (!splits.isLast()) {
 			boolean result = false;
@@ -1397,7 +1404,7 @@ public class LegionService {
 		 */
 			case 0x01:
 				if (targetPlayer != null) {
-					if (targetPlayer.getPlayerSettings().isInDeniedStatus(DeniedStatus.GUILD)) {
+					if (targetPlayer.getCommonData().getPlayerSettings().isInDeniedStatus(DeniedStatus.GUILD)) {
 						PacketSendUtility.sendPacket(activePlayer, SM_SYSTEM_MESSAGE.STR_MSG_REJECTED_INVITE_GUILD(charName));
 						return;
 					}
@@ -1543,7 +1550,7 @@ public class LegionService {
 		PacketSendUtility.sendPacket(activePlayer, new SM_LEGION_INFO(legion));
 		ArrayList<LegionMemberEx> totalMembers = loadLegionMemberExList(legion, null);
 		// Send member list to player
-		ListSplitter<LegionMemberEx> splits = new ListSplitter<LegionMemberEx>(totalMembers, 128);
+		ListSplitter<LegionMemberEx> splits = new ListSplitter<>(totalMembers, 128);
 		// Send the member list to the new legion member
 		while (!splits.isLast()) {
 			boolean result = false;
@@ -1860,8 +1867,15 @@ public class LegionService {
 		 * @return true if allowed to leave
 		 */
 		private boolean canLeave(Player activePlayer) {
+			Legion legion = activePlayer.getLegion();
+			LegionWarehouse legWh = legion.getLegionWarehouse();
+			int whUser = legWh.getWhUser();
+			int playerId = activePlayer.getObjectId();
 			if (isBrigadeGeneral(activePlayer)) {
 				PacketSendUtility.sendPacket(activePlayer, SM_SYSTEM_MESSAGE.STR_GUILD_LEAVE_MASTER_CANT_LEAVE_BEFORE_CHANGE_MASTER);
+				return false;
+			} else if (whUser == playerId) {
+				PacketSendUtility.sendPacket(activePlayer, SM_SYSTEM_MESSAGE.STR_GUILD_LEAVE_CANT_LEAVE_GUILD_WHILE_USING_WAREHOUSE);
 				return false;
 			}
 			return true;
@@ -1933,7 +1947,8 @@ public class LegionService {
 		 */
 		public boolean canOpenWarehouse(Player player) {
 			if (!player.isLegionMember()) {
-				// TODO: Message: Not in a legion
+				// TODO: Message: Herhangi bir lejyona ait değilsin.
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GUILD_LEAVE_I_AM_NOT_BELONG_TO_GUILD);
 				return false;
 			}
 			Legion legion = player.getLegion();
@@ -1945,9 +1960,14 @@ public class LegionService {
 				return false;
 			} else if (!LegionConfig.LEGION_WAREHOUSE) {
 				// Legion Warehouse not enabled
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_CANT_USE_GUILD_STORAGE);
 				return false;
 			} else if (whUser != playerId && legWh.getWhUser() != 0) {
 				PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1300280));
+				return false;
+			} else if (!player.getLegionMember().hasRights(LegionPermissionsMask.WH_DEPOSIT)) {
+				PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GUILD_WAREHOUSE_NO_RIGHT);
+				// Lejyon deposunu kullanmak için gerekli yetkilere sahip değilsin.
 				return false;
 			}
 			legWh.setWhUser(player.getObjectId());

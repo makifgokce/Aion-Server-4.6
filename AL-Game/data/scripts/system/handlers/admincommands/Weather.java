@@ -18,6 +18,7 @@
 package admincommands;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -88,7 +89,7 @@ public class Weather extends AdminCommand {
 		// Retrieving regionId by name
 		WorldMapType region = null;
 		for (WorldMapType worldMapType : WorldMapType.values()) {
-			if (worldMapType.name().toLowerCase().equals(regionName.toLowerCase())) {
+			if (worldMapType.name().toLowerCase(Locale.forLanguageTag("en")).equals(regionName.toLowerCase(Locale.forLanguageTag("en")))) {
 				region = worldMapType;
 				break;
 			}

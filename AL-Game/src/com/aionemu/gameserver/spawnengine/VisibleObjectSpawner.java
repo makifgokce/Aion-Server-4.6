@@ -14,19 +14,38 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.spawnengine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.configs.main.SiegeConfig;
-import com.aionemu.gameserver.controllers.*;
+import com.aionemu.gameserver.controllers.GatherableController;
+import com.aionemu.gameserver.controllers.NpcController;
+import com.aionemu.gameserver.controllers.PetController;
+import com.aionemu.gameserver.controllers.SiegeWeaponController;
+import com.aionemu.gameserver.controllers.SummonController;
 import com.aionemu.gameserver.controllers.effect.EffectController;
 import com.aionemu.gameserver.dataholders.DataManager;
+import com.aionemu.gameserver.dataholders.NpcData;
 import com.aionemu.gameserver.geoEngine.collision.CollisionIntention;
 import com.aionemu.gameserver.geoEngine.math.Vector3f;
 import com.aionemu.gameserver.model.Race;
 import com.aionemu.gameserver.model.base.BaseLocation;
-import com.aionemu.gameserver.model.gameobjects.*;
+import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.Gatherable;
+import com.aionemu.gameserver.model.gameobjects.GroupGate;
+import com.aionemu.gameserver.model.gameobjects.Homing;
+import com.aionemu.gameserver.model.gameobjects.Kisk;
+import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.NpcObjectType;
+import com.aionemu.gameserver.model.gameobjects.Pet;
+import com.aionemu.gameserver.model.gameobjects.Servant;
+import com.aionemu.gameserver.model.gameobjects.Summon;
+import com.aionemu.gameserver.model.gameobjects.SummonedHouseNpc;
+import com.aionemu.gameserver.model.gameobjects.Trap;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.PetCommonData;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.siege.SiegeNpc;
@@ -46,7 +65,11 @@ import com.aionemu.gameserver.model.templates.spawns.siegespawns.SiegeSpawnTempl
 import com.aionemu.gameserver.model.templates.spawns.vortexspawns.VortexSpawnTemplate;
 import com.aionemu.gameserver.model.vortex.VortexLocation;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_PLAYER_STATE;
-import com.aionemu.gameserver.services.*;
+import com.aionemu.gameserver.services.BaseService;
+import com.aionemu.gameserver.services.RiftService;
+import com.aionemu.gameserver.services.SiegeService;
+import com.aionemu.gameserver.services.SkillLearnService;
+import com.aionemu.gameserver.services.VortexService;
 import com.aionemu.gameserver.skillengine.effect.SummonOwner;
 import com.aionemu.gameserver.skillengine.model.SkillTemplate;
 import com.aionemu.gameserver.utils.MathUtil;
@@ -57,58 +80,13 @@ import com.aionemu.gameserver.world.geo.GeoService;
 import com.aionemu.gameserver.world.knownlist.CreatureAwareKnownList;
 import com.aionemu.gameserver.world.knownlist.NpcKnownList;
 import com.aionemu.gameserver.world.knownlist.PlayerAwareKnownList;
-import com.aionemu.gameserver.configs.main.RateConfig;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author ATracer
- * @modify Waii
- * @modify WingMan
  */
-
 public class VisibleObjectSpawner {
 
 	private static final Logger log = LoggerFactory.getLogger(VisibleObjectSpawner.class);
-
-	protected static NpcTemplate RatedTemplate(int objId) {
-		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objId);
-		if (!com.aionemu.gameserver.GameServer.npcs_count.contains(String.valueOf(objId))) {
-			double RateHP = 1.0;
-			double RatePW = 1.0;
-			switch (npcTemplate.getRating()) {
-				case JUNK:
-					RateHP = RateConfig.JUNK_MOBS_RATE_HP;
-					RatePW = RateConfig.JUNK_MOBS_RATE_PW;
-					break;
-				case NORMAL:
-					RateHP = RateConfig.NORMAL_MOBS_RATE_HP;
-					RatePW = RateConfig.NORMAL_MOBS_RATE_PW;
-					break;
-				case ELITE:
-					RateHP = RateConfig.ELITE_MOBS_RATE_HP;
-					RatePW = RateConfig.ELITE_MOBS_RATE_PW;
-					break;
-				case HERO:
-					RateHP = RateConfig.HERO_MOBS_RATE_HP;
-					RatePW = RateConfig.HERO_MOBS_RATE_PW;
-					break;
-				case LEGENDARY:
-					RateHP = RateConfig.LEGENDARY_MOBS_RATE_HP;
-					RatePW = RateConfig.LEGENDARY_MOBS_RATE_PW;
-					break;
-				default:
-					break;
-			}
-			int NewMaxHP = (int) (npcTemplate.getStatsTemplate().getMaxHp() * RateHP);
-			int NewPower = (int) (npcTemplate.getStatsTemplate().getPower() * RatePW);
-			npcTemplate.getStatsTemplate().setMaxHp(NewMaxHP);
-			npcTemplate.getStatsTemplate().setPower(NewPower);
-			com.aionemu.gameserver.GameServer.npcs_count.add(String.valueOf(objId));
-		}
-		return npcTemplate;
-	}
 
 	/**
 	 * @param spawn
@@ -122,22 +100,22 @@ public class VisibleObjectSpawner {
 			log.error("No template for NPC " + String.valueOf(objectId));
 			return null;
 		}
-
 		IDFactory iDFactory = IDFactory.getInstance();
-		Npc npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+		Npc npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 		npc.setCreatorId(spawn.getCreatorId());
 		npc.setMasterName(spawn.getMasterName());
 		npc.setKnownlist(new NpcKnownList(npc));
 		npc.setEffectController(new EffectController(npc));
 
-		if (WalkerFormator.processClusteredNpc(npc, spawn.getWorldId(), instanceIndex))
+		if (WalkerFormator.processClusteredNpc(npc, spawn.getWorldId(), instanceIndex)) {
 			return npc;
+		}
 
 		try {
 			SpawnEngine.bringIntoWorld(npc, spawn, instanceIndex);
-		} catch (Exception ex) {
-			log.error("Error during spawn of npc {}, world {}, x-y {}-{}",
-					new Object[] { npcTemplate.getTemplateId(), spawn.getWorldId(), spawn.getX(), spawn.getY() });
+		}
+		catch (Exception ex) {
+			log.error("Error during spawn of npc {}, world {}, x-y {}-{}", new Object[] { npcTemplate.getTemplateId(), spawn.getWorldId(), spawn.getX(), spawn.getY() });
 			log.error("Npc {} will be despawned", npcTemplate.getTemplateId(), ex);
 			World.getInstance().despawn(npc);
 		}
@@ -147,12 +125,7 @@ public class VisibleObjectSpawner {
 	public static SummonedHouseNpc spawnHouseNpc(SpawnTemplate spawn, int instanceIndex, House creator, String masterName) {
 		int npcId = spawn.getNpcId();
 		NpcTemplate template = DataManager.NPC_DATA.getNpcTemplate(npcId);
-		if (template == null) {
-			log.error("No template for House NPC " + String.valueOf(npcId));
-			return null;
-		}
-
-		SummonedHouseNpc npc = new SummonedHouseNpc(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(npcId), creator, masterName);
+		SummonedHouseNpc npc = new SummonedHouseNpc(IDFactory.getInstance().nextId(), new NpcController(), spawn, template, creator, masterName);
 		npc.setKnownlist(new PlayerAwareKnownList(npc));
 		npc.setEffectController(new EffectController(npc));
 		SpawnEngine.bringIntoWorld(npc, spawn, instanceIndex);
@@ -180,7 +153,7 @@ public class VisibleObjectSpawner {
 		}
 
 		IDFactory iDFactory = IDFactory.getInstance();
-		Npc npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+		Npc npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 
 		npc.setKnownlist(new NpcKnownList(npc));
 		npc.setEffectController(new EffectController(npc));
@@ -197,7 +170,7 @@ public class VisibleObjectSpawner {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
 		if (npcTemplate == null) {
-			log.error("No template for Rift NPC " + String.valueOf(objectId));
+			log.error("No template for NPC " + String.valueOf(objectId));
 			return null;
 		}
 		IDFactory iDFactory = IDFactory.getInstance();
@@ -206,9 +179,10 @@ public class VisibleObjectSpawner {
 		int spawnId = spawn.getId();
 		RiftLocation loc = RiftService.getInstance().getRiftLocation(spawnId);
 		if (loc.isOpened() && spawnId == loc.getId()) {
-			npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+			npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 			npc.setKnownlist(new NpcKnownList(npc));
-		} else {
+		}
+		else {
 			return null;
 		}
 		npc.setEffectController(new EffectController(npc));
@@ -222,13 +196,14 @@ public class VisibleObjectSpawner {
 	 * @return
 	 */
 	protected static VisibleObject spawnSiegeNpc(SiegeSpawnTemplate spawn, int instanceIndex) {
-		if (!SiegeConfig.SIEGE_ENABLED)
+		if (!SiegeConfig.SIEGE_ENABLED) {
 			return null;
+		}
 
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
 		if (npcTemplate == null) {
-			log.error("No template for Siege NPC " + String.valueOf(objectId));
+			log.error("No template for NPC " + String.valueOf(objectId));
 			return null;
 		}
 		IDFactory iDFactory = IDFactory.getInstance();
@@ -238,13 +213,15 @@ public class VisibleObjectSpawner {
 		SiegeLocation loc = SiegeService.getInstance().getSiegeLocation(spawnSiegeId);
 		if ((spawn.isPeace() || loc.isVulnerable()) && spawnSiegeId == loc.getLocationId() && spawn.getSiegeRace() == loc.getRace()) {
 			// default: GUARD
-			npc = new SiegeNpc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+			npc = new SiegeNpc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 			npc.setKnownlist(new NpcKnownList(npc));
-		} else if (spawn.isAssault() && loc.isVulnerable() && spawn.getSiegeRace().equals(SiegeRace.BALAUR)) {
+		}
+		else if (spawn.isAssault() && loc.isVulnerable() && spawn.getSiegeRace().equals(SiegeRace.BALAUR)) {
 			// attakers
-			npc = new SiegeNpc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+			npc = new SiegeNpc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 			npc.setKnownlist(new NpcKnownList(npc));
-		} else {
+		}
+		else {
 			return null;
 		}
 		npc.setEffectController(new EffectController(npc));
@@ -260,7 +237,7 @@ public class VisibleObjectSpawner {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
 		if (npcTemplate == null) {
-			log.error("No template for Invasion NPC " + String.valueOf(objectId));
+			log.error("No template for NPC " + String.valueOf(objectId));
 			return null;
 		}
 		IDFactory iDFactory = IDFactory.getInstance();
@@ -269,12 +246,14 @@ public class VisibleObjectSpawner {
 		int spawnId = spawn.getId();
 		VortexLocation loc = VortexService.getInstance().getVortexLocation(spawnId);
 		if (loc.isActive() && spawnId == loc.getId() && spawn.isInvasion()) {
-			npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+			npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 			npc.setKnownlist(new NpcKnownList(npc));
-		} else if (!loc.isActive() && spawnId == loc.getId() && spawn.isPeace()) {
-			npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+		}
+		else if (!loc.isActive() && spawnId == loc.getId() && spawn.isPeace()) {
+			npc = new Npc(iDFactory.nextId(), new NpcController(), spawn, npcTemplate);
 			npc.setKnownlist(new NpcKnownList(npc));
-		} else {
+		}
+		else {
 			return null;
 		}
 		npc.setEffectController(new EffectController(npc));
@@ -305,17 +284,20 @@ public class VisibleObjectSpawner {
 	public static Trap spawnTrap(SpawnTemplate spawn, int instanceIndex, Creature creator, int skillId) {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
-		if (npcTemplate == null) {
-			log.error("No template for Trap NPC " + String.valueOf(objectId));
-			return null;
-		}
-
-		Trap trap = new Trap(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+		Trap trap = new Trap(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate);
 		trap.setKnownlist(new NpcKnownList(trap));
 		trap.setEffectController(new EffectController(trap));
 		trap.setCreator(creator);
-		trap.setVisualState(CreatureVisualState.HIDE1);
-		trap.getAi2().onCustomEvent(1);
+		trap.getSkillList().addSkill(trap, skillId, 1);
+		if (objectId != 749300 || objectId != 749300) {
+			trap.setVisualState(CreatureVisualState.HIDE1);
+		}
+		try {
+			trap.getAi2().onCustomEvent(1, DataManager.SKILL_DATA.getSkillTemplate(skillId).getProperties().getEffectiveRange());
+		}
+		catch (Exception e) {
+			trap.getAi2().onCustomEvent(1, creator);
+		}
 		SpawnEngine.bringIntoWorld(trap, spawn, instanceIndex);
 		PacketSendUtility.broadcastPacket(trap, new SM_PLAYER_STATE(trap));
 		return trap;
@@ -330,12 +312,7 @@ public class VisibleObjectSpawner {
 	public static GroupGate spawnGroupGate(SpawnTemplate spawn, int instanceIndex, Creature creator) {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
-		if (npcTemplate == null) {
-			log.error("No template for Group Gate NPC " + String.valueOf(objectId));
-			return null;
-		}
-
-		GroupGate groupgate = new GroupGate(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(objectId));
+		GroupGate groupgate = new GroupGate(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate);
 		groupgate.setKnownlist(new PlayerAwareKnownList(groupgate));
 		groupgate.setEffectController(new EffectController(groupgate));
 		groupgate.setCreator(creator);
@@ -352,12 +329,7 @@ public class VisibleObjectSpawner {
 	public static Kisk spawnKisk(SpawnTemplate spawn, int instanceIndex, Player creator) {
 		int npcId = spawn.getNpcId();
 		NpcTemplate template = DataManager.NPC_DATA.getNpcTemplate(npcId);
-		if (template == null) {
-			log.error("No template for Kisk NPC " + String.valueOf(npcId));
-			return null;
-		}
-
-		Kisk kisk = new Kisk(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(npcId), creator);
+		Kisk kisk = new Kisk(IDFactory.getInstance().nextId(), new NpcController(), spawn, template, creator);
 		kisk.setKnownlist(new PlayerAwareKnownList(kisk));
 		kisk.setCreator(creator);
 		kisk.setEffectController(new EffectController(kisk));
@@ -371,43 +343,37 @@ public class VisibleObjectSpawner {
 	 */
 	public static Npc spawnPostman(final Player owner) {
 		int npcId = owner.getRace() == Race.ELYOS ? 798100 : 798101;
-		NpcTemplate template = DataManager.NPC_DATA.getNpcTemplate(npcId);
-		if (template == null) {
-			log.error("No template for Postman NPC " + String.valueOf(npcId));
-			return null;
-		}
-
+		NpcData npcData = DataManager.NPC_DATA;
+		NpcTemplate template = npcData.getNpcTemplate(npcId);
 		IDFactory iDFactory = IDFactory.getInstance();
 		int worldId = owner.getWorldId();
 		int instanceId = owner.getInstanceId();
 		double radian = Math.toRadians(MathUtil.convertHeadingToDegree(owner.getHeading()));
-		Vector3f pos = GeoService.getInstance().getClosestCollision(owner, owner.getX() + (float) (Math.cos(radian) * 5),
-				owner.getY() + (float) (Math.sin(radian) * 5), owner.getZ(), false, CollisionIntention.PHYSICAL.getId());
+		Vector3f pos = GeoService.getInstance().getClosestCollision(owner, owner.getX() + (float) (Math.cos(radian) * 5), owner.getY() + (float) (Math.sin(radian) * 5), owner.getZ(), false, CollisionIntention.PHYSICAL.getId());
 		SpawnTemplate spawn = SpawnEngine.addNewSingleTimeSpawn(worldId, npcId, pos.getX(), pos.getY(), pos.getZ(), (byte) 0);
-		final Npc postman = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(npcId));
+		final Npc postman = new Npc(iDFactory.nextId(), new NpcController(), spawn, template);
 		postman.setKnownlist(new PlayerAwareKnownList(postman));
 		postman.setEffectController(new EffectController(postman));
+		postman.setMasterName(owner.getName());
 		postman.getAi2().onCustomEvent(1, owner);
 		SpawnEngine.bringIntoWorld(postman, spawn, instanceId);
 		owner.setPostman(postman);
 		return postman;
 	}
 
+	/**
+	 * @param summonOwner
+	 */
 	public static Npc spawnFunctionalNpc(final Player owner, int npcId, SummonOwner summonOwner) {
-		NpcTemplate template = DataManager.NPC_DATA.getNpcTemplate(npcId);
-		if (template == null) {
-			log.error("No template for Functional NPC " + String.valueOf(npcId));
-			return null;
-		}
-
+		NpcData npcData = DataManager.NPC_DATA;
+		NpcTemplate template = npcData.getNpcTemplate(npcId);
 		IDFactory iDFactory = IDFactory.getInstance();
 		int worldId = owner.getWorldId();
 		int instanceId = owner.getInstanceId();
 		double radian = Math.toRadians(MathUtil.convertHeadingToDegree(owner.getHeading()));
-		Vector3f pos = GeoService.getInstance().getClosestCollision(owner, owner.getX() + (float) (Math.cos(radian) * 1),
-				owner.getY() + (float) (Math.sin(radian) * 1), owner.getZ(), false, CollisionIntention.PHYSICAL.getId());
+		Vector3f pos = GeoService.getInstance().getClosestCollision(owner, owner.getX() + (float) (Math.cos(radian) * 1), owner.getY() + (float) (Math.sin(radian) * 1), owner.getZ(), false, CollisionIntention.PHYSICAL.getId());
 		SpawnTemplate spawn = SpawnEngine.addNewSingleTimeSpawn(worldId, npcId, pos.getX(), pos.getY(), pos.getZ(), (byte) 0);
-		final Npc functionalNpc = new Npc(iDFactory.nextId(), new NpcController(), spawn, RatedTemplate(npcId));
+		final Npc functionalNpc = new Npc(iDFactory.nextId(), new NpcController(), spawn, template);
 		functionalNpc.setKnownlist(new PlayerAwareKnownList(functionalNpc));
 		functionalNpc.setEffectController(new EffectController(functionalNpc));
 		functionalNpc.getAi2().onCustomEvent(1, owner);
@@ -426,16 +392,11 @@ public class VisibleObjectSpawner {
 	public static Servant spawnServant(SpawnTemplate spawn, int instanceIndex, Creature creator, int skillId, int level, NpcObjectType objectType) {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
-		if (npcTemplate == null) {
-			log.error("No template for Servant NPC " + String.valueOf(objectId));
-			return null;
-		}
-
 		int creatureLevel = creator.getLevel();
 		level = SkillLearnService.getSkillLearnLevel(skillId, creatureLevel, level);
 		byte servantLevel = (byte) SkillLearnService.getSkillMinLevel(skillId, creatureLevel, level);
 
-		Servant servant = new Servant(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(objectId), servantLevel);
+		Servant servant = new Servant(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate, servantLevel);
 		servant.setKnownlist(new NpcKnownList(servant));
 		servant.setEffectController(new EffectController(servant));
 		servant.setCreator(creator);
@@ -461,12 +422,7 @@ public class VisibleObjectSpawner {
 	public static Servant spawnEnemyServant(SpawnTemplate spawn, int instanceIndex, Creature creator, byte servantLvl) {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
-		if (npcTemplate == null) {
-			log.error("No template for Enemy Servant NPC " + String.valueOf(objectId));
-			return null;
-		}
-
-		Servant servant = new Servant(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(objectId), servantLvl);
+		Servant servant = new Servant(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate, servantLvl);
 		servant.setKnownlist(new NpcKnownList(servant));
 		servant.setEffectController(new EffectController(servant));
 		servant.setCreator(creator);
@@ -485,21 +441,17 @@ public class VisibleObjectSpawner {
 	public static Homing spawnHoming(SpawnTemplate spawn, int instanceIndex, Creature creator, int attackCount, int skillId, int level, int homingSkillId) {
 		int objectId = spawn.getNpcId();
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(objectId);
-		if (npcTemplate == null) {
-			log.error("No template for Homing NPC " + String.valueOf(objectId));
-			return null;
-		}
-
 		int creatureLevel = creator.getLevel();
 		level = SkillLearnService.getSkillLearnLevel(skillId, creatureLevel, level);
 		byte homingLevel = (byte) SkillLearnService.getSkillMinLevel(skillId, creatureLevel, level);
-		Homing homing = new Homing(IDFactory.getInstance().nextId(), new NpcController(), spawn, RatedTemplate(objectId), homingLevel, skillId);
+		Homing homing = new Homing(IDFactory.getInstance().nextId(), new NpcController(), spawn, npcTemplate, homingLevel, skillId);
 		homing.setState(CreatureState.WEAPON_EQUIPPED);
 		homing.setKnownlist(new NpcKnownList(homing));
 		homing.setEffectController(new EffectController(homing));
 		homing.setCreator(creator);
-		if (homingSkillId != 0)
+		if (homingSkillId != 0) {
 			homing.getSkillList().addSkill(homing, homingSkillId, 1);
+		}
 		homing.setActiveSkillId(homingSkillId);
 		homing.setAttackCount(attackCount);
 		SpawnEngine.bringIntoWorld(homing, spawn, instanceIndex);
@@ -513,7 +465,7 @@ public class VisibleObjectSpawner {
 	 * @return
 	 */
 	public static Summon spawnSummon(Player creator, int npcId, int skillId, int skillLevel, int time) {
-		float x = creator.getX();
+		float x = creator.getX() - 2;
 		float y = creator.getY();
 		float z = creator.getZ();
 		byte heading = creator.getHeading();
@@ -522,16 +474,11 @@ public class VisibleObjectSpawner {
 
 		SpawnTemplate spawn = SpawnEngine.createSpawnTemplate(worldId, npcId, x, y, z, heading);
 		NpcTemplate npcTemplate = DataManager.NPC_DATA.getNpcTemplate(npcId);
-		if (npcTemplate == null) {
-			log.error("No template for Summon NPC " + String.valueOf(npcId));
-			return null;
-		}
 
 		skillLevel = SkillLearnService.getSkillLearnLevel(skillId, creator.getCommonData().getLevel(), skillLevel);
 		byte level = (byte) SkillLearnService.getSkillMinLevel(skillId, creator.getCommonData().getLevel(), skillLevel);
 		boolean isSiegeWeapon = npcTemplate.getAi().equals("siege_weapon");
-		Summon summon = new Summon(IDFactory.getInstance().nextId(), isSiegeWeapon ? new SiegeWeaponController(npcId) : new SummonController(), spawn,
-				RatedTemplate(npcId), isSiegeWeapon ? npcTemplate.getLevel() : level, time);
+		Summon summon = new Summon(IDFactory.getInstance().nextId(), isSiegeWeapon ? new SiegeWeaponController(npcId) : new SummonController(), spawn, npcTemplate, isSiegeWeapon ? npcTemplate.getLevel() : level, time);
 		summon.setKnownlist(new CreatureAwareKnownList(summon));
 		summon.setEffectController(new EffectController(summon));
 		summon.setMaster(creator);
@@ -550,12 +497,10 @@ public class VisibleObjectSpawner {
 
 		PetCommonData petCommonData = player.getPetList().getPet(petId);
 		if (petCommonData == null) {
-			log.error("No CommonData for Pet " + String.valueOf(petId));
 			return null;
 		}
 		PetTemplate petTemplate = DataManager.PET_DATA.getPetTemplate(petId);
 		if (petTemplate == null) {
-			log.error("No template for Pet " + String.valueOf(petId));
 			return null;
 		}
 
@@ -564,7 +509,7 @@ public class VisibleObjectSpawner {
 		pet.setKnownlist(new PlayerAwareKnownList(pet));
 		player.setToyPet(pet);
 
-		float x = player.getX();
+		float x = player.getX() - 2;
 		float y = player.getY();
 		float z = player.getZ();
 		byte heading = player.getHeading();

@@ -26,5 +26,5 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ExtendAuraRangeEffect")
-public class ExtendAuraRangeEffect extends BufEffect {
+public class ExtendAuraRangeEffect extends BuffEffect {
 }

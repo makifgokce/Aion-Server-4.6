@@ -30,8 +30,6 @@ import com.aionemu.gameserver.ai2.NpcAI2;
 import com.aionemu.gameserver.ai2.manager.WalkManager;
 import com.aionemu.gameserver.configs.main.GroupConfig;
 import com.aionemu.gameserver.configs.main.RateConfig;
-import com.aionemu.gameserver.controllers.observer.ActionObserver;
-import com.aionemu.gameserver.controllers.observer.ObserverType;
 import com.aionemu.gameserver.instance.handlers.GeneralInstanceHandler;
 import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.EmotionType;
@@ -58,11 +56,8 @@ import com.aionemu.gameserver.services.AutoGroupService;
 import com.aionemu.gameserver.services.abyss.AbyssPointsService;
 import com.aionemu.gameserver.services.player.PlayerReviveService;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
-import com.aionemu.gameserver.skillengine.model.Skill;
 import com.aionemu.gameserver.utils.MathUtil;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-import com.aionemu.gameserver.utils.i18n.CustomMessageId;
-import com.aionemu.gameserver.utils.i18n.LanguageHandler;
 import com.aionemu.gameserver.world.WorldMapInstance;
 import com.aionemu.gameserver.world.knownlist.Visitor;
 
@@ -82,7 +77,7 @@ public class KamarBattlefieldInstance extends GeneralInstanceHandler {
 
 	protected KamarBattlefieldPlayerReward getPlayerReward(Integer object) {
 		kamarBattlefieldReward.regPlayerReward(object);
-		return (KamarBattlefieldPlayerReward) kamarBattlefieldReward.getPlayerReward(object);
+		return kamarBattlefieldReward.getPlayerReward(object);
 	}
 
 	private boolean containPlayer(Integer object) {
@@ -247,7 +242,7 @@ public class KamarBattlefieldInstance extends GeneralInstanceHandler {
 			return;
 		}
 		addPointsByRace(player.getRace(), points);
-		List<Player> playersToGainScore = new ArrayList<Player>();
+		List<Player> playersToGainScore = new ArrayList<>();
 		if (target != null && player.isInGroup2()) {
 			for (Player member : player.getPlayerAlliance2().getOnlineMembers()) {
 				if (member.getLifeStats().isAlreadyDead()) {
@@ -389,59 +384,5 @@ public class KamarBattlefieldInstance extends GeneralInstanceHandler {
 	@Override
 	public void onPlayerLogin(Player player) {
 		sendEnterPacket(player);
-	}
-
-	@Override
-	public void onCheckAfk(final Player player) {
-		if (!kamarBattlefieldReward.isStartProgress()) {
-			return;
-		}
-		final ActionObserver observer1 = new ActionObserver(ObserverType.SKILLUSE) {
-			@Override
-			public void skilluse(Skill skill) {
-				player.setAFKMode(false);
-				player.setTimer(0);
-			}
-		};
-		player.getObserveController().addObserver(observer1);
-		final ActionObserver observer2 = new ActionObserver(ObserverType.MOVE) {
-			@Override
-			public void moved() {
-				player.setAFKMode(false);
-				player.setTimer(0);
-			}
-		};
-		player.getObserveController().addObserver(observer2);
-		final ActionObserver observer3 = new ActionObserver(ObserverType.ITEMUSE) {
-			@Override
-			public void skilluse(Skill skill) {
-				player.setAFKMode(false);
-				player.setTimer(0);
-			}
-		};
-		player.getObserveController().addObserver(observer3);
-
-		ThreadPoolManager.getInstance().scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				if (player.getTimer() >= 90) { // 1min30
-					if (player.isInGroup2()) {
-						PlayerGroupService.removePlayer(player);
-					}
-					TeleportService2.moveToBindLocation(player, true);
-					player.getObserveController().removeObserver(observer1);
-					player.getObserveController().removeObserver(observer2);
-					player.getObserveController().removeObserver(observer3);
-					PacketSendUtility.sendMessage(player, LanguageHandler.translate(CustomMessageId.KICKED_AFK_OUT));
-					player.setTimer(0);
-				} else {
-					player.setTimer(player.getTimer() + 1);
-					if (!player.isAFKMode()) {
-						player.setAFKMode(true);
-					}
-				}
-			}
-		}, 1000, 1000);
-		player.addStatus(true);
 	}
 }

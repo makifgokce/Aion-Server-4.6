@@ -22,5 +22,12 @@ package com.aionemu.gameserver.spawnengine;
  */
 public enum SpawnHandlerType {
 
-	ATTACKER, BOSS, RIFT, STATIC
+	ATTACKER,
+    BOSS,
+    RIFT,
+    STATIC,
+	GUARD,
+	GUARD_VILLAGE,
+	PORTAL,
+	CHIEF
 }

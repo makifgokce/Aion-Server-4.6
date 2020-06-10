@@ -20,8 +20,6 @@ package com.aionemu.gameserver.services;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import javolution.util.FastList;
-
 import com.aionemu.gameserver.model.TaskId;
 import com.aionemu.gameserver.model.drop.DropItem;
 import com.aionemu.gameserver.model.gameobjects.Npc;
@@ -125,15 +123,11 @@ public class RespawnService {
 
 		@Override
 		public void run() {
-			FastList<VisibleObject> visibleObjects = spawn.getVisibleObjects();
-			if (visibleObjects != null) {
-				for (VisibleObject visibleObject : visibleObjects) {
-					if (visibleObject != null && visibleObject instanceof Npc && visibleObject.getInstanceId() == instanceId) {
-						((Npc) visibleObject).getController().cancelTask(TaskId.RESPAWN);
-					}
-				}
-			}
-			respawn(spawn, instanceId);
+			 VisibleObject visibleObject = spawn.getVisibleObject();
+            if (visibleObject != null && visibleObject instanceof Npc) {
+                ((Npc) visibleObject).getController().cancelTask(TaskId.RESPAWN);
+            }
+            respawn(spawn, instanceId);
 		}
 	}
 }

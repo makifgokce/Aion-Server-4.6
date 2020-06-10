@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.services.abyss;
 
 import com.aionemu.gameserver.model.DescriptionId;
@@ -30,43 +29,60 @@ import com.aionemu.gameserver.world.knownlist.Visitor;
  */
 public class AbyssService {
 
-	private static final int[] abyssMapList = { 210050000, 220070000, 400010000, 600010000, 600020000, 600030000, 600040000, 600050000, 600060000, 600070000 };
 
-	/**
-	 * @param player
-	 */
-	public static final boolean isOnPvpMap(Player player) {
-		for (int i : abyssMapList) {
-			if (i == player.getWorldId()) {
-				return true;
-			}
-		}
-		return false;
-	}
+    private static final int[] abyssMapList = {
+		210020000, // Elten
+		210040000, // Heiron
+		210050000, // Inggison
+		210060000, // Theobomos
+		220020000, // Morheim
+		220040000, // Beluslan
+		220050000, // Brusthonin
+		220070000, // Gelkmaros
+		400010000, // Reshanta
+		600010000, // Silentera Canyon
+		600020000, // Sarpan
+		600030000, // Tiamaranta
+		600040000, // Tiamaranta's Eye
+		600050000, // North Katalam
+		600060000, // South Katalam
+		600070000};// Katalam Underground
 
-	/**
-	 * @param victim
-	 */
-	public static final void rankedKillAnnounce(final Player victim) {
+    /**
+     * @param player
+     */
+    public static final boolean isOnPvpMap(Player player) {
+        for (int i : abyssMapList) {
+            if (i == player.getWorldId()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		World.getInstance().doOnAllPlayers(new Visitor<Player>() {
-			@Override
-			public void visit(Player p) {
-				if (p != victim && victim.getWorldType() == p.getWorldType() && !p.isInInstance()) {
-					PacketSendUtility.sendPacket(p, SM_SYSTEM_MESSAGE.STR_ABYSS_ORDER_RANKER_DIE(victim, AbyssRankEnum.getRankDescriptionId(victim)));
-				}
-			}
-		});
-	}
+    /**
+     * @param victim
+     */
+    public static final void rankedKillAnnounce(final Player victim) {
 
-	public static final void rankerSkillAnnounce(final Player player, final int nameId) {
-		World.getInstance().doOnAllPlayers(new Visitor<Player>() {
-			@Override
-			public void visit(Player p) {
-				if (p != player && player.getWorldType() == p.getWorldType() && !p.isInInstance()) {
-					PacketSendUtility.sendPacket(p, SM_SYSTEM_MESSAGE.STR_SKILL_ABYSS_SKILL_IS_FIRED(player, new DescriptionId(nameId)));
-				}
-			}
-		});
-	}
+        World.getInstance().doOnAllPlayers(new Visitor<Player>() {
+            @Override
+            public void visit(Player p) {
+                if (p != victim && victim.getWorldId() == p.getWorldId() && !p.isInInstance()) {
+                    PacketSendUtility.sendPacket(p, SM_SYSTEM_MESSAGE.STR_ABYSS_ORDER_RANKER_DIE(victim, AbyssRankEnum.getRankDescriptionId(victim)));
+                }
+            }
+        });
+    }
+
+    public static final void rankerSkillAnnounce(final Player player, final int nameId) {
+        World.getInstance().doOnAllPlayers(new Visitor<Player>() {
+            @Override
+            public void visit(Player p) {
+                if (p != player && player.getWorldId() == p.getWorldId() && !p.isInInstance()) {
+                    PacketSendUtility.sendPacket(p, SM_SYSTEM_MESSAGE.STR_SKILL_ABYSS_SKILL_IS_FIRED(player, new DescriptionId(nameId)));
+                }
+            }
+        });
+    }
 }

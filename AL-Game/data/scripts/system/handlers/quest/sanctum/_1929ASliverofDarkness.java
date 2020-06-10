@@ -20,6 +20,7 @@ package quest.sanctum;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.model.EmotionType;
+import com.aionemu.gameserver.model.TeleportAnimation;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -102,7 +103,7 @@ public class _1929ASliverofDarkness extends QuestHandler {
 					if (env.getDialog() == DialogAction.QUEST_SELECT && var == 1) {
 						return sendQuestDialog(env, 1352);
 					} else if (env.getDialog() == DialogAction.SETPRO2) {
-						TeleportService2.teleportTo(player, 210030000, 2325.1685f, 1808.1615f, 194.2152f);
+						TeleportService2.teleportTo(player, 210030000, 2314.1353f, 1799.8541f, 195.2642f, (byte) 24, TeleportAnimation.BEAM_ANIMATION);
 						changeQuestStep(env, 1, 2, false); // 2
 						return closeDialogWindow(env);
 					}

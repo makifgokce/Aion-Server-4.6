@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
 import com.aionemu.gameserver.model.gameobjects.Creature;
@@ -37,14 +36,23 @@ public class SM_TARGET_SELECTED extends AionServerPacket {
 
 	public SM_TARGET_SELECTED(Player player) {
 		if (player != null) {
-			if (player.getTarget() instanceof Creature) {
-				Creature target = (Creature) player.getTarget();
-				this.level = target.getLevel();
-				this.maxHp = target.getLifeStats().getMaxHp();
-				this.currentHp = target.getLifeStats().getCurrentHp();
-				this.maxMp = target.getLifeStats().getMaxMp();
-				this.currentMp = target.getLifeStats().getCurrentMp();
-			} else {
+			if (player.getTarget() instanceof Player) {
+				Player pl = (Player) player.getTarget();
+				this.level = pl.getLevel();
+				this.maxHp = pl.getLifeStats().getMaxHp();
+				this.currentHp = pl.getLifeStats().getCurrentHp();
+				this.maxMp = pl.getLifeStats().getMaxMp();
+				this.currentMp = pl.getLifeStats().getCurrentMp();
+			}
+			else if (player.getTarget() instanceof Creature) {
+				Creature creature = (Creature) player.getTarget();
+				this.level = creature.getLevel();
+				this.maxHp = creature.getLifeStats().getMaxHp();
+				this.currentHp = creature.getLifeStats().getCurrentHp();
+				this.maxMp = creature.getLifeStats().getMaxMp();
+				this.currentMp = creature.getLifeStats().getCurrentMp();
+			}
+			else {
 				this.level = 0;
 				this.maxHp = 0;
 				this.currentHp = 0;
@@ -67,7 +75,7 @@ public class SM_TARGET_SELECTED extends AionServerPacket {
 		writeH(level);
 		writeD(maxHp);
 		writeD(currentHp);
-		writeD(maxMp); // 4.0
-		writeD(currentMp); // 4.0
+		writeD(maxMp);// new 4.0
+		writeD(currentMp);// new 4.0
 	}
 }

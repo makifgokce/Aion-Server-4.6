@@ -10,11 +10,23 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
 import com.aionemu.gameserver.network.aion.AionConnection;
@@ -25,20 +37,20 @@ import com.aionemu.gameserver.network.aion.AionServerPacket;
  */
 public class SM_FLY_TIME extends AionServerPacket {
 
-	private int currentFp;
-	private int maxFp;
+    private int currentFp;
+    private int maxFp;
 
-	public SM_FLY_TIME(int currentFp, int maxFp) {
-		this.currentFp = currentFp;
-		this.maxFp = maxFp;
-	}
+    public SM_FLY_TIME(int currentFp, int maxFp) {
+        this.currentFp = currentFp;
+        this.maxFp = maxFp;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void writeImpl(AionConnection con) {
-		writeD(currentFp); // current fly time
-		writeD(maxFp); // max flytime
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeImpl(AionConnection con) {
+        writeD(currentFp); // current fly time
+        writeD(maxFp); // max flytime
+    }
 }

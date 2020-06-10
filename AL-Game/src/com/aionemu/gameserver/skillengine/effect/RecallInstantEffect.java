@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
+import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.RequestResponseHandler;
@@ -36,7 +37,6 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RecallInstantEffect")
 public class RecallInstantEffect extends EffectTemplate {
-
 	@Override
 	public void applyEffect(Effect effect) {
 		final Creature effector = effect.getEffector();
@@ -49,6 +49,7 @@ public class RecallInstantEffect extends EffectTemplate {
 		final float locationZ = effect.getSkill().getZ();
 		final byte locationH = effect.getSkill().getH();
 
+
 		/**
 		 * TODO need to confirm if cannot be summoned while on abnormal effects
 		 * stunned, sleeping, feared, etc.
@@ -57,7 +58,7 @@ public class RecallInstantEffect extends EffectTemplate {
 			@Override
 			public void denyRequest(Creature effector, Player effected) {
 				PacketSendUtility.sendPacket((Player) effector, SM_SYSTEM_MESSAGE.STR_MSG_Recall_Rejected_EFFECT(effected.getName()));
-				PacketSendUtility.sendPacket(effected, SM_SYSTEM_MESSAGE.STR_MSG_Recall_Rejected_EFFECT(effector.getName()));
+				PacketSendUtility.sendPacket(effected, SM_SYSTEM_MESSAGE.STR_MSG_Recall_Reject_EFFECT(effector.getName()));
 			}
 
 			@Override
@@ -66,9 +67,10 @@ public class RecallInstantEffect extends EffectTemplate {
 			}
 		};
 
+
 		effected.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_SUMMON_PARTY_DO_YOU_ACCEPT_REQUEST, rrh);
 		PacketSendUtility.sendPacket(effected, new SM_QUESTION_WINDOW(SM_QUESTION_WINDOW.STR_SUMMON_PARTY_DO_YOU_ACCEPT_REQUEST, 0, 0, effector.getName(),
-				"Summon Group Member", 30));
+				new DescriptionId(effect.getSkillTemplate().getNameId()), 30));
 	}
 
 	@Override

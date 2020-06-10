@@ -18,8 +18,9 @@
 package com.aionemu.gameserver.network.aion.gmhandler;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.utils.PacketSendUtility;
+import com.aionemu.gameserver.model.templates.ExpandType;
 import com.aionemu.gameserver.services.CubeExpandService;
+import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author Waii
@@ -32,10 +33,9 @@ public final class CmdCube extends AbstractGMHandler {
 	}
 
 	public void run() {
-		@SuppressWarnings("unused")
 		Player t = target != null ? target : admin;
 
-		CubeExpandService.expand(target, true);
+		CubeExpandService.expand(t, ExpandType.NPC);
 		PacketSendUtility.sendMessage(admin, "9 cube slots successfully added");
 	}
 }

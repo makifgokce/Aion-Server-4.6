@@ -192,11 +192,7 @@ public class RateConfig {
 	public static float PREMIUM_PVP_ARENA_GLORY_REWARD_RATE;
 	@Property(key = "gameserver.rate.vip.pvparena.glory", defaultValue = "3")
 	public static float VIP_PVP_ARENA_GLORY_REWARD_RATE;
-	/**
-	 * Rate which affects amount of required ap for Abyss rank
-	 */
-	@Property(key = "gameserver.rate.ap.rank", defaultValue = "1")
-	public static int ABYSS_RANK_RATE;
+
 	/**
 	 * Sell limits rate
 	 */
@@ -220,29 +216,5 @@ public class RateConfig {
 	public static int ALLIANCE_GP_REWARD;
 	@Property(key = "gameserver.rate.solo.gp", defaultValue = "20")
 	public static int SOLO_GP_REWARD;
-
-	/*
-	 * RATES FOR MOBS (HP & Power)
-	 */
-	@Property(key = "gameserver.rate.junk.mobs.hp", defaultValue = "1.0")
-	public static double JUNK_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.junk.mobs.pw", defaultValue = "1.0")
-	public static double JUNK_MOBS_RATE_PW;
-	@Property(key = "gameserver.rate.normal.mobs.hp", defaultValue = "1.0")
-	public static double NORMAL_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.normal.mobs.pw", defaultValue = "1.0")
-	public static double NORMAL_MOBS_RATE_PW;
-	@Property(key = "gameserver.rate.elite.mobs.hp", defaultValue = "1.0")
-	public static double ELITE_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.elite.mobs.pw", defaultValue = "1.0")
-	public static double ELITE_MOBS_RATE_PW;
-	@Property(key = "gameserver.rate.hero.mobs.hp", defaultValue = "1.0")
-	public static double HERO_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.hero.mobs.pw", defaultValue = "1.0")
-	public static double HERO_MOBS_RATE_PW;
-	@Property(key = "gameserver.rate.legendary.mobs.hp", defaultValue = "1.0")
-	public static double LEGENDARY_MOBS_RATE_HP;
-	@Property(key = "gameserver.rate.legendary.mobs.pw", defaultValue = "1.0")
-	public static double LEGENDARY_MOBS_RATE_PW;
 
 }

@@ -10,12 +10,27 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning 
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.services.siegeservice;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.dao.SiegeDAO;
@@ -32,107 +47,104 @@ import com.aionemu.gameserver.services.player.PlayerService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.knownlist.Visitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author SoulKeeper
  */
 public class ArtifactSiege extends Siege<ArtifactLocation> {
 
-	private static final Logger log = LoggerFactory.getLogger(ArtifactSiege.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(ArtifactSiege.class.getName());
 
-	public ArtifactSiege(ArtifactLocation siegeLocation) {
-		super(siegeLocation);
-	}
+    public ArtifactSiege(ArtifactLocation siegeLocation) {
+        super(siegeLocation);
+    }
 
-	@Override
-	protected void onSiegeStart() {
-		initSiegeBoss();
-	}
+    @Override
+    protected void onSiegeStart() {
+        initSiegeBoss();
+    }
 
-	@Override
-	protected void onSiegeFinish() {
-		// cleanup
-		unregisterSiegeBossListeners();
+    @Override
+    protected void onSiegeFinish() {
+        // cleanup
+        unregisterSiegeBossListeners();
 
-		// despawn npcs
-		deSpawnNpcs(getSiegeLocationId());
+        // despawn npcs
+        deSpawnNpcs(getSiegeLocationId());
 
-		// for artifact should be always true
-		if (isBossKilled()) {
-			onCapture();
-		} else {
-			log.error("Artifact siege (artifactId:" + getSiegeLocationId() + ") ended without killing a boss.");
-		}
+        // for artifact should be always true
+        if (isBossKilled()) {
+            onCapture();
+        } else {
+            log.error("Artifact siege (artifactId:" + getSiegeLocationId() + ") ended without killing a boss.");
+        }
 
-		// add new spawns
-		spawnNpcs(getSiegeLocationId(), getSiegeLocation().getRace(), SiegeModType.PEACE);
+        // add new spawns
+        spawnNpcs(getSiegeLocationId(), getSiegeLocation().getRace(), SiegeModType.PEACE);
 
-		// Store siege results in DB
-		DAOManager.getDAO(SiegeDAO.class).updateLocation(getSiegeLocation());
+        // Store siege results in DB
+        DAOManager.getDAO(SiegeDAO.class).updateLocation(getSiegeLocation());
 
-		broadcastUpdate(getSiegeLocation());
-		startSiege(getSiegeLocationId());
-	}
+        broadcastUpdate(getSiegeLocation());
+        startSiege(getSiegeLocationId());
+    }
 
-	protected void onCapture() {
-		// Update winner counter
-		SiegeRaceCounter wRaceCounter = getSiegeCounter().getWinnerRaceCounter();
-		getSiegeLocation().setRace(wRaceCounter.getSiegeRace());
+    protected void onCapture() {
+        // Update winner counter
+        SiegeRaceCounter wRaceCounter = getSiegeCounter().getWinnerRaceCounter();
+        getSiegeLocation().setRace(wRaceCounter.getSiegeRace());
 
-		// Update legion
-		Integer wLegionId = wRaceCounter.getWinnerLegionId();
-		getSiegeLocation().setLegionId(wLegionId != null ? wLegionId : 0);
+        // Update legion
+        Integer wLegionId = wRaceCounter.getWinnerLegionId();
+        getSiegeLocation().setLegionId(wLegionId != null ? wLegionId : 0);
 
-		// misc stuff to send player system message
-		if (getSiegeLocation().getRace() == SiegeRace.BALAUR) {
-			final AionServerPacket lRacePacket = new SM_SYSTEM_MESSAGE(1320004, getSiegeLocation().getNameAsDescriptionId(), getSiegeLocation().getRace()
-					.getDescriptionId());
-			World.getInstance().doOnAllPlayers(new Visitor<Player>() {
-				@Override
-				public void visit(Player object) {
-					PacketSendUtility.sendPacket(object, lRacePacket);
-				}
-			});
-		} else {
-			// Prepare packet data
-			String wPlayerName = "";
-			final Race wRace = wRaceCounter.getSiegeRace() == SiegeRace.ELYOS ? Race.ELYOS : Race.ASMODIANS;
-			Legion wLegion = wLegionId != null ? LegionService.getInstance().getLegion(wLegionId) : null;
-			if (!wRaceCounter.getPlayerDamageCounter().isEmpty()) {
-				Integer wPlayerId = wRaceCounter.getPlayerDamageCounter().keySet().iterator().next();
-				wPlayerName = PlayerService.getPlayerName(wPlayerId);
-			}
-			final String winnerName = wLegion != null ? wLegion.getLegionName() : wPlayerName;
+        // misc stuff to send player system message
+        if (getSiegeLocation().getRace() == SiegeRace.BALAUR) {
+            final AionServerPacket lRacePacket = new SM_SYSTEM_MESSAGE(1320004, getSiegeLocation().getNameAsDescriptionId(),
+                    getSiegeLocation().getRace().getDescriptionId());
+            World.getInstance().doOnAllPlayers(new Visitor<Player>() {
+                @Override
+                public void visit(Player object) {
+                    PacketSendUtility.sendPacket(object, lRacePacket);
+                }
+            });
+        } else {
+            // Prepare packet data
+            String wPlayerName = "";
+            final Race wRace = wRaceCounter.getSiegeRace() == SiegeRace.ELYOS ? Race.ELYOS : Race.ASMODIANS;
+            Legion wLegion = wLegionId != null ? LegionService.getInstance().getLegion(wLegionId) : null;
+            if (!wRaceCounter.getPlayerDamageCounter().isEmpty()) {
+                Integer wPlayerId = wRaceCounter.getPlayerDamageCounter().keySet().iterator().next();
+                wPlayerName = PlayerService.getPlayerName(wPlayerId);
+            }
+            final String winnerName = wLegion != null ? wLegion.getLegionName() : wPlayerName;
 
-			// prepare packets, we can use single packet instance
-			final AionServerPacket wRacePacket = new SM_SYSTEM_MESSAGE(1320002, wRace.getRaceDescriptionId(), winnerName, getSiegeLocation()
-					.getNameAsDescriptionId());
-			final AionServerPacket lRacePacket = new SM_SYSTEM_MESSAGE(1320004, getSiegeLocation().getNameAsDescriptionId(), wRace.getRaceDescriptionId());
+            // prepare packets, we can use single packet instance
+            final AionServerPacket wRacePacket = new SM_SYSTEM_MESSAGE(1320002, wRace.getRaceDescriptionId(), winnerName, getSiegeLocation().getNameAsDescriptionId());
+            final AionServerPacket lRacePacket = new SM_SYSTEM_MESSAGE(1320004, getSiegeLocation().getNameAsDescriptionId(), wRace.getRaceDescriptionId());
 
-			// send update to players
-			World.getInstance().doOnAllPlayers(new Visitor<Player>() {
-				@Override
-				public void visit(Player player) {
-					PacketSendUtility.sendPacket(player, player.getRace().equals(wRace) ? wRacePacket : lRacePacket);
-				}
-			});
-		}
-	}
+            // send update to players
+            World.getInstance().doOnAllPlayers(new Visitor<Player>() {
+                @Override
+                public void visit(Player player) {
+                    PacketSendUtility.sendPacket(player, player.getRace().equals(wRace) ? wRacePacket : lRacePacket);
+                }
+            });
+        }
+    }
 
-	@Override
-	public boolean isEndless() {
-		return true;
-	}
+    @Override
+    public boolean isEndless() {
+        return true;
+    }
 
-	@Override
-	public void addAbyssPoints(Player player, int abysPoints) {
-		// No need to control AP
-	}
+    @Override
+    public void addAbyssPoints(Player player, int abysPoints) {
+        // No need to control AP
+    }
 
-	@Override
-	public void addGloryPoints(Player player, int gloryPoints) {
-		// No need to control GP
-	}
+    @Override
+    public void addGloryPoints(Player player, int gloryPoints) {
+        // No need to control GP
+    }
 }

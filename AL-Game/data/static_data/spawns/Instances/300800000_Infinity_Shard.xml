@@ -79,13 +79,7 @@
 		<spawn npc_id="231086">
 			<spot x="127.53" y="163.42" z="130.95" static_id="28"/>
 		</spawn>
-		<!-- Hyperion Defense Turret -->
-		<spawn npc_id="231102">
-			<spot x="107.53553" y="142.51953" z="127.03997"/>
-			<spot x="113.86417" y="154.06656" z="127.68255" h="110"/>
-			<spot x="144.52719" y="122.26577" z="127.44639" h="45"/>
-			<spot x="150.33377" y="132.67754" z="126.57981" h="50"/>
-		</spawn>
+		<!-- Id Su Brikintisi -->
 		<spawn npc_id="231104" >
 			<spot x="129.86" y="138.4" z="112.72" h="1" static_id="27"/>
 		</spawn>

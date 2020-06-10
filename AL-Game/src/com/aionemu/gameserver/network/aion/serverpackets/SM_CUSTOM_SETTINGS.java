@@ -32,7 +32,7 @@ public class SM_CUSTOM_SETTINGS extends AionServerPacket {
 	private int deny;
 
 	public SM_CUSTOM_SETTINGS(Player player) {
-		this(player.getObjectId(), 1, player.getPlayerSettings().getDisplay(), player.getPlayerSettings().getDeny());
+		this(player.getObjectId(), 1, player.getCommonData().getPlayerSettings().getDisplay(), player.getCommonData().getPlayerSettings().getDeny());
 	}
 
 	public SM_CUSTOM_SETTINGS(int objectId, int unk, int display, int deny) {

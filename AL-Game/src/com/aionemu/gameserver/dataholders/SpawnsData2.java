@@ -20,7 +20,6 @@ package com.aionemu.gameserver.dataholders;
 import static ch.lambdaj.Lambda.extractIterator;
 import static ch.lambdaj.Lambda.flatten;
 import static ch.lambdaj.Lambda.on;
-import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,8 +42,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import javolution.util.FastMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -71,6 +68,9 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.WorldMap;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+import javolution.util.FastMap;
+
 /**
  * @author xTz
  * @modified Rolandas
@@ -83,12 +83,12 @@ public class SpawnsData2 {
 	private static final Logger log = LoggerFactory.getLogger(SpawnsData2.class);
 	@XmlElement(name = "spawn_map", type = SpawnMap.class)
 	protected List<SpawnMap> templates;
-	private TIntObjectHashMap<FastMap<Integer, SimpleEntry<SpawnGroup2, Spawn>>> allSpawnMaps = new TIntObjectHashMap<FastMap<Integer, SimpleEntry<SpawnGroup2, Spawn>>>();
-	private TIntObjectHashMap<List<SpawnGroup2>> baseSpawnMaps = new TIntObjectHashMap<List<SpawnGroup2>>();
-	private TIntObjectHashMap<List<SpawnGroup2>> riftSpawnMaps = new TIntObjectHashMap<List<SpawnGroup2>>();
-	private TIntObjectHashMap<List<SpawnGroup2>> siegeSpawnMaps = new TIntObjectHashMap<List<SpawnGroup2>>();
-	private TIntObjectHashMap<List<SpawnGroup2>> vortexSpawnMaps = new TIntObjectHashMap<List<SpawnGroup2>>();
-	private TIntObjectHashMap<Spawn> customs = new TIntObjectHashMap<Spawn>();
+	private TIntObjectHashMap<FastMap<Integer, SimpleEntry<SpawnGroup2, Spawn>>> allSpawnMaps = new TIntObjectHashMap<>();
+	private TIntObjectHashMap<List<SpawnGroup2>> baseSpawnMaps = new TIntObjectHashMap<>();
+	private TIntObjectHashMap<List<SpawnGroup2>> riftSpawnMaps = new TIntObjectHashMap<>();
+	private TIntObjectHashMap<List<SpawnGroup2>> siegeSpawnMaps = new TIntObjectHashMap<>();
+	private TIntObjectHashMap<List<SpawnGroup2>> vortexSpawnMaps = new TIntObjectHashMap<>();
+	private TIntObjectHashMap<Spawn> customs = new TIntObjectHashMap<>();
 
 	/**
 	 * @param u
@@ -351,7 +351,7 @@ public class SpawnsData2 {
 
 		SpawnMap map = null;
 		if (data.templates == null) {
-			data.templates = new ArrayList<SpawnMap>();
+			data.templates = new ArrayList<>();
 			map = new SpawnMap(spawn.getWorldId());
 			data.templates.add(map);
 		} else {
@@ -440,7 +440,7 @@ public class SpawnsData2 {
 	 */
 	public void addNewSpawnMap(SpawnMap spawnMap) {
 		if (templates == null) {
-			templates = new ArrayList<SpawnMap>();
+			templates = new ArrayList<>();
 		}
 		templates.add(spawnMap);
 	}

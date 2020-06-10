@@ -75,7 +75,7 @@ public class MySQL5LegionDAO extends LegionDAO {
 	/**
 	 * Storage Queries *
 	 */
-	private static final String SELECT_STORAGE_QUERY = "SELECT `item_unique_id`, `item_id`, `item_count`, `item_color`, `color_expires`, `item_creator`, `expire_time`, `activation_count`, `is_equiped`, `slot`, `enchant`, `item_skin`, `fusioned_item`, `optional_socket`, `optional_fusion_socket`, `charge`, `rnd_bonus`, `rnd_count`, `pack_count`, `is_packed`, `authorize` FROM `inventory` WHERE `item_owner`=? AND `item_location`=? AND `is_equiped`=?";
+	private static final String SELECT_STORAGE_QUERY = "SELECT `item_unique_id`, `item_id`, `item_count`, `item_color`, `color_expires`, `item_creator`, `expire_time`, `activation_count`, `is_equiped`, `slot`, `enchant`, `item_skin`, `fusioned_item`, `optional_socket`, `optional_fusion_socket`, `charge`, `rnd_bonus`, `rnd_count`, `bns_enchant`, `pack_count`, `is_packed`, `authorize` FROM `inventory` WHERE `item_owner`=? AND `item_location`=? AND `is_equiped`=?";
 	/**
 	 * History Queries *
 	 */
@@ -274,7 +274,7 @@ public class MySQL5LegionDAO extends LegionDAO {
 	 */
 	@Override
 	public TreeMap<Timestamp, String> loadAnnouncementList(final int legionId) {
-		final TreeMap<Timestamp, String> announcementList = new TreeMap<Timestamp, String>();
+		final TreeMap<Timestamp, String> announcementList = new TreeMap<>();
 
 		boolean success = DB.select(SELECT_ANNOUNCEMENTLIST_QUERY, new ParamReadStH() {
 			@Override
@@ -488,11 +488,12 @@ public class MySQL5LegionDAO extends LegionDAO {
 					int charge = rset.getInt("charge");
 					int randomBonus = rset.getInt("rnd_bonus");
 					int rndCount = rset.getInt("rnd_count");
+					int bns_enchant = rset.getInt("bns_enchant");
 					int packCount = rset.getInt("pack_count");
 					int isPacked = rset.getInt("is_packed");
 					int authorize = rset.getInt("authorize");
 					Item item = new Item(itemUniqueId, itemId, itemCount, itemColor, colorExpireTime, itemCreator, expireTime, activationCount, isEquiped == 1,
-							false, slot, storage, enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge, randomBonus, rndCount,
+							false, slot, storage, enchant, itemSkin, fusionedItem, optionalSocket, optionalFusionSocket, charge, randomBonus, bns_enchant, rndCount,
 							packCount, isPacked == 1, authorize);
 					item.setPersistentState(PersistentState.UPDATED);
 					inventory.onLoadHandler(item);

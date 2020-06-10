@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SnareEffect")
-public class SnareEffect extends BufEffect {
+public class SnareEffect extends BuffEffect {
 
 	@Override
 	public void applyEffect(Effect effect) {

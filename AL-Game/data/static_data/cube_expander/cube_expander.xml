@@ -6,12 +6,14 @@
     </cube_npc>
     <!-- Sanctum -->
     <cube_npc id="798011">
-        <expand price="12000" level="2"/>
+        <expand price="1000" level="1"/>
+		<expand price="12000" level="2"/>
         <expand price="80000" level="3"/>
         <expand price="180000" level="4"/>
     </cube_npc>
     <cube_npc id="798012">
-        <expand price="12000" level="2"/>
+        <expand price="1000" level="1"/>
+		<expand price="12000" level="2"/>
         <expand price="80000" level="3"/>
         <expand price="180000" level="4"/>
     </cube_npc>
@@ -21,12 +23,14 @@
     </cube_npc>
     <!-- Pandaemonium -->
     <cube_npc id="798058">
-        <expand price="12000" level="2"/>
+        <expand price="1000" level="1"/>
+		<expand price="12000" level="2"/>
         <expand price="80000" level="3"/>
         <expand price="180000" level="4"/>
     </cube_npc>
     <cube_npc id="798059">
-        <expand price="12000" level="2"/>
+        <expand price="1000" level="1"/>
+		<expand price="12000" level="2"/>
         <expand price="80000" level="3"/>
         <expand price="180000" level="4"/>
     </cube_npc>

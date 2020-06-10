@@ -36,6 +36,7 @@ public class SM_CUBE_UPDATE extends AionServerPacket {
 	private int itemsCount;
 	private int npcExpands;
 	private int questExpands;
+	private int itemExpands;
 
 	public static SM_CUBE_UPDATE stigmaSlots(int slots) {
 		return new SM_CUBE_UPDATE(6, slots);
@@ -45,16 +46,19 @@ public class SM_CUBE_UPDATE extends AionServerPacket {
 		int itemsCount = 0;
 		int npcExpands = 0;
 		int questExpands = 0;
+		int itemExpands = 0;
 		switch (type) {
 			case CUBE:
 				itemsCount = player.getInventory().size();
 				npcExpands = player.getNpcExpands();
 				questExpands = player.getQuestExpands();
+				itemExpands = player.getItemExpands();
 				break;
 			case REGULAR_WAREHOUSE:
 				itemsCount = player.getWarehouse().size();
-				npcExpands = player.getWarehouseSize();
-				// questExpands = ?? //TODO!
+				npcExpands = player.getWarehouseNpcExpands();
+				questExpands = player.getWarehouseQuestExpands();
+				itemExpands = player.getWarehouseItemExpands();
 				break;
 			case LEGION_WAREHOUSE:
 				itemsCount = player.getLegion().getLegionWarehouse().size();
@@ -64,14 +68,15 @@ public class SM_CUBE_UPDATE extends AionServerPacket {
 				break;
 		}
 
-		return new SM_CUBE_UPDATE(0, type.ordinal(), itemsCount, npcExpands, questExpands);
+		return new SM_CUBE_UPDATE(0, type.ordinal(), itemsCount, npcExpands, questExpands, itemExpands);
 	}
 
-	private SM_CUBE_UPDATE(int action, int actionValue, int itemsCount, int npcExpands, int questExpands) {
+	private SM_CUBE_UPDATE(int action, int actionValue, int itemsCount, int npcExpands, int questExpands, int itemExpands) {
 		this(action, actionValue);
 		this.itemsCount = itemsCount;
 		this.npcExpands = npcExpands;
 		this.questExpands = questExpands;
+		this.itemExpands = itemExpands;
 	}
 
 	private SM_CUBE_UPDATE(int action, int actionValue) {
@@ -88,7 +93,7 @@ public class SM_CUBE_UPDATE extends AionServerPacket {
 				writeD(itemsCount);
 				writeC(npcExpands); // cube size from npc (so max 5 for now)
 				writeC(questExpands); // cube size from quest (so max 2 for now)
-				writeC(0); // unk - expands from items?
+				writeC(itemExpands); // unk - expands from items?
 				break;
 			case 6:
 				break;

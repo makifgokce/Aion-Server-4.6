@@ -98,7 +98,7 @@ public class CM_HOUSE_OPEN_DOOR extends AionClientPacket {
 			if (house.getOwnerId() != player.getObjectId()) {
 				boolean allowed = false;
 				if (house.getDoorState() == HousePermissions.DOOR_OPENED_FRIENDS) {
-					allowed = player.getFriendList().getFriend(house.getOwnerId()) != null
+					allowed = player.getCommonData().getFriendList().getFriend(house.getOwnerId()) != null
 							|| (player.getLegion() != null && player.getLegion().isMember(house.getOwnerId()));
 				}
 				if (!allowed) {

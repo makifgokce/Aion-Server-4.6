@@ -23,9 +23,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.DB;
 import com.aionemu.commons.database.IUStH;
@@ -36,7 +35,6 @@ import com.aionemu.gameserver.dao.MySQL5DAOUtils;
 import com.aionemu.gameserver.dao.PlayerDAO;
 import com.aionemu.gameserver.model.gameobjects.player.BlockList;
 import com.aionemu.gameserver.model.gameobjects.player.BlockedPlayer;
-import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.gameobjects.player.PlayerCommonData;
 
 /**
@@ -85,8 +83,8 @@ public class MySQL5BlockListDAO extends BlockListDAO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BlockList load(final Player player) {
-		final Map<Integer, BlockedPlayer> list = new HashMap<Integer, BlockedPlayer>();
+	public BlockList load(final PlayerCommonData pcd) {
+		final Map<Integer, BlockedPlayer> list = new HashMap<>();
 
 		DB.select(LOAD_QUERY, new ParamReadStH() {
 			@Override
@@ -94,11 +92,11 @@ public class MySQL5BlockListDAO extends BlockListDAO {
 				PlayerDAO playerDao = DAOManager.getDAO(PlayerDAO.class);
 				while (rset.next()) {
 					int blockedOid = rset.getInt("blocked_player");
-					PlayerCommonData pcd = playerDao.loadPlayerCommonData(blockedOid);
-					if (pcd == null) {
-						log.error("Attempt to load block list for " + player.getName() + " tried to load a player which does not exist: " + blockedOid);
+					PlayerCommonData blockedPcd = playerDao.loadPlayerCommonData(blockedOid);
+					if (blockedPcd == null) {
+						log.error("Attempt to load block list for " + pcd.getName() + " tried to load a player which does not exist: " + blockedOid);
 					} else {
-						list.put(blockedOid, new BlockedPlayer(pcd, rset.getString("reason")));
+						list.put(blockedOid, new BlockedPlayer(blockedPcd, rset.getString("reason")));
 					}
 				}
 
@@ -106,7 +104,7 @@ public class MySQL5BlockListDAO extends BlockListDAO {
 
 			@Override
 			public void setParams(PreparedStatement stmt) throws SQLException {
-				stmt.setInt(1, player.getObjectId());
+				stmt.setInt(1, pcd.getPlayerObjId());
 			}
 		});
 		return new BlockList(list);

@@ -14,33 +14,49 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
-import com.aionemu.gameserver.configs.administration.AdminConfig;
+import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 
 /**
  * @author pixfid
- * @modified Magenik
+ * @modified Magenik , Kev
  */
 public class SM_ACCOUNT_ACCESS_PROPERTIES extends AionServerPacket {
 
-	public SM_ACCOUNT_ACCESS_PROPERTIES() {
+
+	private boolean isGm;
+	private int accountType;
+	private int purchaseType;
+	@SuppressWarnings("unused")
+	private int time;
+	private boolean active;
+
+	public SM_ACCOUNT_ACCESS_PROPERTIES(boolean isGm) {
+		this.isGm = isGm;
+	}
+
+	public SM_ACCOUNT_ACCESS_PROPERTIES(boolean isGm, int accountType, int purchaseType, int time, boolean active) {
+		this.isGm = isGm;
+		this.accountType = accountType;
+		this.purchaseType = purchaseType;
+		this.time = time;
+		this.active = active;
 	}
 
 	@Override
 	protected void writeImpl(AionConnection con) {
-    	writeC(con.getAccount().getAccessLevel() >= AdminConfig.GM_LEVEL ? 1 : 0); // active GM Tool
-		writeH(0x00);
-		writeH(0x00);
-		writeD(0x00);
-		writeD(0x00);
-		writeD(0x00);
-		writeD(0x00);
-		writeC(0x00);
-		writeD(0x00);
-		writeD(0x00);
+		writeC(this.isGm ? 5 : 0); // Max 5 GM-Panel(Shift+F1)
+		writeH(0);
+		writeC(0);
+		writeD(this.isGm ? 32768 : 0); // unk
+		writeD(0);
+		writeC(0);
+		writeD(this.active ? 31 : 0); // 31 with Active GoldPaket (Boost)
+		writeD(0);
+		writeD(purchaseType); // GoldPaket active 8 else 0
+		writeD(accountType); // 2 = Starter 4 = Veteran
 	}
 }

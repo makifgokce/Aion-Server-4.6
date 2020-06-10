@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.services;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -28,58 +27,54 @@ import com.aionemu.gameserver.world.World;
  */
 public class ChatService {
 
-	private static byte[] ip = { 127, 0, 0, 1 };
-	private static int port = 10241;
+    private static byte[] ip = {127, 0, 0, 1};
+    private static int port = 10241;
 
-	/**
-	 * Disonnect from chat server
-	 *
-	 * @param player
-	 */
-	public static void onPlayerLogout(Player player) {
-		ChatServer.getInstance().sendPlayerLogout(player);
-	}
+    /**
+     * Disonnect from chat server
+     *
+     * @param player
+     */
+    public static void onPlayerLogout(Player player) {
+        ChatServer.getInstance().sendPlayerLogout(player);
+    }
 
-	/**
-	 * @param playerId
-	 * @param token
-	 * @param account
-	 * @param nick
-	 */
-	public static void playerAuthed(int playerId, byte[] token) {
-		Player player = World.getInstance().findPlayer(playerId);
-		if (player != null) {
-			PacketSendUtility.sendPacket(player, new SM_CHAT_INIT(token));
-		}
-	}
+    /**
+     * @param playerId
+     * @param token
+     */
+    public static void playerAuthed(int playerId, byte[] token) {
+        Player player = World.getInstance().findPlayer(playerId);
+        if (player != null) {
+            PacketSendUtility.sendPacket(player, new SM_CHAT_INIT(token));
+        }
+    }
 
-	/**
-	 * @return the ip
-	 */
-	public static byte[] getIp() {
-		return ip;
-	}
+    /**
+     * @return the ip
+     */
+    public static byte[] getIp() {
+        return ip;
+    }
 
-	/**
-	 * @return the port
-	 */
-	public static int getPort() {
-		return port;
-	}
+    /**
+     * @return the port
+     */
+    public static int getPort() {
+        return port;
+    }
 
-	/**
-	 * @param ip
-	 *            the ip to set
-	 */
-	public static void setIp(byte[] _ip) {
-		ip = _ip;
-	}
+    /**
+     * @param ip the ip to set
+     */
+    public static void setIp(byte[] _ip) {
+        ip = _ip;
+    }
 
-	/**
-	 * @param port
-	 *            the port to set
-	 */
-	public static void setPort(int _port) {
-		port = _port;
-	}
+    /**
+     * @param port the port to set
+     */
+    public static void setPort(int _port) {
+        port = _port;
+    }
 }

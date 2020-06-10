@@ -14,77 +14,77 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package ai.instance.illuminaryObelisk;
+
+import java.util.concurrent.Future;
 
 import ai.AggressiveNpcAI2;
 
 import com.aionemu.commons.network.util.ThreadPoolManager;
 import com.aionemu.gameserver.ai2.AIName;
-import com.aionemu.gameserver.model.actions.NpcActions;
+import com.aionemu.gameserver.model.actions.CreatureActions;
 import com.aionemu.gameserver.model.gameobjects.Npc;
 import com.aionemu.gameserver.skillengine.SkillEngine;
 
-import java.util.concurrent.Future;
-
 /**
- * 
  * @author Alcapwnd
- *
  */
 @AIName("dainatum_mine")
 public class DainatumBombAI2 extends AggressiveNpcAI2 {
 
-	private Future<?> tasksBomb;
+	private Future<?> TasksBomb;
 	private boolean isCancelled;
 
 	@Override
 	protected void handleSpawned() {
-		skillActive();
+		SkillActive();
 		super.handleSpawned();
 	}
 
-	private void dainatumBomb(int skillId) {
+	private void DainatumBomb(int skillId) {
 		SkillEngine.getInstance().getSkill(getOwner(), skillId, 65, getOwner()).useNoAnimationSkill();
 	}
 
-	private void skillActive() {
-		tasksBomb = ThreadPoolManager.getInstance().schedule(new Runnable() {
+	private void SkillActive() {
+
+		TasksBomb = ThreadPoolManager.getInstance().schedule(new Runnable() {
 
 			@Override
 			public void run() {
 				if (isAlreadyDead() && isCancelled == true) {
-					cancelTask();
-				} else {
-					dainatumBomb(21275);
+					CancelTask();
+				}
+				else {
+					DainatumBomb(21275);
 				}
 			}
 		}, 6000);
 
-		tasksBomb = ThreadPoolManager.getInstance().schedule(new Runnable() {
+		TasksBomb = ThreadPoolManager.getInstance().schedule(new Runnable() {
 
 			@Override
 			public void run() {
 				if (isAlreadyDead() && isCancelled == true) {
-					cancelTask();
-				} else {
+					CancelTask();
+				}
+				else {
 					Npc npc = getOwner();
-					NpcActions.delete(npc);
+					CreatureActions.delete(npc);
 				}
 			}
 		}, 10000);
 	}
 
-	private void cancelTask() {
-		if (tasksBomb != null && !tasksBomb.isCancelled()) {
-			tasksBomb.cancel(true);
+	private void CancelTask() {
+		if (TasksBomb != null && !TasksBomb.isCancelled()) {
+			TasksBomb.cancel(true);
 		}
 	}
 
 	@Override
 	protected void handleDespawned() {
 		super.handleDespawned();
-		cancelTask();
+		CancelTask();
 		isCancelled = true;
 	}
 

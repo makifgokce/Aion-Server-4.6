@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javolution.util.FastMap;
-
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ABNORMAL_EFFECT;
@@ -44,6 +42,8 @@ import com.aionemu.gameserver.taskmanager.tasks.PacketBroadcaster.BroadcastMode;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+
+import javolution.util.FastMap;
 
 /**
  * @author ATracer modified by Wakizashi, Sippolo, Cheatkiller
@@ -162,15 +162,17 @@ public class EffectController {
 				if (nextEffect.getSkillSubType() == SkillSubType.CHANT) {
 					mts = 3;
 				} else if (isBardEffect(nextEffect.getSkillId())) {
-					mts = 2;
+					mts = 1;
 				} else {
 					mts = 1;
 				}
 				if (mapToUpdate.size() >= mts) {
 					Iterator<Effect> iter = mapToUpdate.values().iterator();
 					Effect effect = iter.next();
-					effect.endEffect();
-					iter.remove();
+					if(effect.getSkillId() != 3063 && nextEffect.getSkillId() != 3063) {
+						effect.endEffect();
+						iter.remove();
+					}
 				}
 			}
 
@@ -533,6 +535,9 @@ public class EffectController {
 	private boolean removebleEffect(Effect effect) {
 		int skillId = effect.getSkillId();
 		switch (skillId) {
+			case 20656:
+			case 20700:
+			case 20701:
 			case 20941:
 			case 20942:
 			case 19370:
@@ -689,7 +694,7 @@ public class EffectController {
 	 * @return copy of anbornals list
 	 */
 	public List<Effect> getAbnormalEffects() {
-		List<Effect> effects = new ArrayList<Effect>();
+		List<Effect> effects = new ArrayList<>();
 		Iterator<Effect> iterator = iterator();
 		while (iterator.hasNext()) {
 			Effect effect = iterator.next();

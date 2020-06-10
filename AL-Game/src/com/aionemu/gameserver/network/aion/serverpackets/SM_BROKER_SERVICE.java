@@ -199,14 +199,19 @@ public class SM_BROKER_SERVICE extends AionServerPacket {
 		}
 			writeQ(settledItem.getItemCount());
 			writeQ(settledItem.getItemCount());
-			writeD((int) settledItem.getSettleTime().getTime() / 60000);
+			writeD((int) ((settledItem.getSettleTime().getTime() / 1000) / 60));
 		Item item = settledItem.getItem();
         if (item != null) {
-		ItemInfoBlob.newBlobEntry(ItemInfoBlob.ItemBlobType.MANA_SOCKETS, null, item).writeThisBlob(getBuf());
+        	ItemInfoBlob.newBlobEntry(ItemInfoBlob.ItemBlobType.MANA_SOCKETS, null, item).writeThisBlob(getBuf());
 	    } else {
 			writeB(new byte[54]);
         }
-			writeS(settledItem.getItemCreator());
+	        if (item != null) {
+				writeS(settledItem.getItemCreator());
+				ItemInfoBlob.newBlobEntry(ItemBlobType.PREMIUM_OPTION, null, item).writeThisBlob(getBuf());
+				ItemInfoBlob.newBlobEntry(ItemBlobType.POLISH_INFO, null, item).writeThisBlob(getBuf());
+				ItemInfoBlob.newBlobEntry(ItemBlobType.PACK_INFO, null, item).writeThisBlob(getBuf());
+	        }
         }
     }
 
@@ -223,8 +228,8 @@ public class SM_BROKER_SERVICE extends AionServerPacket {
 		ItemInfoBlob.newBlobEntry(ItemBlobType.MANA_SOCKETS, null, item).writeThisBlob(getBuf());
 			writeS(brokerItem.getItemCreator());
 		ItemInfoBlob.newBlobEntry(ItemBlobType.PREMIUM_OPTION, null, item).writeThisBlob(getBuf());
-			writeC(0x00);
 		ItemInfoBlob.newBlobEntry(ItemBlobType.POLISH_INFO, null, item).writeThisBlob(getBuf());
+		ItemInfoBlob.newBlobEntry(ItemBlobType.PACK_INFO, null, item).writeThisBlob(getBuf());
 	}
 
 	private void writeItemInfo(BrokerItem brokerItem) {
@@ -237,7 +242,7 @@ public class SM_BROKER_SERVICE extends AionServerPacket {
 			writeS(brokerItem.getSeller());
 			writeS(brokerItem.getItemCreator());
 		ItemInfoBlob.newBlobEntry(ItemBlobType.PREMIUM_OPTION, null, item).writeThisBlob(getBuf());
-			writeC(0x00);
 		ItemInfoBlob.newBlobEntry(ItemBlobType.POLISH_INFO, null, item).writeThisBlob(getBuf());
+		ItemInfoBlob.newBlobEntry(ItemBlobType.PACK_INFO, null, item).writeThisBlob(getBuf());
 	}
 }

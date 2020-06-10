@@ -18,6 +18,8 @@
 package admincommands;
 
 import java.sql.Timestamp;
+import java.util.Locale;
+
 import com.aionemu.gameserver.controllers.HouseController;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.PlayerHouseOwnerFlags;
@@ -54,19 +56,19 @@ public class HouseCommand extends AdminCommand {
 				PacketSendUtility.sendMessage(admin, "Syntax: //house acquire <name>");
 				return;
 			}
-			ChangeHouseOwner(admin, params[1].toUpperCase(), true);
+			ChangeHouseOwner(admin, params[1].toUpperCase(Locale.forLanguageTag("en")), true);
 		} else if (params[0].equals("revoke")) {
 			if (params.length == 1) {
 				PacketSendUtility.sendMessage(admin, "Syntax: //house revoke <name>");
 				return;
 			}
-			ChangeHouseOwner(admin, params[1].toUpperCase(), false);
+			ChangeHouseOwner(admin, params[1].toUpperCase(Locale.forLanguageTag("en")), false);
 		} else if (params[0].equals("tp")) {
 			if (params.length == 1) {
 				PacketSendUtility.sendMessage(admin, "Syntax: //house tp <name>");
 				return;
 			}
-			House house = HousingService.getInstance().getHouseByName(params[1].toUpperCase());
+			House house = HousingService.getInstance().getHouseByName(params[1].toUpperCase(Locale.forLanguageTag("en")));
 			if (house == null) {
 				PacketSendUtility.sendMessage(admin, "No such house!");
 				return;

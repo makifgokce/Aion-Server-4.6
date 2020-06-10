@@ -17,12 +17,13 @@
 
 package com.aionemu.gameserver.model.gameobjects;
 
-import com.aionemu.gameserver.model.broker.BrokerRace;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Comparator;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.aionemu.gameserver.model.broker.BrokerRace;
 
 
 /**
@@ -242,7 +243,26 @@ public class BrokerItem implements Comparable<BrokerItem> {
 	public void setIsCanceled(boolean isCanceled) {
 		this.isCanceled = isCanceled;
 	}
-
+	public boolean isGoldPack() {
+		switch (itemId) {
+			case 188710044:
+			case 188710045:
+			case 188710046:
+			case 188710085:
+			case 188710086:
+			case 188710087:
+			case 188710088:
+			case 188710113:
+			case 188710117:
+			case 188710118:
+			case 188710119:
+			case 188710120:
+			case 188710121:
+				return true;
+			default:
+				return false;
+		}
+	}
 	public void removeItem() {
   //this.item = null;
 		this.isSold = true;

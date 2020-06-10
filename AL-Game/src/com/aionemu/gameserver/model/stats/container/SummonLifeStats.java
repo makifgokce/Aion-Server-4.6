@@ -61,8 +61,13 @@ public class SummonLifeStats extends CreatureLifeStats<Summon> {
 	}
 
 	@Override
+	protected void onReduceMp(TYPE type, int value, int skillId, LOG log) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
 	public Summon getOwner() {
-		return (Summon) super.getOwner();
+		return super.getOwner();
 	}
 
 	@Override

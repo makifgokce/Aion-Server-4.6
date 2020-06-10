@@ -17,6 +17,11 @@
 
 package com.aionemu.gameserver.services;
 
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.model.DuelResult;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
@@ -25,6 +30,7 @@ import com.aionemu.gameserver.model.summons.SummonMode;
 import com.aionemu.gameserver.model.summons.UnsummonType;
 import com.aionemu.gameserver.model.templates.zone.ZoneType;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_DUEL;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_DUEL_REQUEST_CANCEL;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_QUESTION_WINDOW;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.services.summons.SummonsService;
@@ -32,11 +38,10 @@ import com.aionemu.gameserver.skillengine.model.SkillTargetSlot;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
+import com.aionemu.gameserver.world.knownlist.Visitor;
 import com.aionemu.gameserver.world.zone.ZoneInstance;
-import java.util.concurrent.Future;
+
 import javolution.util.FastMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Simple, Sphinx, xTz
@@ -80,7 +85,7 @@ public class DuelService {
 			PacketSendUtility.sendPacket(requester, SM_SYSTEM_MESSAGE.STR_DUEL_HE_REJECT_DUEL(responder.getName()));
 			return;
 		}
-		for (ZoneInstance zone : responder.getPosition().getMapRegion().getZones((Creature) responder)) {
+		for (ZoneInstance zone : responder.getPosition().getMapRegion().getZones(responder)) {
 			if (!zone.isOtherRaceDuelsAllowed() && !responder.getRace().equals(requester.getRace())
 					|| (!zone.isSameRaceDuelsAllowed() && responder.getRace().equals(requester.getRace()))) {
 				PacketSendUtility.sendPacket(requester, SM_SYSTEM_MESSAGE.STR_MSG_DUEL_CANT_IN_THIS_ZONE);
@@ -96,7 +101,9 @@ public class DuelService {
 
 			@Override
 			public void acceptRequest(Creature requester, Player responder) {
-				startDuel((Player) requester, responder);
+				if (!isDueling(requester.getObjectId())) {
+					startDuel((Player) requester, responder);
+				}
 			}
 		};
 		responder.getResponseRequester().putRequest(SM_QUESTION_WINDOW.STR_DUEL_DO_YOU_ACCEPT_REQUEST, rrh);
@@ -146,7 +153,7 @@ public class DuelService {
 	 */
 	private void rejectDuelRequest(Player requester, Player responder) {
 		log.debug("[Duel] Player " + responder.getName() + " rejected duel request from " + requester.getName());
-		PacketSendUtility.sendPacket(requester, SM_SYSTEM_MESSAGE.STR_DUEL_HE_REJECT_DUEL(responder.getName()));
+		PacketSendUtility.sendPacket(requester, new SM_DUEL_REQUEST_CANCEL(1300097, responder.getName()));
 		PacketSendUtility.sendPacket(responder, SM_SYSTEM_MESSAGE.STR_DUEL_REJECT_DUEL(requester.getName()));
 	}
 
@@ -159,7 +166,7 @@ public class DuelService {
 	 */
 	private void cancelDuelRequest(Player owner, Player target) {
 		log.debug("[Duel] Player " + owner.getName() + " cancelled his duel request with " + target.getName());
-		PacketSendUtility.sendPacket(target, SM_SYSTEM_MESSAGE.STR_DUEL_REQUESTER_WITHDRAW_REQUEST(owner.getName()));
+		PacketSendUtility.sendPacket(target, new SM_DUEL_REQUEST_CANCEL(1300134, owner.getName()));
 		PacketSendUtility.sendPacket(owner, SM_SYSTEM_MESSAGE.STR_DUEL_WITHDRAW_REQUEST(target.getName()));
 	}
 
@@ -174,6 +181,7 @@ public class DuelService {
 	private void startDuel(Player requester, Player responder) {
 		PacketSendUtility.sendPacket(requester, SM_DUEL.SM_DUEL_STARTED(responder.getObjectId()));
 		PacketSendUtility.sendPacket(responder, SM_DUEL.SM_DUEL_STARTED(requester.getObjectId()));
+		PacketSendUtility.sendPacket(requester, new SM_DUEL_REQUEST_CANCEL(0, ""));
 		createDuel(requester.getObjectId(), responder.getObjectId());
 		createTask(requester, responder);
 	}
@@ -183,15 +191,16 @@ public class DuelService {
 	 *
 	 * @param player
 	 */
-	public void loseDuel(Player player) {
+	public void loseDuel(final Player player) {
 		if (!isDueling(player.getObjectId())) {
 			return;
 		}
 		int opponnentId = duels.get(player.getObjectId());
 
+		player.getEffectController().removeAbnormalEffectsByTargetSlot(SkillTargetSlot.DEBUFF);
 		player.getAggroList().clear();
 
-		Player opponent = World.getInstance().findPlayer(opponnentId);
+		final Player opponent = World.getInstance().findPlayer(opponnentId);
 
 		if (opponent != null) {
 			/**
@@ -235,6 +244,15 @@ public class DuelService {
 
 			PacketSendUtility.sendPacket(opponent, SM_DUEL.SM_DUEL_RESULT(DuelResult.DUEL_WON, player.getName()));
 			PacketSendUtility.sendPacket(player, SM_DUEL.SM_DUEL_RESULT(DuelResult.DUEL_LOST, opponent.getName()));
+			World.getInstance().doOnAllPlayers(new Visitor<Player>() {
+
+				@Override
+				public void visit(Player players) {
+					if(players.getWorldId() == player.getWorldId()) {
+						PacketSendUtility.sendPacket(players, SM_SYSTEM_MESSAGE.STR_DUEL_STOP_BROADCAST(opponent.getName(), player.getName()));
+					}
+				}
+			});
 		} else {
 			log.warn("CHECKPOINT : duel opponent is already out of world");
 		}

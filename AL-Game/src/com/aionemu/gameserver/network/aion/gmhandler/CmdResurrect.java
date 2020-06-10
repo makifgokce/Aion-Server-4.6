@@ -19,24 +19,33 @@ package com.aionemu.gameserver.network.aion.gmhandler;
 
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_RESURRECT;
+import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 
 /**
  * @author Antraxx
  */
-public final class CmdResurrect extends AbstractGMHandler {
+public final class CmdResurrect {
 
-	public CmdResurrect(Player admin, String params) {
-		super(admin, params);
+	private Player admin, player;
+
+	public CmdResurrect(Player admin, Player player) {
+		this.admin = admin;
+		this.player = player;
 		run();
 	}
 
 	public void run() {
-		Player t = target != null ? target : admin;
+		Player t = player != null ? player : admin;
 		if (!t.getLifeStats().isAlreadyDead()) {
+			PacketSendUtility.sendPacket(admin, SM_SYSTEM_MESSAGE.STR_SKILL_TARGET_IS_NOT_VALID);
 			return;
 		}
 		t.setPlayerResActivate(true);
 		PacketSendUtility.sendPacket(t, new SM_RESURRECT(admin));
+		t.setResPosState(true);
+		t.setResPosX(admin.getX());
+		t.setResPosY(admin.getY());
+		t.setResPosZ(admin.getZ());
 	}
 }

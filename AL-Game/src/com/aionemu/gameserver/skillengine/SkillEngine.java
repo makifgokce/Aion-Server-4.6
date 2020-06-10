@@ -138,7 +138,10 @@ public class SkillEngine {
 	public static SkillEngine getInstance() {
 		return skillEngine;
 	}
-
+	
+	public void applyEffectDirectly(int skillId, Creature effector, Creature effected, int duration) {
+		applyEffectDirectly(skillId, effector, effected, duration, false);
+	}
 	/**
 	 * This method is used to apply directly effect of given skill without
 	 * checking properties, sending packets, etc Should be only used from quest
@@ -150,18 +153,18 @@ public class SkillEngine {
 	 * @param duration
 	 *            => 0 takes duration from skill_templates, >0 forced duration
 	 */
-	public void applyEffectDirectly(int skillId, Creature effector, Creature effected, int duration) {
+	public void applyEffectDirectly(int skillId, Creature effector, Creature effected, int duration, boolean noRemoveAtDie) {
 		SkillTemplate st = DataManager.SKILL_DATA.getSkillTemplate(skillId);
 		if (st == null) {
 			return;
 		}
-
 		final Effect ef = new Effect(effector, effected, st, st.getLvl(), duration);
 		ef.setIsForcedEffect(true);
 		ef.initialize();
 		if (duration > 0) {
 			ef.setForcedDuration(true);
 		}
+		ef.getSkillTemplate().setNoRemoveAtDie(noRemoveAtDie);
 		ef.applyEffect();
 	}
 }

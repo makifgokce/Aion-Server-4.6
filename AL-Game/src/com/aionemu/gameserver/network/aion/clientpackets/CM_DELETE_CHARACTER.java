@@ -17,6 +17,9 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.main.SecurityConfig;
 import com.aionemu.gameserver.dao.PlayerPasskeyDAO;
@@ -37,6 +40,7 @@ import com.aionemu.gameserver.services.player.PlayerService;
  */
 public class CM_DELETE_CHARACTER extends AionClientPacket {
 
+	private static final Logger log = LoggerFactory.getLogger("DELETE_CHARACTER_LOG");
 	/**
 	 * PlayOk2 - we dont care...
 	 */
@@ -76,7 +80,7 @@ public class CM_DELETE_CHARACTER extends AionClientPacket {
 			// passkey check
 			if (SecurityConfig.PASSKEY_ENABLE && !client.getAccount().getCharacterPasskey().isPass()) {
 				client.getAccount().getCharacterPasskey().setConnectType(ConnectType.DELETE);
-				client.getAccount().getCharacterPasskey().setObjectId(chaOid);
+				client.getAccount().getCharacterPasskey().setObjectId(client.getAccount().getId());
 				boolean isExistPasskey = DAOManager.getDAO(PlayerPasskeyDAO.class).existCheckPlayerPasskey(client.getAccount().getId());
 
 				if (!isExistPasskey) {
@@ -87,6 +91,7 @@ public class CM_DELETE_CHARACTER extends AionClientPacket {
 			} else {
 				PlayerService.deletePlayer(playerAccData);
 				client.sendPacket(new SM_DELETE_CHARACTER(chaOid, playerAccData.getDeletionTimeInSeconds()));
+				log.info("[DELETE_CHARACTER] > Player:" + playerAccData.getPlayerCommonData().getName() + " (" + chaOid + ")");
 			}
 		} else {
 			client.sendPacket(SM_SYSTEM_MESSAGE.STR_GUILD_DISPERSE_STAYMODE_CANCEL_1);

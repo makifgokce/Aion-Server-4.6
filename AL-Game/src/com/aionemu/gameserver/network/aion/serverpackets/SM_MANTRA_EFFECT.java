@@ -17,7 +17,6 @@
 
 package com.aionemu.gameserver.network.aion.serverpackets;
 
-import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 
@@ -26,21 +25,27 @@ import com.aionemu.gameserver.network.aion.AionServerPacket;
  */
 public class SM_MANTRA_EFFECT extends AionServerPacket {
 
-	private Player player;
+	private int objectId;
 	private int subEffectId;
+	private int unk;
 
-	public SM_MANTRA_EFFECT(Player player, int subEffectId) {
-		this.player = player;
+	public SM_MANTRA_EFFECT(int objectId, int subEffectId) {
+		this.objectId = objectId;
 		this.subEffectId = subEffectId;
 	}
 
+	public SM_MANTRA_EFFECT(int objectId, int subEffectId, int unk) {
+		this.objectId = objectId;
+		this.subEffectId = subEffectId;
+		this.unk = unk;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected void writeImpl(AionConnection con) {
-		writeD(0x00);// unk
-		writeD(player.getObjectId());
+		writeD(unk);// unk
+		writeD(objectId);
 		writeH(subEffectId);
 	}
 }

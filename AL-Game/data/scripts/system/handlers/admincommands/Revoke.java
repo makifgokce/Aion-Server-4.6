@@ -17,6 +17,8 @@
 
 package admincommands;
 
+import java.util.Locale;
+
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.loginserver.LoginServer;
 import com.aionemu.gameserver.utils.PacketSendUtility;
@@ -44,9 +46,9 @@ public class Revoke extends AdminCommand {
 		}
 
 		int type = 0;
-		if (params[1].toLowerCase().equals("acceslevel")) {
+		if (params[1].toLowerCase(Locale.forLanguageTag("en")).equals("acceslevel")) {
 			type = 1;
-		} else if (params[1].toLowerCase().equals("membership")) {
+		} else if (params[1].toLowerCase(Locale.forLanguageTag("en")).equals("membership")) {
 			type = 2;
 		} else {
 			PacketSendUtility.sendMessage(admin, "syntax //revoke <characterName> <acceslevel | membership>");

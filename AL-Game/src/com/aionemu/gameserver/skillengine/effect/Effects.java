@@ -37,7 +37,7 @@ public class Effects {
 
 	@XmlElements({
 			@XmlElement(name = "root", type = RootEffect.class),
-			@XmlElement(name = "buf", type = BufEffect.class),
+			@XmlElement(name = "buf", type = BuffEffect.class),
 			@XmlElement(name = "spellatk", type = SpellAttackEffect.class),
 			@XmlElement(name = "deform", type = DeformEffect.class),
 			@XmlElement(name = "shapechange", type = ShapeChangeEffect.class),
@@ -220,7 +220,7 @@ public class Effects {
 	 */
 	public List<EffectTemplate> getEffects() {
 		if (effects == null) {
-			effects = new ArrayList<EffectTemplate>();
+			effects = new ArrayList<>();
 		}
 		return this.effects;
 	}
@@ -231,7 +231,7 @@ public class Effects {
 
 	public void addEffectType(EffectType effectType) {
 		if (effectTypes == null) {
-			effectTypes = new ArrayList<EffectType>();
+			effectTypes = new ArrayList<>();
 		}
 
 		this.effectTypes.add(effectType);
@@ -258,6 +258,17 @@ public class Effects {
 		return this.isEffectTypePresent(EffectType.MPHEALINSTANT);
 	}
 
+	public boolean isMpAttackInstant() {
+		return this.isEffectTypePresent(EffectType.MPATTACKINSTANT);
+	}
+
+	public boolean isMpAttack() {
+		return this.isEffectTypePresent(EffectType.MPATTACK);
+	}
+
+	public boolean isFpHeal() {
+		return this.isEffectTypePresent(EffectType.FPHEAL) || this.isEffectTypePresent(EffectType.FPHEALINSTANT);
+	}
 	void afterUnmarshal(Unmarshaller u, Object parent) {
 		for (EffectTemplate et : this.getEffects()) {
 			this.addEffectType(et.getEffectType());

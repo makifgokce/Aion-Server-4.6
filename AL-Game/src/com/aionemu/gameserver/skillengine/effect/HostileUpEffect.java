@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Npc;
+import com.aionemu.gameserver.model.gameobjects.Servant;
 import com.aionemu.gameserver.skillengine.model.Effect;
 
 /**
@@ -36,7 +37,11 @@ public class HostileUpEffect extends EffectTemplate {
 	public void applyEffect(Effect effect) {
 		Creature effected = effect.getEffected();
 		if (effected instanceof Npc) {
-			((Npc) effected).getAggroList().addHate(effect.getEffector(), effect.getTauntHate());
+			if(effect.getEffector() instanceof Servant) {
+				((Npc) effected).getAggroList().addHate(effect.getEffector().getMaster(), effect.getTauntHate());
+			} else {
+				((Npc) effected).getAggroList().addHate(effect.getEffector(), effect.getTauntHate());
+			}
 		}
 	}
 

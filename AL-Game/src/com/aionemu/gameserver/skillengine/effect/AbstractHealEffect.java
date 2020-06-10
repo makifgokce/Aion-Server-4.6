@@ -79,9 +79,14 @@ public abstract class AbstractHealEffect extends EffectTemplate {
 		if (healType == HealType.HP && effect.getEffected().getEffectController().isAbnormalSet(AbnormalState.DISEASE)) {
 			finalHeal = 0;
 		}
-
+		if(healType == HealType.FP && !(effect.getEffected() instanceof Player)) {
+			finalHeal = 0;		}
 		effect.setReservedInt(position, finalHeal);
-		effect.setReserved1(-finalHeal);
+		if (healType == HealType.FP) {
+			effect.setReserved2(-finalHeal);
+		}else {
+			effect.setReserved1(-finalHeal);
+		}
 	}
 
 	public void applyEffect(Effect effect, HealType healType) {
@@ -98,12 +103,14 @@ public abstract class AbstractHealEffect extends EffectTemplate {
 															// potions
 				{
 					effected.getLifeStats().increaseHp(TYPE.HP, healValue, 0, LOG.REGULAR);
-				} else // TODO shouldnt send value, on retail sm_attack_status
-						// is send only to update hp bar
-				if (healValue > 0) {
-					effected.getLifeStats().increaseHp(TYPE.REGULAR, healValue, 0, LOG.REGULAR);
 				} else {
-					effected.getLifeStats().reduceHp(-healValue, effected);
+					// TODO shouldnt send value, on retail sm_attack_status
+					// is send only to update hp bar
+					if (healValue > 0) {
+						effected.getLifeStats().increaseHp(TYPE.REGULAR, healValue, 0, LOG.REGULAR);
+					} else {
+						effected.getLifeStats().reduceHp(-healValue, effected);
+					}
 				}
 				break;
 			case MP:
@@ -112,11 +119,19 @@ public abstract class AbstractHealEffect extends EffectTemplate {
 				{
 					effected.getLifeStats().increaseMp(TYPE.MP, healValue, 0, LOG.REGULAR);
 				} else {
-					effected.getLifeStats().increaseMp(TYPE.HEAL_MP, healValue, 0, LOG.REGULAR);
+					if (healValue > 0) {
+						effected.getLifeStats().increaseMp(TYPE.HEAL_MP, healValue, 0, LOG.REGULAR);
+					} else {
+						effected.getLifeStats().reduceMp(-healValue);
+					}
 				}
 				break;
 			case FP:
-				effected.getLifeStats().increaseFp(TYPE.FP, healValue);
+				if(effect.getItemTemplate() == null) {
+					((Player) effected).getLifeStats().increaseFp(TYPE.FP_RINGS, healValue);
+				} else {
+					((Player) effected).getLifeStats().increaseFp(TYPE.FP, healValue);
+				}
 				break;
 			case DP:
 				((Player) effected).getCommonData().addDp(healValue);

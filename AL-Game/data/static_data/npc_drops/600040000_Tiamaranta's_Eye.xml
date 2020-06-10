@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npc_drops>
+	<!-- Key Master Davra -->
+	<npc_drop npc_id="219193">
+		<drop_group name="NAMED_KEY_ALONE">
+			<drop item_id="185000116" chance="90.7" min_amount="1" max_amount="1" no_reduce="false" eachmember="false" name="Protectorate Key (Chest)"/>
+		</drop_group>
+	</npc_drop>
+</npc_drops>

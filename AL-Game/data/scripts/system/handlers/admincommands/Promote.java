@@ -17,6 +17,8 @@
 
 package admincommands;
 
+import java.util.Locale;
+
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.loginserver.LoginServer;
 import com.aionemu.gameserver.utils.PacketSendUtility;
@@ -52,13 +54,13 @@ public class Promote extends AdminCommand {
 		}
 
 		int type = 0;
-		if (params[1].toLowerCase().equals("accesslevel")) {
+		if (params[1].toLowerCase(Locale.forLanguageTag("en")).equals("accesslevel")) {
 			type = 1;
 			if (mask > 10 || mask < 0) {
 				PacketSendUtility.sendMessage(admin, "accesslevel can be 0 - 10");
 				return;
 			}
-		} else if (params[1].toLowerCase().equals("membership")) {
+		} else if (params[1].toLowerCase(Locale.forLanguageTag("en")).equals("membership")) {
 			type = 2;
 			if (mask > 3 || mask < 0) {
 				PacketSendUtility.sendMessage(admin, "membership can be 0 - 3");

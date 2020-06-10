@@ -14,8 +14,21 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mysql5;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.DatabaseFactory;
 import com.aionemu.commons.utils.GenericValidator;
@@ -31,21 +44,10 @@ import com.aionemu.gameserver.model.items.ItemStone.ItemStoneType;
 import com.aionemu.gameserver.model.items.ManaStone;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author ATracer
+ * @rework FrozenKiller
  */
 public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 
@@ -55,18 +57,21 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 	public static final String DELETE_QUERY = "DELETE FROM `item_stones` WHERE `item_unique_id`=? AND slot=? AND category=?";
 	public static final String SELECT_QUERY = "SELECT `item_id`, `slot`, `category`, `polishNumber`, `polishCharge` FROM `item_stones` WHERE `item_unique_id`=?";
 	private static final Predicate<ItemStone> itemStoneAddPredicate = new Predicate<ItemStone>() {
+
 		@Override
 		public boolean apply(@Nullable ItemStone itemStone) {
 			return itemStone != null && PersistentState.NEW == itemStone.getPersistentState();
 		}
 	};
 	private static final Predicate<ItemStone> itemStoneDeletedPredicate = new Predicate<ItemStone>() {
+
 		@Override
 		public boolean apply(@Nullable ItemStone itemStone) {
 			return itemStone != null && PersistentState.DELETED == itemStone.getPersistentState();
 		}
 	};
 	private static final Predicate<ItemStone> itemStoneUpdatePredicate = new Predicate<ItemStone>() {
+
 		@Override
 		public boolean apply(@Nullable ItemStone itemStone) {
 			return itemStone != null && PersistentState.UPDATE_REQUIRED == itemStone.getPersistentState();
@@ -112,8 +117,7 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 								item.getFusionStones().add(new ManaStone(item.getObjectId(), itemId, slot, PersistentState.UPDATED));
 								break;
 							case 3:
-								item.setIdianStone(new IdianStone(itemId, PersistentState.UPDATE_REQUIRED, item, rset.getInt("polishNumber"), rset
-										.getInt("polishCharge")));
+								item.setIdianStone(new IdianStone(itemId, PersistentState.UPDATE_REQUIRED, item, rset.getInt("polishNumber"), rset.getInt("polishCharge")));
 								break;
 						}
 					}
@@ -121,9 +125,11 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 				}
 			}
 			stmt.close();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("Could not restore ItemStoneList data from DB: " + e.getMessage(), e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 	}
@@ -169,8 +175,8 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 	}
 
 	@Override
-	public void storeFusionStone(Set<ManaStone> manaStones) {
-		store(manaStones, ItemStoneType.FUSIONSTONE);
+	public void storeFusionStones(Set<ManaStone> fusionStones) {
+		store(fusionStones, ItemStoneType.FUSIONSTONE);
 	}
 
 	@Override
@@ -196,9 +202,11 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 			addItemStones(con, stonesToAdd, ist);
 			updateItemStones(con, stonesToUpdate, ist);
 
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Can't save stones", e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 
@@ -226,7 +234,8 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 					IdianStone stone = (IdianStone) is;
 					st.setInt(5, stone.getPolishNumber());
 					st.setInt(6, stone.getPolishCharge());
-				} else {
+				}
+				else {
 					st.setInt(5, 0);
 					st.setInt(6, 0);
 				}
@@ -236,9 +245,11 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 
 			st.executeBatch();
 			con.commit();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error occured while saving item stones", e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(st);
 		}
 	}
@@ -259,7 +270,8 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 					IdianStone stone = (IdianStone) is;
 					st.setInt(3, stone.getPolishNumber());
 					st.setInt(4, stone.getPolishCharge());
-				} else {
+				}
+				else {
 					st.setInt(3, 0);
 					st.setInt(4, 0);
 				}
@@ -270,9 +282,11 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 
 			st.executeBatch();
 			con.commit();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error occured while saving item stones", e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(st);
 		}
 	}
@@ -297,9 +311,11 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 
 			st.executeBatch();
 			con.commit();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error occured while saving item stones", e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(st);
 		}
 	}
@@ -313,9 +329,11 @@ public class MySQL5ItemStoneListDAO extends ItemStoneListDAO {
 			st.setInt(2, slot);
 			st.setInt(3, category);
 			st.execute();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error occured while saving item stones", e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(st);
 		}
 	}

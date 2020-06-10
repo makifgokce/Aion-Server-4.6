@@ -17,8 +17,6 @@
 
 package com.aionemu.gameserver.model.templates.spawns;
 
-import javolution.util.FastList;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
@@ -48,7 +46,7 @@ public class SpawnTemplate {
 	private int creatorId;
 	private String masterName = StringUtils.EMPTY;
 	private TemporarySpawn temporarySpawn;
-	private FastList<VisibleObject> visibleObjects;
+    private VisibleObject visibleObject;
 
 	public SpawnTemplate(SpawnGroup2 spawnGroup, SpawnSpotTemplate spot) {
 		this.spawnGroup = spawnGroup;
@@ -263,14 +261,11 @@ public class SpawnTemplate {
 		this.masterName = masterName;
 	}
 
-	public FastList<VisibleObject> getVisibleObjects() {
-		return visibleObjects;
-	}
+	public VisibleObject getVisibleObject() {
+        return visibleObject;
+    }
 
-	public void addVisibleObject(VisibleObject visibleObject) {
-		if (this.visibleObjects == null) {
-			this.visibleObjects = new FastList<VisibleObject>();
-		}
-		this.visibleObjects.add(visibleObject);
-	}
+    public void setVisibleObject(VisibleObject visibleObject) {
+        this.visibleObject = visibleObject;
+    }
 }

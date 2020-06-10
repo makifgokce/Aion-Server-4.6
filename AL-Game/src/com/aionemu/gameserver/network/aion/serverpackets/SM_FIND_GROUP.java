@@ -32,8 +32,10 @@ public class SM_FIND_GROUP extends AionServerPacket {
 	private int lastUpdate;
 	private Collection<FindGroup> findGroups;
 	private int groupSize;
-	private int unk;
 	private int instanceId;
+	private int findGroupObjId;
+	private int serverId;
+	private int hasTeam;
 
 	public SM_FIND_GROUP(int action, int lastUpdate, Collection<FindGroup> findGroups) {
 		this.lastUpdate = lastUpdate;
@@ -42,12 +44,19 @@ public class SM_FIND_GROUP extends AionServerPacket {
 		this.groupSize = findGroups.size();
 	}
 
-	public SM_FIND_GROUP(int action, int lastUpdate, int unk) {
+	public SM_FIND_GROUP(int action, int lastUpdate, int findGroupObjId, int serverId, int hasTeam) {
 		this.action = action;
 		this.lastUpdate = lastUpdate;
-		this.unk = unk;
+		this.findGroupObjId = findGroupObjId;
+		this.serverId = serverId;
+		this.hasTeam = hasTeam;
 	}
 
+	public SM_FIND_GROUP(int action, int lastUpdate, int findGroupObjId) {
+		this.action = action;
+		this.lastUpdate = lastUpdate;
+		this.findGroupObjId = findGroupObjId;
+	}
 	public SM_FIND_GROUP(int action, int instanceId) {
 		this.action = action;
 		this.instanceId = instanceId;
@@ -57,14 +66,15 @@ public class SM_FIND_GROUP extends AionServerPacket {
 	protected void writeImpl(AionConnection con) {
 		writeC(action);
 		switch (action) {
-			case 0x00:
-			case 0x02:
+			case 0x00: // recruit list
 				writeH(groupSize); // groupSize
 				writeH(groupSize); // groupSize
 				writeD(lastUpdate); // objId?
 				for (FindGroup findGroup : findGroups) {
 					writeD(findGroup.getObjectId()); // player object id
-					writeD(findGroup.getUnk()); // unk (0 or 65557)
+					writeH(findGroup.getServerId()); // ServerId
+					writeC(0); // unk
+					writeC(findGroup.hasTeam()); // Group Owner
 					writeC(findGroup.getGroupType()); // 0:group, 1:alliance
 					writeS(findGroup.getMessage()); // text
 					writeS(findGroup.getName()); // writer name
@@ -74,13 +84,13 @@ public class SM_FIND_GROUP extends AionServerPacket {
 					writeD(findGroup.getLastUpdate()); // objId?
 				}
 				break;
-			case 0x01:
-			case 0x03:
-				writeD(lastUpdate); // player object id
-				writeD(unk); // unk (0 or 65557)
+			case 0x01: // offer delete
+				writeD(findGroupObjId); // player object id or groupObjId
+				writeH(serverId); // ServerId
+				writeC(0); // unk
+				writeC(hasTeam); // unk
 				break;
-			case 0x04:
-			case 0x06:
+			case 0x04: // apply list
 				writeH(groupSize); // groupSize
 				writeH(groupSize); // groupSize
 				writeD(lastUpdate); // objId?
@@ -90,12 +100,12 @@ public class SM_FIND_GROUP extends AionServerPacket {
 					writeS(findGroup.getMessage()); // text
 					writeS(findGroup.getName()); // writer name
 					writeC(findGroup.getClassId()); // player class id
-					writeC(findGroup.getMinLevel()); // player level
+					writeC(findGroup.getLevel()); // player level
 					writeD(findGroup.getLastUpdate()); // objId?
 				}
 				break;
-			case 0x05:
-				writeD(lastUpdate); // player object id
+			case 0x05: // post delete
+				writeD(findGroupObjId); // player object id
 				break;
 			// //////////// 4.0 Instance GroupSystem //////////////
 			case 0x0A: // registered Groups

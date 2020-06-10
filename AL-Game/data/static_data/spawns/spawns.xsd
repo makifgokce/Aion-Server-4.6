@@ -139,6 +139,10 @@
             <xs:enumeration value="BOSS"/>
             <xs:enumeration value="RIFT"/>
             <xs:enumeration value="STATIC"/>
+            <xs:enumeration value="GUARD"/>
+            <xs:enumeration value="GUARD_VILLAGE"/>
+            <xs:enumeration value="PORTAL"/>
+			<xs:enumeration value="CHIEF"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

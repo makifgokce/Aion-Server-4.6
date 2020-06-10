@@ -16,10 +16,8 @@
  */
 package com.aionemu.gameserver.dataholders;
 
-import com.aionemu.gameserver.model.templates.item.EnchantType;
-import com.aionemu.gameserver.model.templates.item.ItemEnchantTemplate;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.List;
+
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,6 +25,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.aionemu.gameserver.model.templates.item.ItemEnchantTemplate;
+
+import gnu.trove.map.hash.TIntObjectHashMap;
+
+/**
+ * @author Alcapwnd
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "enchant_templates")
 public class ItemEnchantData {
@@ -34,32 +39,25 @@ public class ItemEnchantData {
 	@XmlElement(name = "enchant_template", required = true)
 	protected List<ItemEnchantTemplate> enchantTemplates;
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@XmlTransient
-	private TIntObjectHashMap<ItemEnchantTemplate> enchants = new TIntObjectHashMap<ItemEnchantTemplate>();
-	@XmlTransient
-	private TIntObjectHashMap<ItemEnchantTemplate> authorizes = new TIntObjectHashMap<ItemEnchantTemplate>();
+	private TIntObjectHashMap<ItemEnchantTemplate> authorizes = new TIntObjectHashMap();
 
 	void afterUnmarshal(Unmarshaller u, Object parent) {
 		for (ItemEnchantTemplate it : this.enchantTemplates) {
-			getEnchantMap(it.getEnchantType()).put(it.getId(), it);
+			getEnchantMap().put(it.getId(), it);
 		}
 	}
 
-	private TIntObjectHashMap<ItemEnchantTemplate> getEnchantMap(EnchantType type) {
-		if (type == EnchantType.ENCHANT) {
-			return this.enchants;
-		}
+	private TIntObjectHashMap<ItemEnchantTemplate> getEnchantMap() {
 		return this.authorizes;
 	}
 
-	public ItemEnchantTemplate getEnchantTemplate(EnchantType type, int id) {
-		if (type == EnchantType.ENCHANT) {
-			return (ItemEnchantTemplate) this.enchants.get(id);
-		}
-		return (ItemEnchantTemplate) this.authorizes.get(id);
+	public ItemEnchantTemplate getEnchantTemplate(int id) {
+		return this.authorizes.get(id);
 	}
 
 	public int size() {
-		return this.enchants.size() + this.authorizes.size();
+		return this.authorizes.size();
 	}
 }

@@ -56,16 +56,18 @@ public class CM_VIEW_PLAYER_DETAILS extends AionClientPacket {
 	protected void runImpl() {
 		Player player = this.getConnection().getActivePlayer();
 		VisibleObject obj = player.getKnownList().getObject(targetObjectId);
-		if (obj == null) {
+		if (obj == null && player.getTarget() != player) {
 			// probably targetObjectId can be 0
 			log.warn("CHECKPOINT: can't show player details for " + targetObjectId);
 			return;
 		}
-
+		if(player.getTarget() == player) {
+			obj = player;
+		}
 		if (obj instanceof Player) {
 			Player target = (Player) obj;
 
-			if (!target.getPlayerSettings().isInDeniedStatus(DeniedStatus.VIEW_DETAILS) || player.getAccessLevel() >= AdminConfig.ADMIN_VIEW_DETAILS) {
+			if (!target.getCommonData().getPlayerSettings().isInDeniedStatus(DeniedStatus.VIEW_DETAILS) || player.getAccessLevel() >= AdminConfig.ADMIN_VIEW_DETAILS) {
 				sendPacket(new SM_VIEW_PLAYER_DETAILS(target.getEquipment().getEquippedItemsWithoutStigma(), target));
 			} else {
 				sendPacket(SM_SYSTEM_MESSAGE.STR_MSG_REJECTED_WATCH(target.getName()));

@@ -35,7 +35,7 @@ public class PackInfoBlobEntry extends ItemBlobEntry {
 		if (ownerItem.getItemTemplate().getPackCount() > 0 && ownerItem.isPacked()) {
 			writeC(buf, ownerItem.getPackCount());
 		} else if (!ownerItem.isPacked()) {
-			writeC(buf, 0);
+			writeC(buf, ownerItem.getPackCount() * -1);
 		} else {
 			writeC(buf, 0);
 		}

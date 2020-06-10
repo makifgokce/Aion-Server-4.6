@@ -41,10 +41,12 @@
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:element name="tradein_item" type="TradeinItem" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
+		<xs:attribute name="ap" type="xs:int" default="0" use="optional"/>
+		<xs:attribute name="price" type="xs:int" default="0" use="optional"/>
     </xs:complexType>
     <xs:complexType name="TradeinItem">
         <xs:attribute name="id" type="itemId"/>
-        <xs:attribute name="price" type="xs:int"/>
+        <xs:attribute name="count" type="xs:int"/>
     </xs:complexType>
     <xs:complexType name="Acquisition">
         <xs:attribute name="ap" type="xs:int" default="0" use="optional"/>
@@ -126,13 +128,14 @@
         <xs:attribute name="m_slots" type="xs:int"/>
         <xs:attribute name="max_enchant" type="xs:int"/>
         <xs:attribute name="max_enchant_bonus" type="xs:int"/>
+        <xs:attribute name="exceed_enchant" type="xs:boolean" default="false"/>
         <xs:attribute name="return_alias" type="xs:string"/>
         <xs:attribute name="return_world" type="xs:int"/>
         <xs:attribute name="equipment_type" type="equipType"/>
         <xs:attribute name="weapon_boost" type="xs:int"/>
         <xs:attribute name="attack_type" type="ItemAttackType"/>
         <xs:attribute name="desc" type="xs:int"/>
-		<xs:attribute name="descr" type="xs:string"/>
+		<xs:attribute name="name_desc" type="xs:string"/>
         <xs:attribute name="restrict_max" type="xs:string"/>
         <xs:attribute name="restrict" type="xs:string"/>
         <xs:attribute name="rnd_bonus" type="xs:int"/>
@@ -217,6 +220,7 @@
             <xs:element name="pack" type="PackAction" minOccurs="0" maxOccurs="1"/>
             <xs:element name="megaphone" type="MegaphoneAction" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="authorize" type="AuthorizeAction" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="f2p" type="F2pAction" minOccurs="0" maxOccurs="1"/>
        </xs:sequence>
 	 </xs:complexType>
     <xs:complexType name="AuthorizeAction">
@@ -444,6 +448,14 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+	<xs:complexType name="F2pAction">
+		<xs:complexContent>
+			<xs:extension base="AbstractItemAction">
+				<xs:attribute name="pack" type="xs:string"/>
+				<xs:attribute name="minutes" type="xs:int"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
     <xs:complexType name="PolishAction">
         <xs:complexContent>
             <xs:extension base="AbstractItemAction">
@@ -542,7 +554,6 @@
             <xs:enumeration value="ANCIENT_MANASTONE"/>
             <xs:enumeration value="GODSTONE"/>
             <xs:enumeration value="ENCHANTMENT"/>
-            <xs:enumeration value="TEMPERSTONE"/>
             <xs:enumeration value="FLUX"/>
             <xs:enumeration value="BALIC_EMOTION"/>
             <xs:enumeration value="BALIC_MATERIAL"/>
@@ -585,11 +596,7 @@
             <xs:enumeration value="KEY"/>
             <xs:enumeration value="CRAFT_BOOST"/>
             <xs:enumeration value="COMBINATION"/>
-            <xs:enumeration value="TUNING"/>
-            <xs:enumeration value="WRAPPING_SCROLL"/>
-			<xs:enumeration value="TEMPERING"/>
-			<xs:enumeration value="FEATHER"/>
-            <xs:enumeration value="MEGAPHONE"/>
+			<xs:enumeration value="PLUME"/>
             <xs:enumeration value="NONE"/>
         </xs:restriction>
     </xs:simpleType>

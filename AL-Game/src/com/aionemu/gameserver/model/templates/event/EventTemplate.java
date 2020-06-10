@@ -20,6 +20,7 @@ package com.aionemu.gameserver.model.templates.event;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Future;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -240,7 +241,7 @@ public class EventTemplate {
 	 */
 	public String getTheme() {
 		if (theme != null) {
-			return theme.toLowerCase();
+			return theme.toLowerCase(Locale.forLanguageTag("en"));
 		}
 		return theme;
 	}

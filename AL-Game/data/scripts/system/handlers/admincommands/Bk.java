@@ -33,6 +33,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -58,7 +60,7 @@ public class Bk extends AdminCommand {
 
 		if (params[0].equals("add")) {
 			try {
-				bookmark_name = params[1].toLowerCase();
+				bookmark_name = params[1].toLowerCase(Locale.forLanguageTag("en"));
 				if (isBookmarkExists(bookmark_name, player.getObjectId())) {
 					PacketSendUtility.sendMessage(player, "Bookmark " + bookmark_name + " already exists !");
 					return;
@@ -93,7 +95,7 @@ public class Bk extends AdminCommand {
 		} else if (params[0].equals("del")) {
 			Connection con = null;
 			try {
-				bookmark_name = params[1].toLowerCase();
+				bookmark_name = params[1].toLowerCase(Locale.forLanguageTag("en"));
 				con = DatabaseFactory.getConnection();
 
 				PreparedStatement statement = con.prepareStatement("DELETE FROM bookmark WHERE name = ?");
@@ -118,7 +120,7 @@ public class Bk extends AdminCommand {
 
 				updateInfo(player.getObjectId());
 
-				bookmark_name = params[1].toLowerCase();
+				bookmark_name = params[1].toLowerCase(Locale.forLanguageTag("en"));
 				Bookmark tele_bk = null;
 				try {
 					tele_bk = selectByName(bookmark_name);

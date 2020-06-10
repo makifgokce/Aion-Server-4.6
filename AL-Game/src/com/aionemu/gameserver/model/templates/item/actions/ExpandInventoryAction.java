@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
+import com.aionemu.gameserver.model.templates.ExpandType;
 import com.aionemu.gameserver.model.templates.item.ItemTemplate;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ITEM_USAGE_ANIMATION;
 import com.aionemu.gameserver.services.CubeExpandService;
@@ -48,7 +49,7 @@ public class ExpandInventoryAction extends AbstractItemAction {
 			case CUBE:
 				return CubeExpandService.canExpandByTicket(player, level);
 			case WAREHOUSE:
-				return WarehouseService.canExpand(player);
+				return WarehouseService.canExpandByTicket(player, level);
 		}
 		return false;
 	}
@@ -64,10 +65,10 @@ public class ExpandInventoryAction extends AbstractItemAction {
 
 		switch (storage) {
 			case CUBE:
-				CubeExpandService.expand(player, false);
+				CubeExpandService.expand(player, ExpandType.ITEM);
 				break;
 			case WAREHOUSE:
-				WarehouseService.expand(player);
+				WarehouseService.expand(player, ExpandType.ITEM);
 				break;
 		}
 	}

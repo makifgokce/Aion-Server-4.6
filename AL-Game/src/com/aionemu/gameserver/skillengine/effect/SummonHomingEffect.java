@@ -30,7 +30,9 @@ import com.aionemu.gameserver.controllers.observer.ObserverType;
 import com.aionemu.gameserver.model.TaskId;
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.model.gameobjects.Homing;
+import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.templates.spawns.SpawnTemplate;
+import com.aionemu.gameserver.services.DuelService;
 import com.aionemu.gameserver.skillengine.model.Effect;
 import com.aionemu.gameserver.spawnengine.SpawnEngine;
 import com.aionemu.gameserver.spawnengine.VisibleObjectSpawner;
@@ -64,7 +66,14 @@ public class SummonHomingEffect extends SummonEffect {
 			SpawnTemplate spawn = SpawnEngine.addNewSingleTimeSpawn(worldId, npcId, x, y, z, heading);
 			final Homing homing = VisibleObjectSpawner.spawnHoming(spawn, instanceId, effector, attackCount, effect.getSkillId(), effect.getSkillLevel(),
 					skillId);
-
+			if(effector instanceof Player && effect.getEffected() instanceof Player) {
+				Player player1 = (Player) effector;
+				Player player2 = (Player) effect.getEffected();
+				if(player1.getRace() == player2.getRace() && !DuelService.getInstance().isDueling(player1.getObjectId(), player2.getObjectId())) {
+					homing.getController().onDelete();
+					return;
+				}
+			}
 			if (attackCount > 0) {
 				ActionObserver observer = new ActionObserver(ObserverType.ATTACK) {
 					@Override

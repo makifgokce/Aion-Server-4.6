@@ -57,8 +57,8 @@ public class CM_CUSTOM_SETTINGS extends AionClientPacket {
 	@Override
 	protected void runImpl() {
 		Player activePlayer = getConnection().getActivePlayer();
-		activePlayer.getPlayerSettings().setDisplay(display);
-		activePlayer.getPlayerSettings().setDeny(deny);
+		activePlayer.getCommonData().getPlayerSettings().setDisplay(display);
+		activePlayer.getCommonData().getPlayerSettings().setDeny(deny);
 
 		PacketSendUtility.broadcastPacket(activePlayer, new SM_CUSTOM_SETTINGS(activePlayer), true);
 	}

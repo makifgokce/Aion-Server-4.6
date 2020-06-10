@@ -16,6 +16,12 @@
  */
 package com.aionemu.gameserver.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.commons.utils.Rnd;
 import com.aionemu.gameserver.configs.main.EnchantsConfig;
 import com.aionemu.gameserver.dataholders.DataManager;
@@ -31,7 +37,6 @@ import com.aionemu.gameserver.model.stats.calc.functions.StatEnchantFunction;
 import com.aionemu.gameserver.model.stats.container.StatEnum;
 import com.aionemu.gameserver.model.stats.listeners.ItemEquipmentListener;
 import com.aionemu.gameserver.model.templates.item.ArmorType;
-import com.aionemu.gameserver.model.templates.item.EnchantType;
 import com.aionemu.gameserver.model.templates.item.EquipType;
 import com.aionemu.gameserver.model.templates.item.ItemEnchantTemplate;
 import com.aionemu.gameserver.model.templates.item.ItemQuality;
@@ -43,11 +48,6 @@ import com.aionemu.gameserver.services.item.ItemService;
 import com.aionemu.gameserver.services.item.ItemSocketService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.audit.AuditLogger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EnchantService {
 
@@ -207,10 +207,10 @@ public class EnchantService {
 		if (cheakLevel > 15)
 		{
 			int level = Rnd.get(1, 100);
-			if (level < 10) {
+			if (level < 20) {
 				rndLevel = 2;
 			}
-			if (level < 5) {
+			if (level < 15) {
 				rndLevel = 3;
 			}
 		}
@@ -356,27 +356,12 @@ public class EnchantService {
 			}
 		} else {
 			PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_GIVE_ITEM_OPTION_FAILED(new DescriptionId(targetItem.getNameId())));
-			if (targetWeapon == 1) {
-				Set<ManaStone> manaStones = targetItem.getItemStones();
-				if (targetItem.isEquipped()) {
-					ItemEquipmentListener.removeStoneStats(manaStones, player.getGameStats());
-					player.getGameStats().updateStatsAndSpeedVisually();
-				}
-				ItemSocketService.removeAllManastone(player, targetItem);
-			} else {
-				Set<ManaStone> manaStones = targetItem.getFusionStones();
-				if (targetItem.isEquipped()) {
-					ItemEquipmentListener.removeStoneStats(manaStones, player.getGameStats());
-					player.getGameStats().updateStatsAndSpeedVisually();
-				}
-				ItemSocketService.removeAllFusionStone(player, targetItem);
-			}
 		}
 		ItemPacketService.updateItemAfterInfoChange(player, targetItem);
 	}
 
 	public static void onItemEquip(Player player, Item item) {
-		List<IStatFunction> modifiers = new ArrayList<IStatFunction>();
+		List<IStatFunction> modifiers = new ArrayList<>();
 		try {
 			if (item.getItemTemplate().isWeapon()) {
 				switch (item.getItemTemplate().getWeaponType()) {
@@ -408,7 +393,7 @@ public class EnchantService {
 				}
 			} else if (item.getItemTemplate().isAccessory()) {
 				if (item.getItemTemplate().getAwakenId() > 0) {
-					ItemEnchantTemplate ie = DataManager.ITEM_ENCHANT_DATA.getEnchantTemplate(EnchantType.AUTHORIZE, item.getItemTemplate().getAwakenId());
+					ItemEnchantTemplate ie = DataManager.ITEM_ENCHANT_DATA.getEnchantTemplate(item.getItemTemplate().getAwakenId());
 					if (item.getAuthorize() > 0) {
 						modifiers.addAll(ie.getStats(item.getAuthorize()));
 					}
@@ -444,7 +429,7 @@ public class EnchantService {
 					modifiers.add(new StatEnchantFunction(item, StatEnum.DAMAGE_REDUCE));
 					modifiers.add(new StatEnchantFunction(item, StatEnum.BLOCK));
 				}
-				if (item.getItemTemplate().isFeather()) {
+				if (item.getItemTemplate().isPlume()) {
 					int id = item.getItemTemplate().getAwakenId();
 					switch (id)
 					{

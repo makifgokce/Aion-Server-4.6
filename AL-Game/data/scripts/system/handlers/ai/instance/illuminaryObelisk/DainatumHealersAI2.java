@@ -14,8 +14,9 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package ai.instance.illuminaryObelisk;
+
+import java.util.concurrent.Future;
 
 import ai.GeneralNpcAI2;
 
@@ -23,12 +24,8 @@ import com.aionemu.commons.network.util.ThreadPoolManager;
 import com.aionemu.gameserver.ai2.AIName;
 import com.aionemu.gameserver.skillengine.SkillEngine;
 
-import java.util.concurrent.Future;
-
 /**
- * 
  * @author Alcapwnd
- *
  */
 @AIName("dainatum_healers")
 public class DainatumHealersAI2 extends GeneralNpcAI2 {
@@ -54,7 +51,8 @@ public class DainatumHealersAI2 extends GeneralNpcAI2 {
 			public void run() {
 				if (isAlreadyDead() && isCancelled == true) {
 					CancelTask();
-				} else {
+				}
+				else {
 					HealDainatum(21535);
 				}
 			}

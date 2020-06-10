@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.network.aion.clientpackets;
 
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +160,7 @@ public class CM_LEGION extends AionClientPacket {
 				newNickname = readS();
 				break;
 			default:
-				log.info("Unknown Legion exOpcode? 0x" + Integer.toHexString(exOpcode).toUpperCase());
+				log.info("Unknown Legion exOpcode? 0x" + Integer.toHexString(exOpcode).toUpperCase(Locale.forLanguageTag("en")));
 				break;
 		}
 	}

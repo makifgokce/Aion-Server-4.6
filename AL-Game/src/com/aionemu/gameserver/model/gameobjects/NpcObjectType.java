@@ -22,10 +22,16 @@ package com.aionemu.gameserver.model.gameobjects;
  */
 public enum NpcObjectType {
 
-	NORMAL(1), SUMMON(2), HOMING(16), TRAP(32), SKILLAREA(64), TOTEM(128), // TODO
-																			// not
-																			// implemented
-	GROUPGATE(256), SERVANT(1024), PET(2048);// TODO not used
+	NORMAL(1),
+	SUMMON(2),
+	FLAG(13),
+	HOMING(16),
+	TRAP(32),
+	SKILLAREA(64),
+	TOTEM(128), // TODO
+	GROUPGATE(256),
+	SERVANT(1024),
+	PET(2048);// TODO not used
 
 	private NpcObjectType(int id) {
 		this.id = id;

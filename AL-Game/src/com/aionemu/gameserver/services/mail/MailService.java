@@ -14,15 +14,25 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aionemu.gameserver.services.mail;
+
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.administration.AdminConfig;
 import com.aionemu.gameserver.configs.main.LoggingConfig;
 import com.aionemu.gameserver.dao.InventoryDAO;
+import com.aionemu.gameserver.dao.ItemStoneListDAO;
 import com.aionemu.gameserver.dao.MailDAO;
 import com.aionemu.gameserver.dao.PlayerDAO;
+import com.aionemu.gameserver.model.DescriptionId;
 import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.Letter;
 import com.aionemu.gameserver.model.gameobjects.LetterType;
@@ -39,18 +49,13 @@ import com.aionemu.gameserver.network.aion.serverpackets.SM_SYSTEM_MESSAGE;
 import com.aionemu.gameserver.services.AdminService;
 import com.aionemu.gameserver.services.HousingBidService;
 import com.aionemu.gameserver.services.item.ItemFactory;
+import com.aionemu.gameserver.services.item.ItemService;
 import com.aionemu.gameserver.services.player.PlayerMailboxState;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.utils.audit.AuditLogger;
 import com.aionemu.gameserver.utils.idfactory.IDFactory;
 import com.aionemu.gameserver.world.World;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author kosyachok
@@ -65,7 +70,7 @@ public class MailService {
 	}
 
 	private MailService() {
-		newPlayers = new ConcurrentLinkedQueue<Player>();
+		newPlayers = new ConcurrentLinkedQueue<>();
 	}
 
 	/**
@@ -76,12 +81,11 @@ public class MailService {
 	 * @param title
 	 * @param message
 	 * @param attachedItemObjId
-	 * @param attachedItemCount
-	 * @param attachedKinahCount
-	 * @param express
+	 * @param itemCount
+	 * @param kinahCount
+	 * @param letterType
 	 */
-	public void sendMail(Player sender, String recipientName, String title, String message, int attachedItemObjId, int attachedItemCount,
-			int attachedKinahCount, LetterType letterType) {
+	public void sendMail(Player sender, String recipientName, String title, String message, int attachedItemObjId, long itemCount, long kinahCount, LetterType letterType) {
 
 		if (letterType == LetterType.BLACKCLOUD || recipientName.length() > 16) {
 			return;
@@ -113,25 +117,26 @@ public class MailService {
 				PacketSendUtility.sendPacket(sender, new SM_MAIL_SERVICE(MailMessage.RECIPIENT_MAILBOX_FULL));
 				return;
 			}
-		} else if (recipientCommonData.getMailboxLetters() > 99) {
+		}
+		else if (recipientCommonData.getMailboxLetters() > 99) {
 			PacketSendUtility.sendPacket(sender, new SM_MAIL_SERVICE(MailMessage.RECIPIENT_MAILBOX_FULL));
 			return;
 		}
 
-		if (!validateMailSendPrice(sender, attachedKinahCount, attachedItemObjId, attachedItemCount)) {
+		if (!validateMailSendPrice(sender, kinahCount, attachedItemObjId, itemCount)) {
 			return;
 		}
 
 		Item attachedItem = null;
-		int finalAttachedKinahCount = 0;
+		long finalAttachedKinahCount = 0;
 
 		int kinahMailCommission = 0;
 		int itemMailCommission = 0;
 
 		Storage senderInventory = sender.getInventory();
 
-		if (attachedItemObjId != 0 && attachedItemCount > 0) {
-			Item senderItem = senderInventory.getItemByObjId(attachedItemObjId);
+		if (attachedItemObjId != 0 && itemCount > 0) {
+			final Item senderItem = senderInventory.getItemByObjId(attachedItemObjId);
 
 			if (senderItem == null) {
 				return;
@@ -167,37 +172,43 @@ public class MailService {
 					break;
 			}
 
-			if (senderItem.getItemCount() < attachedItemCount) {
+			if (senderItem.getItemCount() < itemCount) {
 				return;// Client hack
 			}
 
-            // Check Mailing untradables with Cash items (Special courier passes)
-			if (!senderItem.isTradeable(sender)) {
+			// Check Mailing untradables with Cash items (Special courier passes)
+			if (!senderItem.isTradeable()) {
 				Disposition dispo = senderItem.getItemTemplate().getDisposition();
-                if (dispo == null || dispo.getId() == 0 || dispo.getCount() == 0) //can not be traded, hack
+				if (dispo == null || dispo.getId() == 0 || dispo.getCount() == 0) // can not be traded, hack
 				{
 					return;
 				}
 
-				if (senderInventory.getItemCountByItemId(dispo.getId()) >= dispo.getCount()) {
-					senderInventory.decreaseByItemId(dispo.getId(), dispo.getCount());
-				} else {
-					return;
+				if (!senderItem.isPacked()) {
+					if (senderInventory.getItemCountByItemId(dispo.getId()) >= dispo.getCount()) {
+						senderInventory.decreaseByItemId(dispo.getId(), dispo.getCount());
+					}
+					else {
+						PacketSendUtility.sendPacket(sender, new SM_SYSTEM_MESSAGE(1401514, new DescriptionId(dispo.getId())));
+						return;
+					}
 				}
-
-				if (senderItem.getPackCount() <= senderItem.getItemTemplate().getPackCount() && !senderItem.isPacked()) {
-					return;
+				else {
+					if (senderItem.getPackCount() > senderItem.getItemTemplate().getPackCount()) {
+						return;
+					}
 				}
 			}
 
 			// reuse item in case of full decrease of count
-			if (senderItem.getItemCount() == attachedItemCount) {
+			if (senderItem.getItemCount() == itemCount) {
+				attachedItem = senderItem;
 				senderInventory.remove(senderItem);
 				PacketSendUtility.sendPacket(sender, new SM_DELETE_ITEM(attachedItemObjId));
-				attachedItem = senderItem;
-			} else if (senderItem.getItemCount() > attachedItemCount) {
-				attachedItem = ItemFactory.newItem(senderItem.getItemTemplate().getTemplateId(), attachedItemCount);
-				senderInventory.decreaseItemCount(senderItem, attachedItemCount);
+			}
+			else if (senderItem.getItemCount() > itemCount) {
+				attachedItem = ItemFactory.newItem(senderItem.getItemTemplate().getTemplateId(), itemCount);
+				senderInventory.decreaseItemCount(senderItem, itemCount);
 			}
 
 			if (attachedItem == null) {
@@ -213,30 +224,31 @@ public class MailService {
 		/**
 		 * Calculate kinah
 		 */
-		if (attachedKinahCount > 0) {
-			if (senderInventory.getKinah() - attachedKinahCount >= 0) {
-				finalAttachedKinahCount = attachedKinahCount;
-				kinahMailCommission = Math.round(attachedKinahCount * 0.01f);
+		if (kinahCount > 0) {
+			if (senderInventory.getKinah() - kinahCount >= 0) {
+				finalAttachedKinahCount = kinahCount;
+				kinahMailCommission = Math.round(kinahCount * 0.01f);
 			}
 		}
 
-		int finalMailKinah = 10 + kinahMailCommission + itemMailCommission + finalAttachedKinahCount;
+		long finalMailKinah = 10 + kinahMailCommission + itemMailCommission + finalAttachedKinahCount;
 
 		if (senderInventory.getKinah() > finalMailKinah) {
 			senderInventory.decreaseKinah(finalMailKinah);
-		} else {
+		}
+		else {
 			AuditLogger.info(sender, "Mail kinah exploit.");
 			return;
 		}
 
 		Timestamp time = new Timestamp(Calendar.getInstance().getTimeInMillis());
 
-		Letter newLetter = new Letter(IDFactory.getInstance().nextId(), recipientCommonData.getPlayerObjId(), attachedItem, finalAttachedKinahCount, title,
-				message, sender.getName(), time, true, letterType);
+		Letter newLetter = new Letter(IDFactory.getInstance().nextId(), recipientCommonData.getPlayerObjId(), attachedItem, finalAttachedKinahCount, title, message, sender.getName(), time, true, letterType);
 
 		// first save attached item for FK consistency
 		if (attachedItem != null) {
 			if (!DAOManager.getDAO(InventoryDAO.class).store(attachedItem, recipientCommonData.getPlayerObjId())) {
+				DAOManager.getDAO(ItemStoneListDAO.class).save(recipientCommonData.getPlayer());
 				return;
 			}
 		}
@@ -272,9 +284,7 @@ public class MailService {
 
 		if (attachedItem != null) {
 			if (LoggingConfig.LOG_MAIL) {
-				log.info("[MAILSERVICE] [Player: " + sender.getName() + "] send [Item: " + attachedItem.getItemId()
-						+ (LoggingConfig.ENABLE_ADVANCED_LOGGING ? "] [Item Name: " + attachedItem.getItemName() + "]" : "]") + " [Count: "
-						+ attachedItem.getItemCount() + "] to [Reciever: " + recipientName + "]");
+				log.info("[MAILSERVICE] [Player: " + sender.getName() + "] send [Item: " + attachedItem.getItemId() + (LoggingConfig.ENABLE_ADVANCED_LOGGING ? "] [Item Name: " + attachedItem.getItemName() + "]" : "]") + " [Count: " + attachedItem.getItemCount() + "] to [Reciever: " + recipientName + "]");
 			}
 		}
 
@@ -300,7 +310,12 @@ public class MailService {
 			log.warn("Cannot read mail " + player.getObjectId() + " " + letterId);
 			return;
 		}
-
+		Item item = letter.getAttachedItem();
+		if(item != null && (item.getItemTemplate().isArmor() || item.getItemTemplate().isWeapon())) {
+			if(item.getFusionStones() == null || item.getItemStones() == null){
+				ItemService.loadItemStones(Collections.singletonList(item));
+			}
+		}
 		PacketSendUtility.sendPacket(player, new SM_MAIL_SERVICE(player, letter, letter.getTimeStamp().getTime()));
 		letter.setReadLetter();
 	}
@@ -327,6 +342,9 @@ public class MailService {
 					PacketSendUtility.sendPacket(player, SM_SYSTEM_MESSAGE.STR_MSG_FULL_INVENTORY);
 					return;
 				}
+				if (attachedItem.getExpireTime() != 0) {
+					attachedItem.setExpireTime(((int) (System.currentTimeMillis() / 1000) + attachedItem.getItemTemplate().getExpireTime() * 60) - 1);
+				}
 				player.getInventory().add(attachedItem);
 				if (!DAOManager.getDAO(InventoryDAO.class).store(attachedItem, player.getObjectId())) {
 					return;
@@ -347,7 +365,7 @@ public class MailService {
 
 	/**
 	 * @param player
-	 * @param letterId
+	 * @param mailObjId
 	 */
 	public void deleteMail(Player player, int[] mailObjId) {
 		Mailbox mailbox = player.getMailbox();
@@ -361,14 +379,14 @@ public class MailService {
 
 	/**
 	 * @param sender
-	 * @param attachedKinahCount
+	 * @param kinahCount
 	 * @param attachedItemObjId
-	 * @param attachedItemCount
+	 * @param itemCount
 	 * @return
 	 */
-	private boolean validateMailSendPrice(Player sender, int attachedKinahCount, int attachedItemObjId, int attachedItemCount) {
+	private boolean validateMailSendPrice(Player sender, long kinahCount, int attachedItemObjId, long itemCount) {
 		int itemMailCommission = 0;
-		int kinahMailCommission = Math.round(attachedKinahCount * 0.01f);
+		int kinahMailCommission = Math.round(kinahCount * 0.01f);
 		if (attachedItemObjId != 0) {
 			Item senderItem = sender.getInventory().getItemByObjId(attachedItemObjId);
 			if (senderItem == null || senderItem.getItemTemplate() == null) {
@@ -400,16 +418,13 @@ public class MailService {
 					break;
 			}
 
-			itemMailCommission = Math.round((senderItem.getItemTemplate().getPrice() * attachedItemCount) * qualityPriceRate);
+			itemMailCommission = Math.round((senderItem.getItemTemplate().getPrice() * itemCount) * qualityPriceRate);
 		}
 
 		int finalMailPrice = 10 + itemMailCommission + kinahMailCommission;
 
-		if (sender.getInventory().getKinah() >= finalMailPrice) {
-			return true;
-		}
+		return sender.getInventory().getKinah() >= finalMailPrice;
 
-		return false;
 	}
 
 	/**

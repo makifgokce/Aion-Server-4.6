@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
-import com.aionemu.gameserver.model.gameobjects.Creature;
+import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.skillengine.action.DamageType;
 import com.aionemu.gameserver.skillengine.model.DashStatus;
@@ -59,7 +59,7 @@ public class DashEffect extends DamageEffect {
 			return;
 		}
 
-		Creature effected = effect.getEffected();
+		VisibleObject effected = effect.getEffector().getTarget();
 		effect.setDashStatus(DashStatus.DASH);
 		effect.getSkill().setTargetPosition(effected.getX(), effected.getY(), effected.getZ(), effected.getHeading());
 	}

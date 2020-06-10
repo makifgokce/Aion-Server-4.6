@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package ai.instance.shugoImperialTomb;
 
 import com.aionemu.gameserver.ai2.AIName;
@@ -31,53 +30,50 @@ import com.aionemu.gameserver.utils.PacketSendUtility;
 /**
  * @author Swig
  */
-@AIName("shugodelightedadmirer")
-// 831114, 831306, 831115, 831195
+@AIName("shugodelightedadmirer") //831114, 831306, 831115, 831195
 public class ShugoDelightedAdmirerAI2 extends NpcAI2 {
 
-	@Override
-	protected void handleDialogStart(Player player) {
-		PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 1011));
-	}
+    @Override
+    protected void handleDialogStart(Player player) {
+        PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 1011));
+    }
 
-	@Override
-	public boolean onDialogSelect(Player player, int dialogId, int questId, int extendedRewardIndex) {
-		int instanceId = player.getInstanceId();
+    @Override
+    public boolean onDialogSelect(Player player, int dialogId, int questId, int extendedRewardIndex) {
+        int instanceId = player.getInstanceId();
 
-		switch (DialogAction.getActionByDialogId(dialogId)) {
-			case SETPRO2:
-				switch (getNpcId()) {
-					case 831114:
-					case 831306:
-						skillId = player.getRace() == Race.ASMODIANS ? 21104 : 21095;
-						SkillEngine.getInstance().applyEffectDirectly(skillId, player, player, 0);
-						break;
-					case 831115:
-					case 831195:
-						skillId = player.getRace() == Race.ASMODIANS ? 21105 : 21096;
-						SkillEngine.getInstance().applyEffectDirectly(skillId, player, player, 0);
-						break;
-				}
-				PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 1012));
-				break;
-			case SETPRO1:
-				PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 0));
-				switch (getNpcId()) {
-					case 831114:
-					case 831306:
-						TeleportService2.teleportTo(player, 300560000, instanceId, 346.27332f, 424.07101f, 294.75793f, (byte) 90,
-								TeleportAnimation.BEAM_ANIMATION);
-						break;
-					case 831115:
-					case 831195:
-						TeleportService2.teleportTo(player, 300560000, instanceId, 450.8527f, 105.94637f, 212.20023f, (byte) 90,
-								TeleportAnimation.BEAM_ANIMATION);
-						break;
-				}
-				break;
-			default:
-				break;
-		}
-		return true;
-	}
+        switch (DialogAction.getActionByDialogId(dialogId)) {
+            case SETPRO2:
+                switch (getNpcId()) {
+                    case 831114:
+                    case 831306:
+                        skillId = player.getRace() == Race.ASMODIANS ? 21104 : 21095;
+                        SkillEngine.getInstance().applyEffectDirectly(skillId, player, player, 0);
+                        break;
+                    case 831115:
+                    case 831195:
+                        skillId = player.getRace() == Race.ASMODIANS ? 21105 : 21096;
+                        SkillEngine.getInstance().applyEffectDirectly(skillId, player, player, 0);
+                        break;
+                }
+                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 1012));
+                break;
+            case SETPRO1:
+                PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(getObjectId(), 0));
+                switch (getNpcId()) {
+                    case 831114:
+                    case 831306:
+                        TeleportService2.teleportTo(player, 300560000, instanceId, 346.27332f, 424.07101f, 294.75793f, (byte) 90, TeleportAnimation.BEAM_ANIMATION);
+                        break;
+                    case 831115:
+                    case 831195:
+                        TeleportService2.teleportTo(player, 300560000, instanceId, 450.8527f, 105.94637f, 212.20023f, (byte) 90, TeleportAnimation.BEAM_ANIMATION);
+                        break;
+                }
+                break;
+		default:
+			break;
+        }
+        return true;
+    }
 }

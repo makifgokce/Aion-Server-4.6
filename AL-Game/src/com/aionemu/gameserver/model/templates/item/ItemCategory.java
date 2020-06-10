@@ -31,7 +31,6 @@ public enum ItemCategory {
     MANASTONE,
     ANCIENT_MANASTONE,
     GODSTONE,
-    TEMPERSTONE, //4.7
     ENCHANTMENT,
     FLUX,
     BALIC_EMOTION,
@@ -75,11 +74,6 @@ public enum ItemCategory {
     KEY,
     CRAFT_BOOST,
     COMBINATION,
-    WRAPPING_SCROLL,
-	MEGAPHONE,
-	TEMPERING,
-	TUNING,
-	FEATHER,
-	SPECIALSTONE,
+	PLUME,
     NONE
 }

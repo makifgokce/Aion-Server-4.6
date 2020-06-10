@@ -20,7 +20,6 @@ package admincommands;
 import com.aionemu.gameserver.model.gameobjects.VisibleObject;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_RESURRECT;
-import com.aionemu.gameserver.services.player.PlayerReviveService;
 import com.aionemu.gameserver.utils.PacketSendUtility;
 import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
 
@@ -59,8 +58,13 @@ public class Res extends AdminCommand {
 			return;
 		}
 
-		if (("instant").startsWith(params[0])) {
-			PlayerReviveService.skillRevive(player);
+		if (("pos").startsWith(params[0])) {
+			player.setPlayerResActivate(true);
+			PacketSendUtility.sendPacket(player, new SM_RESURRECT(admin));
+			player.setResPosState(true);
+			player.setResPosX(admin.getX());
+			player.setResPosY(admin.getY());
+			player.setResPosZ(admin.getZ());
 			return;
 		}
 

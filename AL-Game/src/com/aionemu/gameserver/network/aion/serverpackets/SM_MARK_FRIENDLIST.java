@@ -17,6 +17,8 @@
 
 package com.aionemu.gameserver.network.aion.serverpackets;
 
+import com.aionemu.gameserver.model.gameobjects.player.FriendRequest;
+import com.aionemu.gameserver.model.gameobjects.player.FriendRequestList;
 import com.aionemu.gameserver.network.aion.AionConnection;
 import com.aionemu.gameserver.network.aion.AionServerPacket;
 
@@ -28,8 +30,18 @@ public class SM_MARK_FRIENDLIST extends AionServerPacket {
 
 	@Override
 	protected void writeImpl(AionConnection con) {
+		FriendRequestList list = con.getActivePlayer().getCommonData().getFriendRequestList();
 		writeD(con.getActivePlayer().getObjectId());
 		writeC(1);
-		writeH(0);
+		writeH(list.getSize());
+		for(FriendRequest request : list) {
+			writeD(request.getOid());
+			writeS(request.getName());
+			writeS(request.getFriendRequestNote());
+			writeD(request.getLevel());
+			writeD(request.getPlayerClass().getClassId());
+			writeC(request.isOnline() ? 1 : 0);
+			writeD(1); // unk
+		}
 	}
 }

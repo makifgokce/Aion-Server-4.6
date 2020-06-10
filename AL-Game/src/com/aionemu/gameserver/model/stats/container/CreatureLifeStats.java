@@ -17,6 +17,16 @@
 
 package com.aionemu.gameserver.model.stats.container;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang.NullArgumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.aionemu.gameserver.model.gameobjects.Creature;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.LOG;
@@ -24,14 +34,6 @@ import com.aionemu.gameserver.network.aion.serverpackets.SM_ATTACK_STATUS.TYPE;
 import com.aionemu.gameserver.services.LifeStatsRestoreService;
 import com.aionemu.gameserver.skillengine.effect.AbnormalState;
 import com.aionemu.gameserver.utils.PacketSendUtility;
-import org.apache.commons.lang.NullArgumentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author ATracer
@@ -157,12 +159,31 @@ public abstract class CreatureLifeStats<T extends Creature> {
 		return currentMp;
 	}
 
+	public int reduceMp(TYPE type, int value, int skillId, LOG log) {
+		mpLock.lock();
+		try {
+			int newMp = this.currentMp - value;
+
+			if (newMp < 0) {
+				newMp = 0;
+			}
+
+			this.currentMp = newMp;
+		} finally {
+			mpLock.unlock();
+		}
+		if (value != 0) {
+			onReduceMp(type, -value, skillId, log);
+		}
+		return currentMp;
+	}
+
 	protected void sendAttackStatusPacketUpdate(TYPE type, int value, int skillId, LOG log) {
 		if (owner == null)// possible?
 		{
 			return;
 		}
-		PacketSendUtility.broadcastPacketAndReceive(owner, new SM_ATTACK_STATUS(owner, type, skillId, value, log));
+		PacketSendUtility.broadcastPacketAndReceive(owner, new SM_ATTACK_STATUS(owner, owner, type, skillId, value, log));
 	}
 
 	/**
@@ -357,6 +378,8 @@ public abstract class CreatureLifeStats<T extends Creature> {
 	}
 
 	protected abstract void onIncreaseMp(TYPE type, int value, int skillId, LOG log);
+
+	protected abstract void onReduceMp(TYPE type, int value, int skillId, LOG log);
 
 	protected abstract void onReduceMp();
 

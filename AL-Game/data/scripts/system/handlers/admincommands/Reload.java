@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package admincommands;
 
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
@@ -22,22 +21,26 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.makeSVNAware;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.prefixFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+
 import gnu.trove.procedure.TObjectProcedure;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
 import com.aionemu.gameserver.configs.Config;
 import com.aionemu.gameserver.dataholders.DataManager;
 import com.aionemu.gameserver.dataholders.EventData;
@@ -50,7 +53,6 @@ import com.aionemu.gameserver.dataholders.loadingutils.XmlValidationHandler;
 import com.aionemu.gameserver.instance.InstanceEngine;
 import com.aionemu.gameserver.model.drop.NpcDrop;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
-import com.aionemu.gameserver.model.ingameshop.InGameShopEn;
 import com.aionemu.gameserver.model.templates.npc.NpcTemplate;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.services.EventService;
@@ -61,7 +63,7 @@ import com.aionemu.gameserver.utils.chathandlers.AdminCommand;
 import com.aionemu.gameserver.utils.chathandlers.ChatProcessor;
 
 /**
- * @author MrPoke
+ * @author MrPoke, reworked by Voidstar
  */
 public class Reload extends AdminCommand {
 
@@ -118,10 +120,12 @@ public class Reload extends AdminCommand {
 				}
 				DataManager.SKILL_DATA.setSkillTemplates(newTemplates);
 				DataManager.SKILL_DATA.initializeCooldownGroups();
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				PacketSendUtility.sendMessage(admin, "Skill reload failed!");
 				log.error("Skill reload failed!", e);
-			} finally {
+			}
+			finally {
 				PacketSendUtility.sendMessage(admin, "Skill reload Success!");
 			}
 		} else if (params[0].equals("npc")) {
@@ -183,10 +187,7 @@ public class Reload extends AdminCommand {
 			}
 		}
 
-		else if (params[0].equals("gameshop")) {
-			InGameShopEn.getInstance().reload();
-			PacketSendUtility.sendMessage(admin, "Gameshop successfully reloaded!");
-		} else if (params[0].equals("events")) {
+		else if (params[0].equals("events")) {
 			File eventXml = new File("./data/static_data/events_config/events_config.xml");
 			EventData data = null;
 			try {

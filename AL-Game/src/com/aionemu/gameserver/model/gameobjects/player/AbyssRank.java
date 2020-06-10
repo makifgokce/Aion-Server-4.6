@@ -17,11 +17,11 @@
 
 package com.aionemu.gameserver.model.gameobjects.player;
 
+import java.util.Calendar;
+
 import com.aionemu.gameserver.configs.main.CustomConfig;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
 import com.aionemu.gameserver.utils.stats.AbyssRankEnum;
-
-import java.util.Calendar;
 
 /**
  * @author ATracer, Divinity
@@ -116,7 +116,7 @@ public final class AbyssRank {
 
         int cappedCount = 0;
         if (CustomConfig.ENABLE_AP_CAP) {
-            cappedCount = (long) (currentAp + additionalAp) > CustomConfig.AP_CAP_VALUE ? (int) (CustomConfig.AP_CAP_VALUE - currentAp) : additionalAp;
+            cappedCount = currentAp + additionalAp > CustomConfig.AP_CAP_VALUE ? (int) (CustomConfig.AP_CAP_VALUE - currentAp) : additionalAp;
         } else {
             cappedCount = additionalAp;
         }
@@ -150,7 +150,7 @@ public final class AbyssRank {
 
         int GpcappedCount = 0;
         if (CustomConfig.ENABLE_GP_CAP) {
-            GpcappedCount = (long) (currentGp + additionalGp) > CustomConfig.GP_CAP_VALUE ? (int) (CustomConfig.GP_CAP_VALUE - currentGp) : additionalGp;
+            GpcappedCount = currentGp + additionalGp > CustomConfig.GP_CAP_VALUE ? (int) (CustomConfig.GP_CAP_VALUE - currentGp) : additionalGp;
         } else {
             GpcappedCount = additionalGp;
         }

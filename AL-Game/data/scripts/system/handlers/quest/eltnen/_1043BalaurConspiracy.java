@@ -40,6 +40,7 @@ import com.aionemu.gameserver.questEngine.model.QuestStatus;
 import com.aionemu.gameserver.services.QuestService;
 import com.aionemu.gameserver.services.teleport.TeleportService2;
 import com.aionemu.gameserver.utils.PacketSendUtility;
+import com.aionemu.gameserver.utils.ThreadPoolManager;
 import com.aionemu.gameserver.world.World;
 import com.aionemu.gameserver.world.WorldMapType;
 
@@ -49,14 +50,14 @@ import com.aionemu.gameserver.world.WorldMapType;
 public class _1043BalaurConspiracy extends QuestHandler {
 
 	private final static int questId = 1043;
-	private static List<Integer> mobs = new ArrayList<Integer>();
+	private static List<Integer> mobs = new ArrayList<>();
 
 	static {
 		mobs.add(211628);
 		mobs.add(211630);
 		mobs.add(213575);
 	}
-
+	static boolean spwn = false;
 	public _1043BalaurConspiracy() {
 		super(questId);
 	}
@@ -149,6 +150,7 @@ public class _1043BalaurConspiracy extends QuestHandler {
 							updateQuestStatus(env);
 							PacketSendUtility.sendPacket(player, new SM_DIALOG_WINDOW(env.getVisibleObject().getObjectId(), 10));
 							QuestService.questTimerStart(env, 180);
+							spwn = true;
 							spawn(player);
 							return true;
 						}
@@ -203,6 +205,7 @@ public class _1043BalaurConspiracy extends QuestHandler {
 			if (var == 3) {
 				qs.setQuestVar(4);
 				updateQuestStatus(env);
+				spwn = false;
 				return true;
 			}
 		}
@@ -220,6 +223,8 @@ public class _1043BalaurConspiracy extends QuestHandler {
 				updateQuestStatus(env);
 				PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(SystemMessageId.QUEST_FAILED_$1, DataManager.QUEST_DATA.getQuestById(questId)
 						.getName()));
+
+				spwn = false;
 				return true;
 			}
 		}
@@ -235,30 +240,17 @@ public class _1043BalaurConspiracy extends QuestHandler {
 			if (var == 3) {
 				qs.setQuestVar(2);
 				updateQuestStatus(env);
+				spwn = false;
 				return true;
 			}
 		}
 		return false;
 	}
 
-	@Override
-	public boolean onKillEvent(QuestEnv env) {
-		Player player = env.getPlayer();
-		QuestState qs = player.getQuestStateList().getQuestState(questId);
-		if (qs != null && qs.getStatus() == QuestStatus.START) {
-			int var = qs.getQuestVarById(0);
-			if (var == 3) {
-				int targetId = env.getTargetId();
-				if (mobs.contains(targetId)) {
-					spawn(player);
-					return true;
-				}
-			}
+	private void spawn(final Player player) {
+		if(!spwn) {
+			return;
 		}
-		return false;
-	}
-
-	private void spawn(Player player) {
 		int mobToSpawn = mobs.get(Rnd.get(0, 2));
 		float x = 0;
 		float y = 0;
@@ -295,5 +287,13 @@ public class _1043BalaurConspiracy extends QuestHandler {
 			spawn.getMoveController().moveToTargetObject();
 			PacketSendUtility.broadcastPacket(spawn, new SM_EMOTION(spawn, EmotionType.START_EMOTE2, 0, spawn.getObjectId()));
 		}
+		ThreadPoolManager.getInstance().schedule(new Runnable() {
+			@Override
+			public void run() {
+				if(spwn) {
+					spawn(player);
+				}
+			}
+		}, 30 * 1000);
 	}
 }

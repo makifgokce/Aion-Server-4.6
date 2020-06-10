@@ -19,7 +19,13 @@ package com.aionemu.gameserver.model.stats.calc.functions;
 import com.aionemu.gameserver.model.stats.calc.Stat2;
 import com.aionemu.gameserver.model.stats.container.StatEnum;
 
+/**
+ * @author ATracer
+ */
 public class StatRateFunction extends StatFunction {
+
+	public StatRateFunction() {
+	}
 
 	public StatRateFunction(StatEnum name, int value, boolean bonus) {
 		super(name, value, bonus);
@@ -28,8 +34,9 @@ public class StatRateFunction extends StatFunction {
 	@Override
 	public void apply(Stat2 stat) {
 		if (isBonus()) {
-			stat.addToBonus((int) (stat.getBase() * getValue() / 100.0F));
-		} else {
+			stat.addToBonus((int) (stat.getBase() * getValue() / 100f));
+		}
+		else {
 			stat.setBase((int) (stat.getBase() * stat.calculatePercent(getValue())));
 		}
 	}
@@ -42,8 +49,5 @@ public class StatRateFunction extends StatFunction {
 	@Override
 	public String toString() {
 		return "StatRateFunction [" + super.toString() + "]";
-	}
-
-	public StatRateFunction() {
 	}
 }

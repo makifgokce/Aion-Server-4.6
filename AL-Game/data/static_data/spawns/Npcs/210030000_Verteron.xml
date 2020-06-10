@@ -2323,11 +2323,6 @@
 			<spot x="1708.76" y="1489.18" z="121.668" h="58"/>
 			<spot x="1721.24" y="1490.51" z="121.938" h="55"/>
 		</spawn>
-		<!-- Map of Eyvindr -->
-		<spawn npc_id="700139" respawn_time="295">
-			<spot x="1155.71" y="1856.87" z="105.543" h="49" static_id="486"/>
-			<spot x="2125.93" y="690.84" z="100.438" h="73" static_id="485"/>
-		</spawn>
 		<!-- Manos -->
 		<spawn npc_id="790000" respawn_time="295">
 			<spot x="1655.87" y="1520.23" z="118.911" h="90"/>

@@ -101,8 +101,9 @@ public class CM_TUNE extends AionClientPacket {
 				player.getObserveController().removeObserver(observer);
 				PacketSendUtility.broadcastPacket(player, new SM_ITEM_USAGE_ANIMATION(player.getObjectId(), itemObjectId, itemId, 0, 1, 1), true);
 
-				item.setOptionalSocket(Rnd.get(0, item.getItemTemplate().getOptionSlotBonus()));
+				item.setOptionalSocket(Rnd.get(0, template.getOptionSlotBonus()));
 				item.setRndBonus();
+				item.setBonusEnchant(Rnd.get(0, template.getMaxEnchantBonus()));
 				item.setPersistentState(PersistentState.UPDATE_REQUIRED);
 				PacketSendUtility.sendPacket(player, new SM_INVENTORY_UPDATE_ITEM(player, item));
 				PacketSendUtility.sendPacket(player, new SM_SYSTEM_MESSAGE(1401626, new DescriptionId(nameId)));

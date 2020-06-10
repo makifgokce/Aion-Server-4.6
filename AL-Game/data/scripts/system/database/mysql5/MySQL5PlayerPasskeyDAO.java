@@ -14,7 +14,6 @@
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mysql5;
 
 import java.sql.Connection;
@@ -22,9 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.slf4j.LoggerFactory;
-
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aionemu.commons.database.DatabaseFactory;
 import com.aionemu.gameserver.dao.MySQL5DAOUtils;
@@ -55,9 +53,11 @@ public class MySQL5PlayerPasskeyDAO extends PlayerPasskeyDAO {
 
 			stmt.execute();
 			stmt.close();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error saving PlayerPasskey. accountId: " + accountId, e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 	}
@@ -79,9 +79,11 @@ public class MySQL5PlayerPasskeyDAO extends PlayerPasskeyDAO {
 				result = true;
 			}
 			stmt.close();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error updating PlayerPasskey. accountId: " + accountId, e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 
@@ -104,9 +106,11 @@ public class MySQL5PlayerPasskeyDAO extends PlayerPasskeyDAO {
 				result = true;
 			}
 			stmt.close();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error updaing PlayerPasskey. accountId: " + accountId, e);
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 
@@ -134,10 +138,12 @@ public class MySQL5PlayerPasskeyDAO extends PlayerPasskeyDAO {
 
 			rset.close();
 			stmt.close();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error loading PlayerPasskey. accountId: " + accountId, e);
 			return false;
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 
@@ -164,10 +170,12 @@ public class MySQL5PlayerPasskeyDAO extends PlayerPasskeyDAO {
 
 			rset.close();
 			stmt.close();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			log.error("Error loading PlayerPasskey. accountId: " + accountId, e);
 			return false;
-		} finally {
+		}
+		finally {
 			DatabaseFactory.close(con);
 		}
 

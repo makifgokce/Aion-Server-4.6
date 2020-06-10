@@ -26,6 +26,7 @@ import com.aionemu.gameserver.model.gameobjects.Item;
 import com.aionemu.gameserver.model.gameobjects.PersistentState;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.items.storage.IStorage;
+import com.aionemu.gameserver.model.items.storage.ItemStorage;
 import com.aionemu.gameserver.model.items.storage.StorageType;
 import com.aionemu.gameserver.services.ExchangeService;
 import com.aionemu.gameserver.services.LegionService;
@@ -55,9 +56,7 @@ public class ItemMoveService {
 			return;
 		}
 
-		if (sourceStorageType != destinationStorageType
-				&& (ItemRestrictionService.isItemRestrictedTo(player, item, destinationStorageType) || ItemRestrictionService.isItemRestrictedFrom(player,
-						item, sourceStorageType))) {
+		if (sourceStorageType != destinationStorageType && (ItemRestrictionService.isItemRestrictedTo(player, item, destinationStorageType) || ItemRestrictionService.isItemRestrictedFrom(player, item, sourceStorageType))) {
 			sendStorageUpdatePacket(player, StorageType.getStorageTypeById(sourceStorageType), item);
 			return;
 		}
@@ -79,7 +78,7 @@ public class ItemMoveService {
 		if (!targetStorage.isFull() && item.getItemCount() > 0) {
 			sourceStorage.remove(item);
 			sendItemDeletePacket(player, StorageType.getStorageTypeById(sourceStorageType), item, ItemDeleteType.MOVE);
-			item.setEquipmentSlot(slot);
+			item.setEquipmentSlot(sourceStorageType == destinationStorageType ? slot : ItemStorage.FIRST_AVAILABLE_SLOT);
 			targetStorage.add(item);
 		}
 	}

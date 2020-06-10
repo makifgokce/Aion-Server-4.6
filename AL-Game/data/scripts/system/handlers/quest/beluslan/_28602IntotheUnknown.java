@@ -17,10 +17,9 @@
 
 package quest.beluslan;
 
-import com.aionemu.gameserver.dataholders.DataManager;
+import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.questEngine.handlers.QuestHandler;
-import com.aionemu.gameserver.model.DialogAction;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
 import com.aionemu.gameserver.questEngine.model.QuestState;
 import com.aionemu.gameserver.questEngine.model.QuestStatus;
@@ -34,7 +33,7 @@ import com.aionemu.gameserver.world.WorldMapInstance;
  *
  * Workaround FrozenKiller
  */
- 
+
 public class _28602IntotheUnknown extends QuestHandler {
 
 	private final static int questId = 28602;
@@ -89,9 +88,9 @@ public class _28602IntotheUnknown extends QuestHandler {
 		return false;
 	}
 
-	// Changed if Player didnt kill NPC's 217002 217000 216982 Instance will spawn 217006 for this Quest we need 217005	
+	// Changed if Player didnt kill NPC's 217002 217000 216982 Instance will spawn 217006 for this Quest we need 217005
 	// Workaround Both NPC's working
-	
+
 	@Override
 	public boolean onKillEvent(QuestEnv env) {
 		Player player = env.getPlayer();
@@ -109,7 +108,7 @@ public class _28602IntotheUnknown extends QuestHandler {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean onMovieEndEvent(QuestEnv env, int movieId) {
 		if (movieId != 454) {

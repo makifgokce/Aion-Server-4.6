@@ -34,4 +34,5 @@ public enum NpcRank {
 	EXPERT,
 	VETERAN,
     MASTER;
+
 }

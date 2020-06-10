@@ -170,7 +170,7 @@ public class SummonsService {
 		Player master = summon.getMaster();
 		PacketSendUtility.sendPacket(master, SM_SYSTEM_MESSAGE.STR_SKILL_SUMMON_ATTACK_MODE(summon.getNameId()));
 		PacketSendUtility.sendPacket(master, new SM_SUMMON_UPDATE(summon));
-		summon.getLifeStats().cancelRestoreTask();
+		summon.getLifeStats().triggerRestoreTask();
 	}
 
 	public static final void doMode(SummonMode summonMode, Summon summon) {

@@ -25,7 +25,12 @@ import org.slf4j.LoggerFactory;
 import com.aionemu.commons.database.dao.DAOManager;
 import com.aionemu.gameserver.configs.main.AutoGroupConfig;
 import com.aionemu.gameserver.configs.main.GSConfig;
-import com.aionemu.gameserver.dao.*;
+import com.aionemu.gameserver.dao.HouseObjectCooldownsDAO;
+import com.aionemu.gameserver.dao.ItemCooldownsDAO;
+import com.aionemu.gameserver.dao.PlayerCooldownsDAO;
+import com.aionemu.gameserver.dao.PlayerDAO;
+import com.aionemu.gameserver.dao.PlayerEffectsDAO;
+import com.aionemu.gameserver.dao.PlayerLifeStatsDAO;
 import com.aionemu.gameserver.model.gameobjects.Summon;
 import com.aionemu.gameserver.model.gameobjects.player.Player;
 import com.aionemu.gameserver.model.items.storage.StorageType;
@@ -37,7 +42,18 @@ import com.aionemu.gameserver.network.aion.clientpackets.CM_QUIT;
 import com.aionemu.gameserver.network.aion.serverpackets.SM_DELETE;
 import com.aionemu.gameserver.questEngine.QuestEngine;
 import com.aionemu.gameserver.questEngine.model.QuestEnv;
-import com.aionemu.gameserver.services.*;
+import com.aionemu.gameserver.services.AutoGroupService;
+import com.aionemu.gameserver.services.BrokerService;
+import com.aionemu.gameserver.services.ChatService;
+import com.aionemu.gameserver.services.DuelService;
+import com.aionemu.gameserver.services.ExchangeService;
+import com.aionemu.gameserver.services.FindGroupService;
+import com.aionemu.gameserver.services.KiskService;
+import com.aionemu.gameserver.services.LegionService;
+import com.aionemu.gameserver.services.PunishmentService;
+import com.aionemu.gameserver.services.RepurchaseService;
+import com.aionemu.gameserver.services.SerialKillerService;
+import com.aionemu.gameserver.services.WorldBuffService;
 import com.aionemu.gameserver.services.drop.DropService;
 import com.aionemu.gameserver.services.instance.InstanceService;
 import com.aionemu.gameserver.services.summons.SummonsService;
@@ -77,10 +93,9 @@ public class PlayerLeaveWorldService {
      * {@link CM_QUIT} and must not be called from anywhere else</b>
      */
 	public static final void startLeaveWorld(Player player) {
-		log.info("Player logged out: " + player.getName() + " Account: "
-				+ (player.getClientConnection() != null ? player.getClientConnection().getAccount().getName() : "disconnected"));
-		FindGroupService.getInstance().removeFindGroup(player.getRace(), 0x00, player.getObjectId());
-		FindGroupService.getInstance().removeFindGroup(player.getRace(), 0x04, player.getObjectId());
+		log.info("Player logged out: " + player.getName() + " Account: " + (player.getClientConnection() != null ? player.getClientConnection().getAccount().getName() : "disconnected"));
+		FindGroupService.getInstance().removeRecruitFindGroup(player.getRace(), 0x00, player.getObjectId(), player.getCommonData().getServerId(), player.isInTeam() ? 0 : 16);
+		FindGroupService.getInstance().removeApplyFindGroup(player.getRace(), 0x04, player.getObjectId());
 		player.onLoggedOut();
 		BrokerService.getInstance().removePlayerCache(player);
 		ExchangeService.getInstance().cancelExchange(player);
@@ -91,6 +106,7 @@ public class PlayerLeaveWorldService {
 		SerialKillerService.getInstance().onLogout(player);
 		InstanceService.onLogOut(player);
 		KiskService.getInstance().onLogout(player);
+		WorldBuffService.getInstance().onLogOut(player);
 		player.getMoveController().abortMove();
 
 		if (player.isLooting()) {
@@ -123,7 +139,7 @@ public class PlayerLeaveWorldService {
 		LegionService.getInstance().LegionWhUpdate(player);
 		player.getEffectController().removeAllEffects(true);
 		player.getLifeStats().cancelAllTasks();
-
+		player.getCommonData().getFriendList().setIsFriendListSent(false);
 		if (player.getLifeStats().isAlreadyDead()) {
 			if (player.isInInstance()) {
 				PlayerReviveService.instanceRevive(player);

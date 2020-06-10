@@ -93,7 +93,10 @@ public final class PlayerSkillList implements SkillList<Player> {
 	public boolean addStigmaSkill(Player player, int skillId, int skillLevel) {
 		return addSkill(player, skillId, skillLevel, true, PersistentState.NEW);
 	}
-
+	
+	public boolean addGMSkill(Player player, int skillId, int skillLevel) {
+		return addSkillAct(player, skillId, skillLevel, true, false, PersistentState.NOACTION, true);
+	}
 	/**
 	 * Add temporary skill which will not be saved in db
 	 *
@@ -196,7 +199,36 @@ public final class PlayerSkillList implements SkillList<Player> {
 		}
 		return true;
 	}
+	private synchronized boolean addSkillAct(Player player, int skillId, int skillLevel, boolean isStigma, boolean isLinked, PersistentState state, boolean isGMSkill) {
+		PlayerSkillEntry existingSkill = isStigma ? stigmaSkills.get(skillId) : basicSkills.get(skillId);
 
+		boolean isNew = false;
+		if (existingSkill != null) {
+			// if (existingSkill.getSkillLevel() >= skillLevel) {
+			// return false;
+			// }
+			existingSkill.setSkillLvl(skillLevel);
+		}
+		else {
+			if (isStigma) {
+				stigmaSkills.put(skillId, new PlayerSkillEntry(skillId, true, skillLevel, state));
+			}
+			else if (isLinked) {
+				stigmaSkills.put(skillId, new PlayerSkillEntry(skillId, false, skillLevel, state));
+			}
+			else {
+				basicSkills.put(skillId, new PlayerSkillEntry(skillId, false, skillLevel, state));
+				isNew = true;
+			}
+		}
+		if (player.isSpawned()) {
+			if (!isStigma || isGMSkill) {
+				sendMessage(player, skillId, isNew);
+			}
+		}
+		return true;
+	}
+	
 	@Override
 	public boolean isSkillPresent(int skillId) {
 		return basicSkills.containsKey(skillId) || stigmaSkills.containsKey(skillId);

@@ -10,11 +10,23 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details. *
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with Aion-Lightning.
  *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Credits goes to all Open Source Core Developer Groups listed below
+ * Please do not change here something, ragarding the developer credits, except the "developed by XXXX".
+ * Even if you edit a lot of files in this source, you still have no rights to call it as "your Core".
+ * Everybody knows that this Emulator Core was developed by Aion Lightning
+ * @-Aion-Unique-
+ * @-Aion-Lightning
+ * @Aion-Engine
+ * @Aion-Extreme
+ * @Aion-NextGen
+ * @Aion-Core Dev.
  */
-
 package com.aionemu.gameserver.network.aion.serverpackets;
 
 import java.util.Collection;
@@ -30,45 +42,46 @@ import com.aionemu.gameserver.skillengine.model.Effect;
  */
 public class SM_ABNORMAL_EFFECT extends AionServerPacket {
 
-	private int effectedId;
-	private int effectType = 1;// 1: creature 2: effected is player
-	private int abnormals;
-	private Collection<Effect> filtered;
+    private int effectedId;
+    private int effectType = 1;// 1: creature 2: effected is player
+    private int abnormals;
+    private Collection<Effect> filtered;
 
-	public SM_ABNORMAL_EFFECT(Creature effected, int abnormals, Collection<Effect> effects) {
-		this.abnormals = abnormals;
-		this.effectedId = effected.getObjectId();
-		this.filtered = effects;
+    public SM_ABNORMAL_EFFECT(Creature effected, int abnormals, Collection<Effect> effects) {
+        this.abnormals = abnormals;
+        this.effectedId = effected.getObjectId();
+        this.filtered = effects;
 
-		if (effected instanceof Player) {
-			effectType = 2;
-		}
-	}
+        if (effected instanceof Player) {
+            effectType = 2;
+        }
+    }
 
-	@Override
-	protected void writeImpl(AionConnection con) {
-		writeD(effectedId);
-		writeC(effectType); // unk
-		writeD(0); // time
-		writeD(abnormals); // unk
-		writeD(0); // unk
-		writeC(0x7F); // unk 4.5 slots ? can be 0x7F:127, 0x04:4, 0x01:1
-		writeH(filtered.size()); // effects size
+    @Override
+    protected void writeImpl(AionConnection con) {
+        writeD(effectedId);
+        writeC(effectType); //unk
+        writeD(0); // time
+        writeD(abnormals); // unk
+        writeD(0); // unk
+        writeC(0x7F);
 
-		for (Effect effect : filtered) {
-			switch (effectType) {
-				case 2:
-					writeD(effect.getEffectorId());
-				case 1:
-					writeH(effect.getSkillId());
-					writeC(effect.getSkillLevel());
-					writeC(effect.getTargetSlot());
-					writeD(effect.getRemainingTime());
-					break;
-				default:
-					writeH(effect.getSkillId());
-					writeC(effect.getSkillLevel());
-			}
-		}
-	}
+        writeH(filtered.size()); // effects size
+
+        for (Effect effect : filtered) {
+            switch (effectType) {
+                case 2:
+                    writeD(effect.getEffectorId());
+                case 1:
+                    writeH(effect.getSkillId());
+                    writeC(effect.getSkillLevel());
+                    writeC(effect.getTargetSlot());
+                    writeD(effect.getRemainingTime());
+                    break;
+                default:
+                    writeH(effect.getSkillId());
+                    writeC(effect.getSkillLevel());
+            }
+        }
+    }
 }
